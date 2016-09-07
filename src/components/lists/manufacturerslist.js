@@ -1,5 +1,6 @@
 import { Component } from 'jumpsuit'
 import {removeManufacturer, clearManufacturer} from '../../state/manufacturers'
+import Loader from '../loader'
 
 export default Component({
     componentDidMount() {
@@ -23,7 +24,7 @@ export default Component({
                 <tbody>
                 {manufacturers ? Object.keys(manufacturers).map(function (key) {
                     return <ManufacturerRow manufacturer_id={key} key={key} manufacturer={manufacturers[key]}/>
-                }) : "No" }
+                }) : <Loader/> }
                 </tbody>
             </table>
         )
@@ -40,7 +41,7 @@ const ManufacturerRow = Component({
         return (
             <tr>
                 <td>
-                    <a href={"/admin/manufacturers/edit/" + this.props.manufacturer_id} >{this.props.manufacturer.name}</a>
+                    <a href={"/admin/manufacturer/edit/" + this.props.manufacturer_id} >{this.props.manufacturer.name}</a>
                 </td>
                 <td>
                     {this.props.manufacturer.manufacturer_sys_ex_id.toString()}

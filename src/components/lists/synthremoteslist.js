@@ -3,6 +3,7 @@
  */
 import { Component } from 'jumpsuit'
 import { removeSynthremote } from '../../state/synthremotes'
+import Loader from '../loader'
 
 export default Component({
     componentDidMount() {
@@ -23,7 +24,7 @@ export default Component({
                 <tbody>
                 {synthremotes ? Object.keys(synthremotes).map(function (key) {
                     return <SynthRemoteRow synthremote_id={key} key={key} synthremote={synthremotes[key]}/>
-                }) : "No" }
+                }) : <Loader/> }
                 </tbody>
             </table>
         )
@@ -40,7 +41,7 @@ const SynthRemoteRow = Component({
         return (
             <tr>
                 <td>
-                    <a href={"/admin/sysexheaders/edit/" + this.props.synthremote_id} >{this.props.synthremote.name}</a>
+                    <a href={"/admin/synthremote/edit/" + this.props.synthremote_id} >{this.props.synthremote.name}</a>
                 </td>
                 <td>
                     {this.props.synthremote.panels ? this.props.synthremote.panels.length : 0}

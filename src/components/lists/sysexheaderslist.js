@@ -1,5 +1,6 @@
 import { Component } from 'jumpsuit'
 import { removeSysexheader, clearSysexheader } from '../../state/sysexheaders'
+import Loader from '../loader'
 
 export default Component({
     componentDidMount() {
@@ -23,7 +24,7 @@ export default Component({
                 <tbody>
                 {sysexheaders ? Object.keys(sysexheaders).map(function (key) {
                     return <SysexheadersRow sysexheader_id={key} key={key} sysexheader={sysexheaders[key]}/>
-                }) : "No" }
+                }) : <Loader/> }
                 </tbody>
             </table>
         )
@@ -40,7 +41,7 @@ const SysexheadersRow = Component({
         return (
             <tr>
                 <td>
-                    <a href={"/admin/sysexheaders/edit/" + this.props.sysexheader_id} >{this.props.sysexheader.name}</a>
+                    <a href={"/admin/sysexheader/edit/" + this.props.sysexheader_id} >{this.props.sysexheader.name}</a>
                 </td>
                 <td>
                     {this.props.sysexheader.fields ? this.props.sysexheader.fields.length : 0}

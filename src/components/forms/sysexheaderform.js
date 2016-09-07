@@ -4,6 +4,7 @@ import Selector from '../input/selector'
 import {getManufacturers} from '../../state/manufacturers'
 import sysexheaders, {addSysexheader} from '../../state/sysexheaders'
 import {eventValueHandler} from '../../utils/handlers'
+import Loader from '../loader'
 
 export default Component({
     componentDidMount() {
@@ -32,7 +33,7 @@ export default Component({
         }
         else {
             return (
-                <div>Loading...</div>
+                <Loader/>
             );
         }
     },

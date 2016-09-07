@@ -7,7 +7,7 @@ import Selector from '../input/selector'
 import {getManufacturers} from '../../state/manufacturers'
 import synthremotes, {addSynthRemote} from '../../state/synthremotes'
 import {eventValueHandler} from '../../utils/handlers'
-
+import Loader from '../loader'
 
 export default Component({
     componentDidMount() {
@@ -33,7 +33,7 @@ export default Component({
                             value={value}
                             data={data}
                             eventhandler={handler}/>;
-        const selector_or_wait = this.props.manufacturersReady ? selector : 'Loading...';
+        const selector_or_wait = this.props.manufacturersReady ? selector : <Loader/>;
         return (
             <form className="form-horizontal" onSubmit={this.submitForm}>
                 <Input

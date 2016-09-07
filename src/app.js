@@ -10,6 +10,7 @@ import Manufacturer from 'screens/manufacturer'
 import SysExHeaders from 'screens/sysexheaders'
 import SysExHeader from 'screens/sysexheader'
 import SynthRemotes from 'screens/synthremotes'
+import SynthRemote from 'screens/synthremote'
 
 
 Render(datasource, (
@@ -18,10 +19,11 @@ Render(datasource, (
             <IndexRoute component={Main} />
             <Route path="admin" component={Admin}>
                 <Route path="manufacturers" component={Manufacturers} />
-                <Route path="manufacturers/edit/:key" component={Manufacturer} />
+                <Route path="manufacturer/edit/:key" component={Manufacturer} />
                 <Route path="sysexheaders" component={SysExHeaders} />
-                <Route path="sysexheaders/edit/:key" component={SysExHeader} />
+                <Route path="sysexheader/edit/:key" component={SysExHeader} />
                 <Route path="synthremotes" component={SynthRemotes} />
+                <Route path="synthremote/edit/:key" component={SynthRemote} />
             </Route>
         </Route>
     </Router>
