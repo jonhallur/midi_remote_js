@@ -11,9 +11,12 @@ const synthremotes = State('synthremotes', {
         synthremotesReady: false,
         synthremotes: [],
         synthremoteReady: false,
-        synthremote: {},
-        synthremoteName: '',
-        manufacturerId: '',
+        synthremotePanelName: '',
+        synthremote: {
+            name: '',
+            manufacturer_id: null,
+            panels: [
+        ]}
     },
 
     setManufacturerIdField: (state, payload) => ({
@@ -26,7 +29,14 @@ const synthremotes = State('synthremotes', {
 
     setSynthRemotes: (state, payload) => ({
         synthremotes: payload
-    })
+    }),
+
+    setSynthRemote: (state, payload) => ({
+        synthremote: payload
+    }),
+    setsynthremotePanelName: (state, payload) => ({
+      synthremotePanelName: payload
+    }),
 });
 
 export default synthremotes
@@ -53,6 +63,43 @@ export function getSynthRemotes() {
     });
 }
 
+export function getSynthRemote(key) {
+    console.log("key", key);
+    firebase.database().ref('admin/synthremotes/' + key).on("value", function(snapshot) {
+        var data = snapshot.val();
+        var panels = [];
+        if (data.panels !== undefined) {
+          data.panels.forEach(panel => panels.push(panel));
+        }
+        synthremotes.setSynthRemote({
+            name: data.name,
+            manufacturer_id: data.manufacturer_id,
+            panels: panels
+        });
+    });
+    return null;
+}
+
+export function addPanel(key, name) {
+    if(!(key && name !== undefined)) {
+        console.log("broken input");
+        return;
+    }
+    var ref = firebase.database().ref('admin/synthremotes/' + key + '/panels');
+    ref.once("value").then(function(snapshot) {
+        if(snapshot.exists()) {
+            var data = snapshot.val()
+            var list = []
+            data.forEach(item => list.push(item));
+            list.push({name:name})
+            ref.set(list);
+        }
+        else {
+            ref.set([{name: name}]);
+        }
+    });
+}
+
 export function removeSynthremote(key) {
     var ref = firebase.database().ref('admin/synthremotes');
     ref.child(key).remove(function(error) {
@@ -63,4 +110,16 @@ export function removeSynthremote(key) {
             console.log("sysexheader removal error")
         }
     })
+}
+
+export function deleteSynthRemotePanel(key, id) {
+  var ref = firebase.database().ref('admin/synthremotes/' +  key + '/panels');
+  ref.once('value').then(function(snapshot) {
+    if(snapshot.exists()) {
+      var list = []
+      snapshot.val().forEach(item => list.push(item));
+      list.splice(id, 1);
+      ref.set(list);
+    }
+  })
 }

@@ -19,7 +19,7 @@ export default Component({
                 <h3>Edit SysExHeader</h3>
                 <div className="panel panel-default">
                     <div className="panel-heading">
-                        <h4>Edit Header</h4>
+                        <h4>Edit Name</h4>
                     </div>
                     <div className="panel-body">
                         <SysExHeaderForm/>

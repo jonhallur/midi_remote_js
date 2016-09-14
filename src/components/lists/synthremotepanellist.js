@@ -1,62 +1,53 @@
 import { Component } from 'jumpsuit'
-import {swapSysexheaderfields, deleteSysexheaderfield} from '../../state/sysexheaders'
-import Loader from '../loader'
+import { deleteSynthRemotePanel} from '../../state/synthremotes'
+import {DragSource, DropTarget} from 'react-dnd'
 
-export default Component({
+const ItemTypes = {
+  PANELROW: 'panelrow'
+};
 
-    render () {
-        var panels = {0: {name: "name", value: 100, channel_mod: true}, 1: {name: "foo", value: 200, channel_mod: false}, 2: {name: "another", value: 250, channel_mod: true}};
-        //var fields = this.props.fields;
-        var params = this.props.params;
-        return (
-
-            <table className="table table-hover">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Remote</th>
-                    <th>MOVE</th>
-                </tr>
-                </thead>
-                <tbody>
-                {panels ? Object.keys(panels).map(function (key) {
-                    return <SysExHeaderFieldRow params={params} field_id={key} key={key} panel={panels[key]}/>
-                }) : <tr><td><Loader/></td><td><Loader/></td><td><Loader/></td></tr> }
-                </tbody>
-            </table>
-
-        )
+const rowSource = {
+  beginDrag(props) {
+    return {
+      field_id: props.field_id,
+      index: props.index
     }
-}, (state) => ({
-    fields: state.sysexheaders.sysexheaderFields
-}))
+  }
+};
 
-var target_id;
-var source_id;
+const rowTarget = {
+  hover(props, monitor, component) {
+    const dragIndex = monitor.getItem().index;
+    const hoverIndex = props.index;
 
-const SysExHeaderFieldRow = Component({
+    // Don't replace items with themselves
+    if (dragIndex === hoverIndex) {
+      return;
+    }
+  },
+
+  drop(props, monitor, component) {
+    let source = props.field_id
+    let target = monitor.getItem().field_id
+    if (source === 'undefined' || target === 'undefined')
+    {
+      return;
+    }
+  }
+};
+
+
+const SynthPanelRow = Component({
     deleteField(event) {
         event.preventDefault();
         var id = event.target.id;
+        deleteSynthRemotePanel(this.props.params.key, id);
         //deleteSysexheaderfield(this.props.params.key, id);
-    },
-    dragHandler(object) {
-        source_id = object.target.id;
-
-    },
-    dragEnter(object) {
-        target_id = object.target.id;
-
-    },
-    dragEnd() {
-        if(source_id === target_id) {
-            return;
-        }
-        //swapSysexheaderfields(this.props.params.key, source_id, target_id);
     },
 
     render() {
-        return (
+      const { text, isDragging, connectDragSource, connectDropTarget } = this.props;
+        return connectDragSource(connectDropTarget(
             <tr >
                 <td>
                     {this.props.panel.name}
@@ -64,13 +55,45 @@ const SysExHeaderFieldRow = Component({
                 <td>
                     <a id={this.props.field_id} href="#" onClick={this.deleteField}><span id={this.props.field_id} className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
                 </td>
-                <td id={this.props.field_id} draggable="true"  onDragEnd={this.dragEnd} onDrag={this.dragHandler} onDragEnter={this.dragEnter}>
-                    <span id={this.props.field_id} className="glyphicon glyphicon-resize-vertical" aria-hidden="true"></span>
-                </td>
             </tr>
-        )
+        ))
     }
-
 });/**
  * Created by jonhallur on 07/09/16.
  */
+
+const TargetSynthPanelRow = DropTarget(ItemTypes.PANELROW, rowTarget, connect => ({
+  connectDropTarget: connect.dropTarget()
+}))(SynthPanelRow);
+
+const SourceTargetSynthPanelRow = DragSource(ItemTypes.PANELROW, rowSource, (connect, monitor) => ({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging()
+}))(TargetSynthPanelRow);
+
+
+export default Component({
+  render () {
+    let params = this.props.params;
+    let panels = this.props.panels;
+    return (
+
+      <table className="table table-hover">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Remove</th>
+        </tr>
+        </thead>
+        <tbody>
+        {this.props.panels.map(function (panel, index) {
+          return <SourceTargetSynthPanelRow params={params} field_id={index} key={index} panel={panel}/>
+        })}
+        </tbody>
+      </table>
+
+    )
+  }
+}, (state) => ({
+  panels: state.synthremotes.synthremote.panels
+}))
