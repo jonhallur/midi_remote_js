@@ -61,7 +61,7 @@ export default Component({
 }, (state) => ({
     manufacturersReady: state.manufacturers.manufacturersReady,
     manufacturers: state.manufacturers.manufacturers,
-    sysexheaderName: state.sysexheaders.sysexheaderName,
-    sysexheaderManufacturerId: state.sysexheaders.sysexheaderManufacturerId,
+    sysexheaderName: state.sysexheaders.sysexheader.name,
+    sysexheaderManufacturerId: state.sysexheaders.sysexheader.manufacturer_id,
     sysexheaderReady: state.sysexheaders.sysexheaderReady
 }))

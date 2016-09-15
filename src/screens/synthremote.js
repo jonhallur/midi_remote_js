@@ -10,7 +10,6 @@ import SynthRemotePanelList from '../components/lists/synthremotepanellist'
 
 export default Component({
     componentDidMount() {
-        console.log("get single synthremote")
         getSynthRemote(this.props.params.key)
     },
 

@@ -3,6 +3,7 @@
  */
 import {Component} from 'jumpsuit'
 import Input from '../input/input'
+import Button from '../input/button'
 import Selector from '../input/selector'
 import {getManufacturers} from '../../state/manufacturers'
 import synthremotes, {addSynthRemote} from '../../state/synthremotes'
@@ -43,6 +44,7 @@ export default Component({
                     onChange={eventValueHandler.bind(this, synthremotes.setNameField)}
                     placeholder="Model Name"/>
                 {selector_or_wait}
+                <Button label={this.props.synthremoteReady ? 'Update' : 'Create'} />
             </form>
             )
 
@@ -50,6 +52,7 @@ export default Component({
 }, (state) => ({
     manufacturers: state.manufacturers.manufacturers,
     manufacturersReady: state.manufacturers.manufacturersReady,
-    synthremoteManufacturerId: state.synthremotes.manufacturerId,
-    synthremoteName: state.synthremotes.synthremoteName
+    synthremoteManufacturerId: state.synthremotes.synthremote.manufacturer_id,
+    synthremoteName: state.synthremotes.synthremote.name,
+    synthremoteReady: state.synthremotes.synthremoteReady
 }))

@@ -1,4 +1,4 @@
-import { Render, Router, Route, IndexRoute, Middleware } from 'jumpsuit'
+import { Render, Router, Route, IndexRoute } from 'jumpsuit'
 /* state */
 import datasource from 'state/index'
 /* screens */
@@ -11,6 +11,7 @@ import SysExHeaders from 'screens/sysexheaders'
 import SysExHeader from 'screens/sysexheader'
 import SynthRemotes from 'screens/synthremotes'
 import SynthRemote from 'screens/synthremote'
+import SynthPanel from 'screens/synthpanel'
 
 
 Render(datasource, (
@@ -24,6 +25,7 @@ Render(datasource, (
                 <Route path="sysexheader/edit/:key" component={SysExHeader} />
                 <Route path="synthremotes" component={SynthRemotes} />
                 <Route path="synthremote/edit/:key" component={SynthRemote} />
+                <Route path="synthremote/:remote_id/panel/edit/:panel_id" component={SynthPanel} />
             </Route>
         </Route>
     </Router>

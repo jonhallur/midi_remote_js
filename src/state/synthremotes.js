@@ -2,7 +2,7 @@
  * Created by jonhallur on 3.9.2016.
  */
 import { State } from 'jumpsuit';
-import {firebase_initialized, initializeFirebase} from './test'
+import { initializeFirebase} from './test'
 
 var firebase = require('firebase');
 
@@ -14,7 +14,7 @@ const synthremotes = State('synthremotes', {
         synthremotePanelName: '',
         synthremote: {
             name: '',
-            manufacturer_id: null,
+            manufacturer_id: '',
             panels: [
         ]}
     },
@@ -28,11 +28,15 @@ const synthremotes = State('synthremotes', {
     }),
 
     setSynthRemotes: (state, payload) => ({
-        synthremotes: payload
+        synthremotes: payload,
+        synthremotesReady: true,
+        synthremoteReady: false
     }),
 
     setSynthRemote: (state, payload) => ({
-        synthremote: payload
+        synthremote: payload,
+        synthremoteReady: true,
+        synthremotesReady: false
     }),
     setsynthremotePanelName: (state, payload) => ({
       synthremotePanelName: payload
@@ -88,14 +92,13 @@ export function addPanel(key, name) {
     var ref = firebase.database().ref('admin/synthremotes/' + key + '/panels');
     ref.once("value").then(function(snapshot) {
         if(snapshot.exists()) {
-            var data = snapshot.val()
-            var list = []
-            data.forEach(item => list.push(item));
-            list.push({name:name})
-            ref.set(list);
+            let panels = [];
+            snapshot.val().forEach(panel => panels.push(panel));
+            panels.push({name:name, controls: []});
+            ref.set(panels);
         }
         else {
-            ref.set([{name: name}]);
+            ref.set([{name: name, controls: []}]);
         }
     });
 }
@@ -112,14 +115,28 @@ export function removeSynthremote(key) {
     })
 }
 
+export function swapSynthRemotePanels(key, source, target) {
+  var ref = firebase.database().ref('admin/synthremotes/' +  key + '/panels');
+  ref.once('value').then(function(snapshot) {
+    if(snapshot.exists()) {
+      var panels = [];
+      snapshot.val().forEach(panel => panels.push(panel));
+      let temp = panels[source];
+      panels[source] = panels[target];
+      panels[target] = temp;
+      ref.set(panels);
+    }
+  })
+}
+
 export function deleteSynthRemotePanel(key, id) {
   var ref = firebase.database().ref('admin/synthremotes/' +  key + '/panels');
   ref.once('value').then(function(snapshot) {
     if(snapshot.exists()) {
-      var list = []
-      snapshot.val().forEach(item => list.push(item));
-      list.splice(id, 1);
-      ref.set(list);
+      var panels = [];
+      snapshot.val().forEach(panel => panels.push(panel));
+      panels.splice(id, 1);
+      ref.set(panels);
     }
   })
 }

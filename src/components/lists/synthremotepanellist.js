@@ -1,5 +1,5 @@
 import { Component } from 'jumpsuit'
-import { deleteSynthRemotePanel} from '../../state/synthremotes'
+import { deleteSynthRemotePanel, swapSynthRemotePanels} from '../../state/synthremotes'
 import {DragSource, DropTarget} from 'react-dnd'
 
 const ItemTypes = {
@@ -9,7 +9,7 @@ const ItemTypes = {
 const rowSource = {
   beginDrag(props) {
     return {
-      field_id: props.field_id,
+      panel_id: props.panel_id,
       index: props.index
     }
   }
@@ -27,12 +27,13 @@ const rowTarget = {
   },
 
   drop(props, monitor, component) {
-    let source = props.field_id
-    let target = monitor.getItem().field_id
-    if (source === 'undefined' || target === 'undefined')
+    let source = props.panel_id;
+    let target = monitor.getItem().panel_id;
+    if (source === undefined || target === undefined)
     {
       return;
     }
+    swapSynthRemotePanels(component.props.params.key, source, target);
   }
 };
 
@@ -42,18 +43,20 @@ const SynthPanelRow = Component({
         event.preventDefault();
         var id = event.target.id;
         deleteSynthRemotePanel(this.props.params.key, id);
-        //deleteSysexheaderfield(this.props.params.key, id);
     },
 
     render() {
-      const { text, isDragging, connectDragSource, connectDropTarget } = this.props;
+        const { connectDragSource, connectDropTarget, isOver } = this.props;
+        let href='/admin/synthremote/' + this.props.params.key + '/panel/edit/' + this.props.panel_id;
         return connectDragSource(connectDropTarget(
-            <tr >
+            <tr className={isOver ? 'active' : ''}>
                 <td>
-                    {this.props.panel.name}
+                    <a href={href}>{this.props.panel.name}</a>
                 </td>
                 <td>
-                    <a id={this.props.field_id} href="#" onClick={this.deleteField}><span id={this.props.field_id} className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                    <a id={this.props.panel_id} href="#" onClick={this.deleteField}>
+                      <span className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                    </a>
                 </td>
             </tr>
         ))
@@ -62,8 +65,9 @@ const SynthPanelRow = Component({
  * Created by jonhallur on 07/09/16.
  */
 
-const TargetSynthPanelRow = DropTarget(ItemTypes.PANELROW, rowTarget, connect => ({
-  connectDropTarget: connect.dropTarget()
+const TargetSynthPanelRow = DropTarget(ItemTypes.PANELROW, rowTarget, (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver()
 }))(SynthPanelRow);
 
 const SourceTargetSynthPanelRow = DragSource(ItemTypes.PANELROW, rowSource, (connect, monitor) => ({
@@ -75,7 +79,7 @@ const SourceTargetSynthPanelRow = DragSource(ItemTypes.PANELROW, rowSource, (con
 export default Component({
   render () {
     let params = this.props.params;
-    let panels = this.props.panels;
+
     return (
 
       <table className="table table-hover">
@@ -87,7 +91,7 @@ export default Component({
         </thead>
         <tbody>
         {this.props.panels.map(function (panel, index) {
-          return <SourceTargetSynthPanelRow params={params} field_id={index} key={index} panel={panel}/>
+          return <SourceTargetSynthPanelRow params={params} panel_id={index} key={index} panel={panel}/>
         })}
         </tbody>
       </table>
