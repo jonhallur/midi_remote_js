@@ -19,6 +19,17 @@ export default Component({
         event.preventDefault();
         addSynthRemote(this.props.synthremoteName, this.props.synthremoteManufacturerId)
     },
+    updateNameField(event) {
+        let name = event.target.value;
+        let object = {name: name, manufacturer_id: this.props.synthremoteManufacturerId}
+        synthremotes.setSynthRemote(object)
+    },
+
+    updateManufacturerId(event) {
+        let man_id = event.target.value;
+        let object = {name: this.props.synthremoteName, manufacturer_id: man_id}
+        synthremotes.setSynthRemote(object)
+    },
 
     render() {
         var id = "manufacturerSelector";
@@ -26,7 +37,7 @@ export default Component({
         var default_text = "Please Select Manufacturer";
         var value = this.props.synthremoteManufacturerId;
         var data = this.props.manufacturers;
-        var handler = eventValueHandler.bind(this, synthremotes.setManufacturerIdField);
+        var handler = this.updateManufacturerId;
         const selector = <Selector
                             id={id}
                             label={label}
@@ -41,7 +52,7 @@ export default Component({
                     type="text"
                     className="form-control"
                     value={this.props.synthremoteName}
-                    onChange={eventValueHandler.bind(this, synthremotes.setNameField)}
+                    onChange={this.updateNameField}
                     placeholder="Model Name"/>
                 {selector_or_wait}
                 <Button label={this.props.synthremoteReady ? 'Update' : 'Create'} />

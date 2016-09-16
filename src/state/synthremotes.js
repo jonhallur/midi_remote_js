@@ -134,6 +134,7 @@ export function deleteSynthRemotePanel(key, id) {
   ref.once('value').then(function(snapshot) {
     if(snapshot.exists()) {
       var panels = [];
+        console.log("deleting id", id);
       snapshot.val().forEach(panel => panels.push(panel));
       panels.splice(id, 1);
       ref.set(panels);

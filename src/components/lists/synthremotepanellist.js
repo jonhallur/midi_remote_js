@@ -49,13 +49,13 @@ const SynthPanelRow = Component({
         const { connectDragSource, connectDropTarget, isOver } = this.props;
         let href='/admin/synthremote/' + this.props.params.key + '/panel/edit/' + this.props.panel_id;
         return connectDragSource(connectDropTarget(
-            <tr className={isOver ? 'active' : ''}>
+            <tr className={isOver ? 'warning' : ''}>
                 <td>
                     <a href={href}>{this.props.panel.name}</a>
                 </td>
                 <td>
                     <a id={this.props.panel_id} href="#" onClick={this.deleteField}>
-                      <span className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                      <span id={this.props.panel_id} className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
                     </a>
                 </td>
             </tr>
