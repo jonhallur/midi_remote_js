@@ -3,6 +3,7 @@
  */
 import {Component} from 'jumpsuit'
 import SynthPanelForm from '../components/forms/synthremotepanelform'
+import SynthRemoteControlForm from '../components/forms/synthremotecontrolform'
 
 export default Component({
   componentDidMount() {
@@ -15,6 +16,7 @@ export default Component({
       <div>
         <h3>Edit Synth Panel</h3>
         <SynthPanelForm params={this.props.params}/>
+        <SynthRemoteControlForm />
       </div>
     )
   }

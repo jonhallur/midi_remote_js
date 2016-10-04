@@ -10,7 +10,8 @@ const synthpanels = State('synthpanels', {
     synthpanelsReady: false,
     synthpanels: [],
     synthpanelReady: false,
-    synthpanel: {name: '', controls: []}
+    synthpanel: {name: '', controls: []},
+    selectedType: ''
   },
 
   setPanels: (state, payload) => ({
@@ -24,7 +25,9 @@ const synthpanels = State('synthpanels', {
     synthpanel: payload,
     synthpanelReady: true,
     synthpanelsReady: false
-  })
+  }),
+  
+  
 });
 
 export default synthpanels
