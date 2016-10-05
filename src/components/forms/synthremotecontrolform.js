@@ -3,6 +3,7 @@
  */
 import {Component} from 'jumpsuit'
 import Selector from '../input/arrayselector'
+import Input from '../input/input'
 import synthpanels from '../../state/synthpanels'
 import {getSysExHeaderFromManufacturerId} from '../../state/sysexheaders'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../../pojos/constants'
@@ -13,6 +14,8 @@ export default Component({
 
   render() {
     let isSysEx = this.props.selectedType === CONTROLTYPE.SYSEX.toString();
+    let isRange = this.props.selectedSubType === SUBCONTROLTYPE.RANGE.toString();
+    let isToggle = this.props.selectedSubType === SUBCONTROLTYPE.TOGGLE.toString();
     return (
       <form className="form-horizontal">
         <Selector
@@ -32,6 +35,8 @@ export default Component({
           eventhandler={(event) => synthpanels.setSelectedSubType(event.target.value)}
         />
         {isSysEx ? <SysExFormExtra params={this.props.params} /> : ''}
+        {isRange ? <RangeForm params={this.props.params} /> : '' }
+        {isToggle ? <ToggleForm params={this.props.params} /> : '' }
         <button className="btn btn-default">Add Controller</button>
       </form>
     )
@@ -74,3 +79,53 @@ const SysExFormExtra = Component({
   selectedSysExHeader: state.synthpanels.selectedSysExHeader,
   compatibleSysExHeaders: state.sysexheaders.compatibleSysExHeaders,
 }));
+
+const RangeForm = Component({
+  render() {
+    return (
+      <div>
+        <Input
+          placeholder="Parameter Number"
+          type="number"
+        />
+        <Input
+          placeholder="Minimum Value"
+          type="number"
+        />
+        <Input
+          placeholder="Maximum Value"
+          type="number"
+        />
+        <Input
+          placeholder="Default Value"
+          type="number"
+        />
+      </div>
+    )
+  }
+});
+
+const ToggleForm = Component({
+  render() {
+    return (
+      <div>
+        <Input
+          placeholder="Parameter Number"
+          type="number"
+        />
+        <Input
+          placeholder="On Value"
+          type="number"
+        />
+        <Input
+          placeholder="Off Value"
+          type="number"
+        />
+        <Input
+          placeholder="Default Value"
+          type="checkbox"
+        />
+      </div>
+    )
+  }
+});

@@ -25,7 +25,7 @@ export default Component({
         </div>
         <div className="panel panel-default">
           <div className="panel-heading">
-            <h4>Edit Basic Info</h4>
+            <h4>Create Control</h4>
           </div>
           <div className="panel-body">
             <SynthRemoteControlForm params={this.props.params}/>
