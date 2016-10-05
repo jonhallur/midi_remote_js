@@ -11,7 +11,9 @@ const synthpanels = State('synthpanels', {
     synthpanels: [],
     synthpanelReady: false,
     synthpanel: {name: '', controls: []},
-    selectedType: ''
+    selectedType: '',
+    selectedSubType: '',
+    selectedSysExHeader: '',
   },
 
   setPanels: (state, payload) => ({
@@ -26,6 +28,20 @@ const synthpanels = State('synthpanels', {
     synthpanelReady: true,
     synthpanelsReady: false
   }),
+
+  setSelectedType: (state, payload) => ({
+    selectedType: payload
+  }),
+
+  setSelectedSubType: (state, payload) => ({
+    selectedSubType: payload
+  }),
+
+  setSelectedSysExHeader: (state, payload) => ({
+    selectedSysExHeader: payload
+  })
+
+
   
   
 });

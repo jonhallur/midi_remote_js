@@ -3,8 +3,9 @@
  */
 import { State } from 'jumpsuit';
 import { initializeFirebase} from './test'
+import firebase from 'firebase'
 
-var firebase = require('firebase');
+//var firebase = require('firebase');
 
 const sysexheaders = State('sysexheaders', {
     initial: {
@@ -13,6 +14,7 @@ const sysexheaders = State('sysexheaders', {
             manufacturer_id: '',
             fields: []
         },
+        sysexheadername: '',
         sysexheaderReady: false,
         sysexheaderFields: [],
         sysexheaderExists: false,
@@ -20,7 +22,8 @@ const sysexheaders = State('sysexheaders', {
         sysexheaders: [],
         sysexheaderFieldName: '',
         sysexheaderFieldValue: '',
-        sysexheaderFieldChannelMod: false
+        sysexheaderFieldChannelMod: false,
+        compatibleSysExHeaders: []
     },
 
     setSysexheader: (state, payload) => ({
@@ -29,11 +32,17 @@ const sysexheaders = State('sysexheaders', {
     }),
 
     setNameField: (state, payload) => ({
-      sysexheaderName: payload
+      sysexheader: {
+          name: payload,
+          manufacturer_id: state.sysexheader.manufacturer_id,
+          fields: state.sysexheader.fields }
     }),
 
     setManufacturerIdField: (state, payload) => ({
-        sysexheaderManufacturerId: payload
+        sysexheader: {
+            name: state.sysexheader.name,
+            manufacturer_id: payload,
+            fields: state.sysexheader.fields }
     }),
     setSysexheaders: (state, payload) => ({
         sysexheaders: payload,
@@ -47,6 +56,9 @@ const sysexheaders = State('sysexheaders', {
     }),
     setFieldChannelMod: (state, payload) => ({
         sysexheaderFieldChannelMod: payload
+    }),
+    setCompatibleSysexHeaders: (state, payload) => ({
+        compatibleSysExHeaders: payload
     })
 
 });
@@ -152,4 +164,18 @@ export  function getSingleSysexheader(key) {
         sysexheaders.setSysexheader(snapshot.val());
     });
     return null;
+}
+
+export function getSysExHeaderFromManufacturerId(manufacturerId) {
+    console.log(manufacturerId);
+    firebase.database().ref('admin/sysexheaders').on('value', function(snapshot) {
+        let compatibleSysExHeaders = [];
+        snapshot.forEach(function(item) {
+            let value = item.val();
+            if (value.manufacturer_id === manufacturerId) {
+                compatibleSysExHeaders.push({value: item.key, name: value.name})
+            }
+        });
+        sysexheaders.setCompatibleSysexHeaders(compatibleSysExHeaders);
+    })
 }

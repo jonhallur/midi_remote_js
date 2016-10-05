@@ -21,7 +21,7 @@ export default Component({
                         ref={this.props.id}
                         value={this.props.value}
                         onChange={this.props.eventhandler} >
-                        <option disabled value>{this.props.default_text}</option>
+                        <option disabled value="">{this.props.default_text}</option>
                         {this.props.data.map(item =>
                             <Option key={item.value} id={item.value} name={item.name}/>
                         )}

@@ -15,8 +15,22 @@ export default Component({
     return (
       <div>
         <h3>Edit Synth Panel</h3>
-        <SynthPanelForm params={this.props.params}/>
-        <SynthRemoteControlForm />
+        <div className="panel panel-default">
+          <div className="panel-heading">
+            <h4>Edit Basic Info</h4>
+          </div>
+          <div className="panel-body">
+            <SynthPanelForm params={this.props.params}/>
+          </div>
+        </div>
+        <div className="panel panel-default">
+          <div className="panel-heading">
+            <h4>Edit Basic Info</h4>
+          </div>
+          <div className="panel-body">
+            <SynthRemoteControlForm params={this.props.params}/>
+          </div>
+        </div>
       </div>
     )
   }

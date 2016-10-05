@@ -26,7 +26,7 @@ export default Component({
             var default_text = "Please Select Manufacturer";
             var value = this.props.sysexheaderManufacturerId;
             var data = this.props.manufacturers;
-            var handler = eventValueHandler.bind(this, sysexheaders.setManufacturerIdField);
+            var handler = (event) => sysexheaders.setManufacturerIdField(event.target.value);
             return (
                 <Selector id={id} label={label} default_text={default_text} value={value} data={data} eventhandler={handler}/>
             )
@@ -52,7 +52,13 @@ export default Component({
         );
         return (
         <form className="form-horizontal" onSubmit={this.submitForm}>
-            <Input className="form-control" type="text" id="sysexheaderName" placeholder="Name" value={this.props.sysexheaderName} onChange={eventValueHandler.bind(this, sysexheaders.setNameField)}/>
+            <Input
+              className="form-control"
+              type="text"
+              id="sysexheaderName"
+              placeholder="Name"
+              value={this.props.sysexheaderName}
+              onChange={(event) => sysexheaders.setNameField(event.target.value)}/>
             {this.renderManufacturerSelector()}
             {submitButton}
         </form>

@@ -24,7 +24,7 @@ export default Component({
                 <tbody>
                 {sysexheaders ? Object.keys(sysexheaders).map(function (key) {
                     return <SysexheadersRow sysexheader_id={key} key={key} sysexheader={sysexheaders[key]}/>
-                }) : <Loader/> }
+                }) : "" }
                 </tbody>
             </table>
         )
