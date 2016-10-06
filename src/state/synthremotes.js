@@ -38,7 +38,7 @@ const synthremotes = State('synthremotes', {
         synthremoteReady: true,
         synthremotesReady: false
     }),
-    setsynthremotePanelName: (state, payload) => ({
+    setSynthremotePanelName: (state, payload) => ({
       synthremotePanelName: payload
     }),
 });
@@ -68,7 +68,7 @@ export function getSynthRemotes() {
 }
 
 export function getSynthRemote(key) {
-    console.log("key", key);
+    let synthRemote;
     firebase.database().ref('admin/synthremotes/' + key).on("value", function(snapshot) {
         var data = snapshot.val();
         var panels = [];
@@ -80,8 +80,9 @@ export function getSynthRemote(key) {
             manufacturer_id: data.manufacturer_id,
             panels: panels
         });
+        synthRemote = data;
     });
-    return null;
+    return synthRemote;
 }
 
 export function addPanel(key, name) {

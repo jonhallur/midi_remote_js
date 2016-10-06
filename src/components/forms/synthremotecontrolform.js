@@ -11,6 +11,10 @@ import {CONTROLTYPE, SUBCONTROLTYPE} from '../../pojos/constants'
 import {getSynthRemote} from '../../state/synthremotes'
 
 export default Component({
+  componentDidMount() {
+    getSynthRemote(this.props.params.remote_id);
+  },
+    
   onAddControlBtnClick(event) {
     event.preventDefault();
     let controlType = this.props.selectedType;
@@ -27,7 +31,6 @@ export default Component({
     let isRange = this.props.selectedSubType === SUBCONTROLTYPE.RANGE.toString();
     let isToggle = this.props.selectedSubType === SUBCONTROLTYPE.TOGGLE.toString();
     let isList = this.props.selectedSubType === SUBCONTROLTYPE.LIST.toString();
-    let showCreateButton = (this.props.selectedType !== '') && (this.props.selectedSubType !== '');
     return (
       <form className="form-horizontal">
         <Selector
@@ -50,11 +53,11 @@ export default Component({
         {isRange ? <RangeForm params={this.props.params} /> : '' }
         {isToggle ? <ToggleForm params={this.props.params} /> : '' }
         {isList ? <ListForm params={this.props.params} /> : ''}
-        <button className={showCreateButton ? "btn btn-default" : "hidden"} onClick={this.onAddControlBtnClick}>Add Controller</button>
       </form>
     )
   }
 }, (state) => ({
+
   controlTypes: state.midicontrols.types,
   controlSubTypes: state.midicontrols.subtypes,
   selectedType: state.midicontrols.selectedType,
@@ -63,9 +66,8 @@ export default Component({
 
 const SysExFormExtra = Component({
   componentDidMount() {
-    getSynthRemote(this.props.params.remote_id);
+
     if (this.props.manufacturerId) {
-      console.log("has manid");
       getSysExHeaderFromManufacturerId(this.props.manufacturerId)
 
     }
@@ -87,39 +89,65 @@ const SysExFormExtra = Component({
    )
   }
 }, (state) => ({
-  manufacturerId: state.synthremotes.synthremote.manufacturer_id,
   selectedSysExHeader: state.synthpanels.selectedSysExHeader,
   compatibleSysExHeaders: state.sysexheaders.compatibleSysExHeaders,
+  manufacturerId: state.synthremotes.synthremote.manufacturer_id
 }));
 
 const RangeForm = Component({
   render() {
+    let showCreateButton = (this.props.selectedType !== '') && (this.props.selectedSubType !== '');
     return (
       <div>
         <Input
           placeholder="Parameter Name"
           type="text"
+          id="parameter_name"
+          value={this.props.name}
+          onChange={(event) => midicontrols.setName(event.target.value)}
         />
         <Input
           placeholder="Parameter Number"
           type="number"
+          id="parameter_number"
+          value={this.props.parameter}
+          onChange={(event) => midicontrols.setParameter(event.target.value)}
         />
         <Input
           placeholder="Minimum Value"
           type="number"
+          id="parameter_minimum"
+          value={this.props.minimum}
+          onChange={(event) => midicontrols.setMinimum(event.target.value)}
         />
         <Input
           placeholder="Maximum Value"
           type="number"
+          id="parameter_maximum"
+          value={this.props.maximum}
+          onChange={(event) => midicontrols.setMaximum(event.target.value)}
         />
         <Input
           placeholder="Default Value"
           type="number"
+          id="parameter_default"
+          value={this.props.default}
+          onChange={(event) => midicontrols.setDefault(event.target.value)}
         />
+        <button className={showCreateButton ? "btn btn-default" : "hidden"} onClick={this.onAddControlBtnClick}>Add Range</button>
+
       </div>
     )
   }
-});
+}, (state) => ({
+  name: state.midicontrols.name,
+  parameter: state.midicontrols.parameter,
+  minimum: state.midicontrols.minimum,
+  maximum: state.midicontrols.maximum,
+  default: state.midicontrols.default,
+  selectedType: state.midicontrols.selectedType,
+  selectedSubType: state.midicontrols.selectedSubType
+}));
 
 const ToggleForm = Component({
   render() {

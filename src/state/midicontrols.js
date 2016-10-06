@@ -1,6 +1,3 @@
-/**
- * Created by jonh on 5.10.2016.
- */
 import {State} from 'jumpsuit'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 
@@ -9,6 +6,7 @@ const midicontrols = State('midicontrols', {
     selectedType: '',
     selectedSubType: '',
     selectedSysExHeader: '',
+    name: '',
     parameter: '',
     minimum: '',
     maximum: '',
@@ -40,6 +38,26 @@ const midicontrols = State('midicontrols', {
 
   setSelectedSysExHeader: (state, payload) => ({
     selectedSysExHeader: payload
+  }),
+
+  setName: (state, payload) => ({
+    name: payload
+  }),
+
+  setParameter: (state, payload) => ({
+    parameter: payload
+  }),
+
+  setMinimum: (state, payload) => ({
+    minimum: payload
+  }),
+
+  setMaximum: (state, payload) => ({
+    maximum: payload
+  }),
+
+  setDefault: (state, payload) => ({
+    default: payload
   })
 });
 

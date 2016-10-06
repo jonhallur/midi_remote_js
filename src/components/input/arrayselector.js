@@ -1,9 +1,3 @@
-/**
- * Created by jonhallur on 04/10/16.
- */
-/**
- * Created by jonhallur on 3.9.2016.
- */
 import {Component} from 'jumpsuit'
 
 export default Component({

@@ -167,7 +167,7 @@ export  function getSingleSysexheader(key) {
 }
 
 export function getSysExHeaderFromManufacturerId(manufacturerId) {
-    console.log(manufacturerId);
+    console.log("manud", manufacturerId);
     firebase.database().ref('admin/sysexheaders').on('value', function(snapshot) {
         let compatibleSysExHeaders = [];
         snapshot.forEach(function(item) {
