@@ -4,18 +4,30 @@
 import {Component} from 'jumpsuit'
 import Selector from '../input/arrayselector'
 import Input from '../input/input'
-import synthpanels from '../../state/synthpanels'
+import CheckBox from '../input/checkbox'
+import midicontrols from '../../state/midicontrols'
 import {getSysExHeaderFromManufacturerId} from '../../state/sysexheaders'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../../pojos/constants'
 import {getSynthRemote} from '../../state/synthremotes'
 
 export default Component({
+  onAddControlBtnClick(event) {
+    event.preventDefault();
+    let controlType = this.props.selectedType;
+    let controlSubType = this.props.selectedSubType;
 
+
+  },
+  addControl(type, subType) {
+
+  },
 
   render() {
     let isSysEx = this.props.selectedType === CONTROLTYPE.SYSEX.toString();
     let isRange = this.props.selectedSubType === SUBCONTROLTYPE.RANGE.toString();
     let isToggle = this.props.selectedSubType === SUBCONTROLTYPE.TOGGLE.toString();
+    let isList = this.props.selectedSubType === SUBCONTROLTYPE.LIST.toString();
+    let showCreateButton = (this.props.selectedType !== '') && (this.props.selectedSubType !== '');
     return (
       <form className="form-horizontal">
         <Selector
@@ -24,7 +36,7 @@ export default Component({
           data={this.props.controlTypes}
           label="Controller Type"
           default_text="Select controller type"
-          eventhandler={(event) => synthpanels.setSelectedType(event.target.value)}
+          eventhandler={(event) => midicontrols.setSelectedType(event.target.value)}
           />
         <Selector
           id="subtypeSelector"
@@ -32,21 +44,21 @@ export default Component({
           data={this.props.controlSubTypes}
           label="Controller Sub-Type"
           default_text="Select sub-controller type"
-          eventhandler={(event) => synthpanels.setSelectedSubType(event.target.value)}
+          eventhandler={(event) => midicontrols.setSelectedSubType(event.target.value)}
         />
         {isSysEx ? <SysExFormExtra params={this.props.params} /> : ''}
         {isRange ? <RangeForm params={this.props.params} /> : '' }
         {isToggle ? <ToggleForm params={this.props.params} /> : '' }
-        <button className="btn btn-default">Add Controller</button>
+        {isList ? <ListForm params={this.props.params} /> : ''}
+        <button className={showCreateButton ? "btn btn-default" : "hidden"} onClick={this.onAddControlBtnClick}>Add Controller</button>
       </form>
     )
   }
 }, (state) => ({
-  controlName: state.synthpanels.synthpanel,
-  controlTypes: state.controltypes.types,
-  controlSubTypes: state.controltypes.subtypes,
-  selectedType: state.synthpanels.selectedType,
-  selectedSubType: state.synthpanels.selectedSubType
+  controlTypes: state.midicontrols.types,
+  controlSubTypes: state.midicontrols.subtypes,
+  selectedType: state.midicontrols.selectedType,
+  selectedSubType: state.midicontrols.selectedSubType
 }));
 
 const SysExFormExtra = Component({
@@ -68,7 +80,7 @@ const SysExFormExtra = Component({
         data={this.props.compatibleSysExHeaders}
         label="Available SysExHeaders"
         default_text="Select SysEx Header"
-        eventhandler={(event) => synthpanels.setSelectedSysExHeader(event.target.value)}
+        eventhandler={(event) => midicontrols.setSelectedSysExHeader(event.target.value)}
 
       />
     </div>
@@ -84,6 +96,10 @@ const RangeForm = Component({
   render() {
     return (
       <div>
+        <Input
+          placeholder="Parameter Name"
+          type="text"
+        />
         <Input
           placeholder="Parameter Number"
           type="number"
@@ -110,6 +126,10 @@ const ToggleForm = Component({
     return (
       <div>
         <Input
+          placeholder="Parameter Name"
+          type="text"
+        />
+        <Input
           placeholder="Parameter Number"
           type="number"
         />
@@ -121,9 +141,38 @@ const ToggleForm = Component({
           placeholder="Off Value"
           type="number"
         />
-        <Input
-          placeholder="Default Value"
+        <CheckBox
+          label="Default Value"
           type="checkbox"
+        />
+      </div>
+    )
+  }
+});
+
+const ListForm = Component({
+  render() {
+    return (
+      <div>
+        <Input
+          placeholder="Parameter Name"
+          type="text"
+        />
+        <Input
+          placeholder="Parameter Number"
+          type="number"
+        />
+        <Input
+          placeholder="Menu item list (comma separated)"
+          type="text"
+        />
+        <Input
+          placeholder="Menu value list (comma separated)"
+          type="text"
+        />
+        <Input
+          placeholder="Default Value (from 0 index)"
+          type="number"
         />
       </div>
     )

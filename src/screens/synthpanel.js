@@ -4,6 +4,7 @@
 import {Component} from 'jumpsuit'
 import SynthPanelForm from '../components/forms/synthremotepanelform'
 import SynthRemoteControlForm from '../components/forms/synthremotecontrolform'
+import SynthRemoteControlList from '../components/lists/synthremotecontrollist'
 
 export default Component({
   componentDidMount() {
@@ -17,7 +18,7 @@ export default Component({
         <h3>Edit Synth Panel</h3>
         <div className="panel panel-default">
           <div className="panel-heading">
-            <h4>Edit Basic Info</h4>
+            <h5>Edit Basic Info</h5>
           </div>
           <div className="panel-body">
             <SynthPanelForm params={this.props.params}/>
@@ -25,10 +26,18 @@ export default Component({
         </div>
         <div className="panel panel-default">
           <div className="panel-heading">
-            <h4>Create Control</h4>
+            <h5>Create Control</h5>
           </div>
           <div className="panel-body">
             <SynthRemoteControlForm params={this.props.params}/>
+          </div>
+        </div>
+        <div className="panel panel-default">
+          <div className="panel-heading">
+            <h5>Panel Controls</h5>
+          </div>
+          <div className="panel-body">
+            <SynthRemoteControlList params={this.props.params}/>
           </div>
         </div>
       </div>
