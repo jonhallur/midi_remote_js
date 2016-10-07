@@ -14,3 +14,7 @@ const BITMASK = Symbol('bitmask');
 
 export const CONTROLTYPE = {SYSEX: 0, CC: 1, NRPN: 2, OSC: 3};
 export const SUBCONTROLTYPE = {RANGE: 0, TOGGLE: 1, LIST: 2, BITMASK: 3};
+
+export const ITEMTYPE = {
+  LISTROW: 'listrow'
+};

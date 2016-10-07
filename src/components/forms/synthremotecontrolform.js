@@ -9,21 +9,11 @@ import midicontrols from '../../state/midicontrols'
 import {getSysExHeaderFromManufacturerId} from '../../state/sysexheaders'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../../pojos/constants'
 import {getSynthRemote} from '../../state/synthremotes'
+import {addToCollection} from '../../state/genericfirebase'
 
 export default Component({
   componentDidMount() {
     getSynthRemote(this.props.params.remote_id);
-  },
-    
-  onAddControlBtnClick(event) {
-    event.preventDefault();
-    let controlType = this.props.selectedType;
-    let controlSubType = this.props.selectedSubType;
-
-
-  },
-  addControl(type, subType) {
-
   },
 
   render() {
@@ -89,14 +79,41 @@ const SysExFormExtra = Component({
    )
   }
 }, (state) => ({
-  selectedSysExHeader: state.synthpanels.selectedSysExHeader,
+  selectedSysExHeader: state.midicontrols.selectedSysExHeader,
   compatibleSysExHeaders: state.sysexheaders.compatibleSysExHeaders,
   manufacturerId: state.synthremotes.synthremote.manufacturer_id
 }));
 
 const RangeForm = Component({
+  onAddBtnClick(event) {
+    event.preventDefault();
+    let controlType = this.props.selectedType;
+    let controlSubType = this.props.selectedSubType;
+    let data = {
+      name: this.props.name,
+      parameter: this.props.parameter,
+      minimum: this.props.minimum,
+      maximum: this.props.maximum,
+      default: this.props.default,
+      sysexheaderid: this.props.selectedSysExHeader,
+      type: controlType,
+      subtype: controlSubType
+    };
+    let {remote_id, panel_id} = this.props.params;
+    let pathList = ['admin', 'synthremotes', remote_id, 'panels', panel_id, 'controls'];
+    addToCollection(pathList, data);
+    midicontrols.clearRangeInputs();
+  },
+
   render() {
-    let showCreateButton = (this.props.selectedType !== '') && (this.props.selectedSubType !== '');
+    let inputList = [
+      this.props.name,
+      this.props.parameter,
+      this.props.minimum,
+      this.props.maximum,
+      this.props.default
+    ];
+    let showCreateButton = inputList.reduce(function(a,b) {return a && b});
     return (
       <div>
         <Input
@@ -134,7 +151,7 @@ const RangeForm = Component({
           value={this.props.default}
           onChange={(event) => midicontrols.setDefault(event.target.value)}
         />
-        <button className={showCreateButton ? "btn btn-default" : "hidden"} onClick={this.onAddControlBtnClick}>Add Range</button>
+        <button className={showCreateButton ? "btn btn-default" : "hidden"} onClick={this.onAddBtnClick}>Add Range</button>
 
       </div>
     )
@@ -146,7 +163,8 @@ const RangeForm = Component({
   maximum: state.midicontrols.maximum,
   default: state.midicontrols.default,
   selectedType: state.midicontrols.selectedType,
-  selectedSubType: state.midicontrols.selectedSubType
+  selectedSubType: state.midicontrols.selectedSubType,
+  selectedSysExHeader: state.midicontrols.selectedSysExHeader,
 }));
 
 const ToggleForm = Component({

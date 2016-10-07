@@ -1,10 +1,7 @@
 import { Component } from 'jumpsuit'
 import {swapSysexheaderfields, deleteSysexheaderfield} from '../../state/sysexheaders'
 import {DragSource, DropTarget} from 'react-dnd'
-
-const ItemTypes = {
-  PANELROW: 'panelrow'
-};
+import {ITEMTYPE} from '../../pojos/constants'
 
 const rowSource = {
     beginDrag(props) {
@@ -65,12 +62,12 @@ const SysExHeaderFieldRow = Component({
   }
 });
 
-const TargetSysexheaderFieldRow = DropTarget(ItemTypes.PANELROW, rowTarget, (connect, monitor) => ({
+const TargetSysexheaderFieldRow = DropTarget(ITEMTYPE.LISTROW, rowTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver()
 }))(SysExHeaderFieldRow);
 
-const SourceTargetSysexheaderFieldRow = DragSource(ItemTypes.PANELROW, rowSource, (connect, monitor) => ({
+const SourceTargetSysexheaderFieldRow = DragSource(ITEMTYPE.LISTROW, rowSource, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging()
 }))(TargetSysexheaderFieldRow);

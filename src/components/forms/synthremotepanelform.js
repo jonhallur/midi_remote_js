@@ -1,7 +1,8 @@
 import { Component } from 'jumpsuit'
 import Input from '../input/input'
 import Button from '../input/button'
-import synthremotes, {addPanel} from '../../state/synthremotes'
+import synthremotes from '../../state/synthremotes'
+import {addPanel} from '../../state/synthpanels'
 import { eventValueHandler} from '../../utils/handlers'
 
 

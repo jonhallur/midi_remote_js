@@ -1,15 +1,13 @@
 import { Component } from 'jumpsuit'
-import { deleteSynthRemotePanel, swapSynthRemotePanels} from '../../state/synthremotes'
+import { deleteSynthRemotePanel, swapSynthRemotePanels} from '../../state/synthpanels'
 import {DragSource, DropTarget} from 'react-dnd'
+import {ITEMTYPE} from '../../pojos/constants'
 
-const ItemTypes = {
-  PANELROW: 'panelrow'
-};
 
 const rowSource = {
   beginDrag(props) {
     return {
-      panel_id: props.panel_id,
+      control_id: props.control_id,
       index: props.index
     }
   }
@@ -27,8 +25,8 @@ const rowTarget = {
   },
 
   drop(props, monitor, component) {
-    let source = props.panel_id;
-    let target = monitor.getItem().panel_id;
+    let source = props.control_id;
+    let target = monitor.getItem().control_id;
     if (source === undefined || target === undefined)
     {
       return;
@@ -47,15 +45,15 @@ const SynthPanelRow = Component({
 
     render() {
         const { connectDragSource, connectDropTarget, isOver } = this.props;
-        let href='/admin/synthremote/' + this.props.params.key + '/panel/edit/' + this.props.panel_id;
+        let href='/admin/synthremote/' + this.props.params.key + '/panel/edit/' + this.props.control_id;
         return connectDragSource(connectDropTarget(
             <tr className={isOver ? 'warning' : ''}>
                 <td>
                     <a href={href}>{this.props.panel.name}</a>
                 </td>
                 <td>
-                    <a id={this.props.panel_id} href="#" onClick={this.deleteField}>
-                      <span id={this.props.panel_id} className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                    <a id={this.props.control_id} href="#" onClick={this.deleteField}>
+                      <span id={this.props.control_id} className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
                     </a>
                 </td>
             </tr>
@@ -65,12 +63,12 @@ const SynthPanelRow = Component({
  * Created by jonhallur on 07/09/16.
  */
 
-const TargetSynthPanelRow = DropTarget(ItemTypes.PANELROW, rowTarget, (connect, monitor) => ({
+const TargetSynthPanelRow = DropTarget(ITEMTYPE.LISTROW, rowTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver()
 }))(SynthPanelRow);
 
-const SourceTargetSynthPanelRow = DragSource(ItemTypes.PANELROW, rowSource, (connect, monitor) => ({
+const SourceTargetSynthPanelRow = DragSource(ITEMTYPE.LISTROW, rowSource, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging()
 }))(TargetSynthPanelRow);

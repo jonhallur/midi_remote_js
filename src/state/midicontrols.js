@@ -1,5 +1,6 @@
 import {State} from 'jumpsuit'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
+import firebase from 'firebase'
 
 const midicontrols = State('midicontrols', {
   initial: {
@@ -13,7 +14,7 @@ const midicontrols = State('midicontrols', {
     default: '',
     onValue: '',
     offValue: '',
-
+    controls: [],
     types: [
       {value: CONTROLTYPE.SYSEX, name: 'System Exclusive'},
       {value: CONTROLTYPE.CC, name: 'Continuous Controller'},
@@ -25,7 +26,6 @@ const midicontrols = State('midicontrols', {
       {value: SUBCONTROLTYPE.LIST, name: 'List'},
       {value: SUBCONTROLTYPE.BITMASK, name: 'Bitmask'}
     ]
-
   },
 
   setSelectedType: (state, payload) => ({
@@ -58,7 +58,55 @@ const midicontrols = State('midicontrols', {
 
   setDefault: (state, payload) => ({
     default: payload
-  })
+  }),
+
+  setControls: (state, payload) => ({
+    controls: payload
+  }),
+
+  clearRangeInputs: (state, payload) => ({
+    name: '',
+    parameter: '',
+    minimum: '',
+    maximum: '',
+    default: ''
+  }),
+
+
 });
 
 export default midicontrols
+
+export function getControls(remote_id, panel_id) {
+  if (panel_id === '' || remote_id === ''){
+    console.log("Broken input on getting controls");
+    return;
+  }
+  let refList = ['admin', 'synthremotes', remote_id, 'panels', panel_id, 'controls'];
+  firebase.database().ref(refList.join('/')).on('value', function(snapshot) {
+    let controlList = [];
+    snapshot.forEach(function(child) {
+      let controlData = {...child.val(), key: child.key};
+      controlList.push(controlData);
+    });
+    midicontrols.setControls(controlList);
+  })
+}
+
+export function addControl(remote_id, panel_id, control_data) {
+  let refList = ['admin', 'synthremotes', remote_id, 'panels', panel_id, 'controls'];
+  var ref = firebase.database().ref(refList.join('/'));
+  ref.once("value").then(function(snapshot) {
+    if(snapshot.exists()) {
+      let controls = [];
+      console.log(snapshot.val());
+      snapshot.val().forEach(control => controls.push(control));
+      controls.push(control_data);
+      ref.set(controls);
+    }
+    else {
+      ref.set([control_data]);
+    }
+  });
+}
+

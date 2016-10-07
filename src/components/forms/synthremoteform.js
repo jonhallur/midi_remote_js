@@ -7,7 +7,6 @@ import Button from '../input/button'
 import Selector from '../input/selector'
 import {getManufacturers} from '../../state/manufacturers'
 import synthremotes, {addSynthRemote} from '../../state/synthremotes'
-import {eventValueHandler} from '../../utils/handlers'
 import Loader from '../loader'
 
 export default Component({

@@ -1,11 +1,100 @@
 import {Component} from 'jumpsuit'
+import {getControls} from '../../state/midicontrols'
+import {ITEMTYPE} from '../../pojos/constants'
+import {DragSource, DropTarget} from 'react-dnd'
+import {swapCollectionItemsByIndex, removeFromCollectionByIndex} from "../../state/genericfirebase";
+
+const rowSource = {
+  beginDrag(props) {
+    return {
+      control_id: props.control_id,
+      index: props.index
+    }
+  }
+};
+
+const rowTarget = {
+  hover(props, monitor, component) {
+    const dragIndex = monitor.getItem().index;
+    const hoverIndex = props.index;
+
+    // Don't replace items with themselves
+    if (dragIndex === hoverIndex) {
+      return;
+    }
+  },
+
+  drop(props, monitor, component) {
+    let source_index = props.control_id;
+    let target_index = monitor.getItem().control_id;
+    if (source_index === undefined || target_index === undefined)
+    {
+      return;
+    }
+    let {remote_id, panel_id} = component.props.params;
+    let pathList = ['admin/synthremotes', remote_id, 'panels', panel_id, 'controls'];
+    swapCollectionItemsByIndex(pathList, source_index, target_index);
+  }
+};
+
+
+const MidiControlRow = Component({
+  render() {
+    const { connectDragSource, connectDropTarget, isOver } = this.props;
+    let {remote_id, panel_id} = this.props.params;
+    let pathList = ['admin/synthremotes', remote_id, 'panels', panel_id, 'controls'];
+    return connectDragSource(connectDropTarget(
+      <div
+        className={isOver ? 'list-group-item-info list-group-item' : 'list-group-item'}
+
+      >
+        {this.props.control.name}
+          <a
+            className="badge"
+            id={this.props.control_id}
+            href="#"
+            onClick={(event) => removeFromCollectionByIndex(pathList, event.target.id)}
+          >
+            <span id={this.props.control_id} className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+          </a>
+      </div>
+    ))
+  }
+});
+
+const TargetMidiControlRow = DropTarget(ITEMTYPE.LISTROW, rowTarget, (connect, monitor) => ({
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver()
+  }))(MidiControlRow);
+
+const SourceTargetMidiControlRow = DragSource(ITEMTYPE.LISTROW, rowSource, (connect, monitor) => ({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging()
+}))(TargetMidiControlRow);
+
+
+
 
 export default Component({
+  componentDidMount() {
+    let {remote_id, panel_id} = this.props.params;
+    getControls(remote_id, panel_id);
+  },
+
   render() {
     return (
-      <div>
-
+      <div className="list-group">
+        {this.props.controls.map((control, index) => (
+          <SourceTargetMidiControlRow
+            key={index}
+            params={this.props.params}
+            control_id={index}
+            control={control}
+          />
+        ))}
       </div>
     )
   }
-})
+}, (state) => ({
+  controls: state.midicontrols.controls,
+}))
