@@ -7,6 +7,9 @@ const midicontrols = State('midicontrols', {
     selectedType: '',
     selectedSubType: '',
     selectedSysExHeader: '',
+    showBasicPanel: true,
+    showCreatePanel: true,
+    showControlsPanel: true,
     name: '',
     parameter: '',
     minimum: '',
@@ -72,6 +75,17 @@ const midicontrols = State('midicontrols', {
     default: ''
   }),
 
+  toggleBasicPanel: (state, payload) => ({
+    showBasicPanel: !state.showBasicPanel
+  }),
+
+  toggleCreatePanel: (state, payload) => ({
+    showCreatePanel: !state.showCreatePanel
+  }),
+
+  toggleControlsPanel: (state, payload) => ({
+    showControlsPanel: !state.showControlsPanel
+  })
 
 });
 

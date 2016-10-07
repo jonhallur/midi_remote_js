@@ -5,6 +5,7 @@ import {Component} from 'jumpsuit'
 import SynthPanelForm from '../components/forms/synthremotepanelform'
 import SynthRemoteControlForm from '../components/forms/synthremotecontrolform'
 import SynthRemoteControlList from '../components/lists/synthremotecontrollist'
+import midicontrols from '../state/midicontrols'
 
 export default Component({
   componentDidMount() {
@@ -18,29 +19,59 @@ export default Component({
         <h3>Edit Synth Panel</h3>
         <div className="panel panel-default">
           <div className="panel-heading">
-            <h5>Edit Basic Info</h5>
+            <h4>Edit Basic Info
+              <span
+                id={this.props.control_id}
+                className="glyphicon glyphicon-align-justify float-right"
+                aria-hidden="true"
+                onClick={midicontrols.toggleBasicPanel}
+
+              >&nbsp;
+              </span>
+            </h4>
           </div>
-          <div className="panel-body">
+          <div className={this.props.showBasicPanel ? "panel-body": "hidden" }>
             <SynthPanelForm params={this.props.params}/>
           </div>
         </div>
         <div className="panel panel-default">
           <div className="panel-heading">
-            <h5>Create Control</h5>
+            <h4>Create Control
+              <span
+                id={this.props.control_id}
+                className="glyphicon glyphicon-align-justify float-right"
+                aria-hidden="true"
+                onClick={midicontrols.toggleCreatePanel}
+
+              >&nbsp;
+              </span>
+            </h4>
           </div>
-          <div className="panel-body">
+          <div className={this.props.showCreatePanel ? "panel-body": "hidden" }>
             <SynthRemoteControlForm params={this.props.params}/>
           </div>
         </div>
         <div className="panel panel-default">
           <div className="panel-heading">
-            <h5>Panel Controls</h5>
+            <h4>Panel Controls
+              <span
+                id={this.props.control_id}
+                className="glyphicon glyphicon-align-justify float-right"
+                aria-hidden="true"
+                onClick={midicontrols.toggleControlsPanel}
+              >&nbsp;
+              </span>
+            </h4>
           </div>
-          <div className="panel-body">
+          <div className={this.props.showControlsPanel ? "panel-body": "hidden" }>
             <SynthRemoteControlList params={this.props.params}/>
           </div>
         </div>
       </div>
     )
   }
-})
+}, (state) => ({
+  showBasicPanel: state.midicontrols.showBasicPanel,
+  showCreatePanel: state.midicontrols.showCreatePanel,
+  showControlsPanel: state.midicontrols.showControlsPanel
+}))

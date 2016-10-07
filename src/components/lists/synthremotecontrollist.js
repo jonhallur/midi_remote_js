@@ -20,8 +20,24 @@ const rowTarget = {
 
     // Don't replace items with themselves
     if (dragIndex === hoverIndex) {
-      return;
+      return {
+        dropOnSelf: true
+      }
     }
+    else {
+      return {
+        dropOnSelf: false
+      }
+    }
+  },
+
+  canDrop(props, monitor) {
+    const dragIndex = monitor.getItem().index;
+    const hoverIndex = props.index;
+
+    // Don't replace items with themselves
+    console.log(dragIndex, hoverIndex);
+    return dragIndex !== hoverIndex;
   },
 
   drop(props, monitor, component) {
@@ -40,12 +56,22 @@ const rowTarget = {
 
 const MidiControlRow = Component({
   render() {
-    const { connectDragSource, connectDropTarget, isOver } = this.props;
+    const { connectDragSource, connectDropTarget, isOver, canDrop } = this.props;
     let {remote_id, panel_id} = this.props.params;
     let pathList = ['admin/synthremotes', remote_id, 'panels', panel_id, 'controls'];
+    let listGroupColoring = 'list-group-item';
+    if (isOver) {
+      console.log("dr", canDrop);
+      if (canDrop) {
+        listGroupColoring = 'list-group-item-danger list-group-item'
+      }
+      else {
+        listGroupColoring = 'list-group-item-info list-group-item'
+      }
+    }
     return connectDragSource(connectDropTarget(
       <div
-        className={isOver ? 'list-group-item-info list-group-item' : 'list-group-item'}
+        className={listGroupColoring}
 
       >
         {this.props.control.name}
@@ -64,7 +90,8 @@ const MidiControlRow = Component({
 
 const TargetMidiControlRow = DropTarget(ITEMTYPE.LISTROW, rowTarget, (connect, monitor) => ({
     connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver()
+    isOver: monitor.isOver(),
+    canDrop: monitor.canDrop()
   }))(MidiControlRow);
 
 const SourceTargetMidiControlRow = DragSource(ITEMTYPE.LISTROW, rowSource, (connect, monitor) => ({
