@@ -93,7 +93,7 @@ export default Component({
           )
     }
 }, (state) => ({
-    fields: state.sysexheaders.sysexheader.fields
+    fields: state.sysexheaders.sysexheader.fields || []
 }))
 
 

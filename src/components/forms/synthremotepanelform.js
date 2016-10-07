@@ -2,26 +2,38 @@ import { Component } from 'jumpsuit'
 import Input from '../input/input'
 import Button from '../input/button'
 import synthremotes from '../../state/synthremotes'
-import {addPanel} from '../../state/synthpanels'
-import { eventValueHandler} from '../../utils/handlers'
+import synthpanels from '../../state/synthpanels'
+import {addPanel, updatePanelName} from '../../state/synthpanels'
 
 
 export default Component({
     submitForm(event) {
         event.preventDefault();
-        addPanel(this.props.params.key, this.props.panelName);
-        synthremotes.setsynthremotePanelName('')
+      if (this.props.synthpanelReady) {
+        let {remote_id, panel_id} = this.props.params;
+        let pathList = ['admin/synthremotes', remote_id, 'panels', panel_id];
+        updatePanelName(pathList, this.props.panelName);
+      }
+      else {
+        addPanel(this.props.params.remote_id, this.props.panelName);
+        synthremotes.setSynthremotePanelName('')
+      }
     },
     render() {
         return (
             <form className="form-horizontal" onSubmit={this.submitForm}>
-                <Input value={this.props.panelName} type="text" id="synthremotePanelName" placeholder="Name" onChange={eventValueHandler.bind(this, synthremotes.setsynthremotePanelName)}/>
+                <Input
+                  value={this.props.panelName}
+                  type="text"
+                  id="synthremotePanelName"
+                  placeholder="Name"
+                  onChange={event => synthpanels.setPanelName(event.target.value)}/>
                 <Button label={this.props.synthpanelReady ? 'Update' : 'Create'}/>
             </form>
         )
     }
 }, (state) => ({
-    panelName: state.synthremotes.synthremotePanelName,
+    panelName: state.synthpanels.synthpanel.name,
     synthpanelReady: state.synthpanels.synthpanelReady
 
 }))

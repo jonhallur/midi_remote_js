@@ -24,7 +24,7 @@ Render(datasource, (
                 <Route path="sysexheaders" component={SysExHeaders} />
                 <Route path="sysexheader/edit/:key" component={SysExHeader} />
                 <Route path="synthremotes" component={SynthRemotes} />
-                <Route path="synthremote/edit/:key" component={SynthRemote} />
+                <Route path="synthremote/edit/:remote_id" component={SynthRemote} />
                 <Route path="synthremote/:remote_id/panel/edit/:panel_id" component={SynthPanel} />
             </Route>
         </Route>

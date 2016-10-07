@@ -8,15 +8,15 @@ var firebase = require('firebase');
 
 const synthremotes = State('synthremotes', {
     initial: {
-        synthremotesReady: false,
-        synthremotes: [],
-        synthremoteReady: false,
-        synthremotePanelName: '',
-        synthremote: {
-            name: '',
-            manufacturer_id: '',
-            panels: [
-        ]}
+      synthremotesReady: false,
+      synthremotes: [],
+      synthremoteReady: false,
+      synthremotePanelName: '',
+      synthremote: {
+          name: '',
+          manufacturer_id: '',
+          panels: []
+      }
     },
 
     setManufacturerIdField: (state, payload) => ({
@@ -68,7 +68,6 @@ export function getSynthRemotes() {
 }
 
 export function getSynthRemote(key) {
-    let synthRemote;
     firebase.database().ref('admin/synthremotes/' + key).on("value", function(snapshot) {
         var data = snapshot.val();
         var panels = [];
@@ -80,9 +79,7 @@ export function getSynthRemote(key) {
             manufacturer_id: data.manufacturer_id,
             panels: panels
         });
-        synthRemote = data;
     });
-    return synthRemote;
 }
 
 export function removeSynthremote(key) {

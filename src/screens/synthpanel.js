@@ -5,18 +5,20 @@ import {Component} from 'jumpsuit'
 import SynthPanelForm from '../components/forms/synthremotepanelform'
 import SynthRemoteControlForm from '../components/forms/synthremotecontrolform'
 import SynthRemoteControlList from '../components/lists/synthremotecontrollist'
+import {getSynthPanel} from '../state/synthpanels'
 import midicontrols from '../state/midicontrols'
 
 export default Component({
   componentDidMount() {
-    console.log("get single panel");
-    console.log(this.props.params);
+    let {remote_id, panel_id} = this.props.params;
+    let pathList = ['admin/synthremotes', remote_id, 'panels', panel_id];
+    getSynthPanel(pathList);
   },
 
   render() {
     return (
       <div>
-        <h3>Edit Synth Panel</h3>
+        <h3>Edit {this.props.panelName} Panel</h3>
         <div className="panel panel-default">
           <div className="panel-heading">
             <h4>Edit Basic Info
@@ -25,7 +27,6 @@ export default Component({
                 className="glyphicon glyphicon-align-justify float-right"
                 aria-hidden="true"
                 onClick={midicontrols.toggleBasicPanel}
-
               >&nbsp;
               </span>
             </h4>
@@ -73,5 +74,6 @@ export default Component({
 }, (state) => ({
   showBasicPanel: state.midicontrols.showBasicPanel,
   showCreatePanel: state.midicontrols.showCreatePanel,
-  showControlsPanel: state.midicontrols.showControlsPanel
+  showControlsPanel: state.midicontrols.showControlsPanel,
+  panelName: state.synthpanels.synthpanel.name
 }))

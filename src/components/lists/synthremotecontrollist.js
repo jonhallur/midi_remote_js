@@ -31,12 +31,9 @@ const rowTarget = {
     }
   },
 
-  canDrop(props, monitor) {
-    const dragIndex = monitor.getItem().index;
-    const hoverIndex = props.index;
-
-    // Don't replace items with themselves
-    console.log(dragIndex, hoverIndex);
+  canDrop(props, monitor, component) {
+    const dragIndex = monitor.getItem().control_id;
+    const hoverIndex = props.control_id;
     return dragIndex !== hoverIndex;
   },
 
@@ -61,20 +58,17 @@ const MidiControlRow = Component({
     let pathList = ['admin/synthremotes', remote_id, 'panels', panel_id, 'controls'];
     let listGroupColoring = 'list-group-item';
     if (isOver) {
-      console.log("dr", canDrop);
       if (canDrop) {
-        listGroupColoring = 'list-group-item-danger list-group-item'
+        listGroupColoring = 'list-group-item-info list-group-item'
       }
       else {
-        listGroupColoring = 'list-group-item-info list-group-item'
+        listGroupColoring = 'disabled list-group-item'
       }
     }
     return connectDragSource(connectDropTarget(
-      <div
-        className={listGroupColoring}
-
-      >
-        {this.props.control.name}
+      <div className={listGroupColoring}>
+        <strong>{this.props.control.name}</strong> - #{this.props.control.parameter}&nbsp;
+        - From: {this.props.control.minimum} to: {this.props.control.maximum} - Default: {this.props.control.default}
           <a
             className="badge"
             id={this.props.control_id}

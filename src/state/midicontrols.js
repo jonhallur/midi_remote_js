@@ -11,6 +11,7 @@ const midicontrols = State('midicontrols', {
     showCreatePanel: true,
     showControlsPanel: true,
     name: '',
+    short: '',
     parameter: '',
     minimum: '',
     maximum: '',
@@ -47,6 +48,10 @@ const midicontrols = State('midicontrols', {
     name: payload
   }),
 
+  setShort: (state, payload) => ({
+    short: payload
+  }),
+
   setParameter: (state, payload) => ({
     parameter: payload
   }),
@@ -69,6 +74,7 @@ const midicontrols = State('midicontrols', {
 
   clearRangeInputs: (state, payload) => ({
     name: '',
+    short: '',
     parameter: '',
     minimum: '',
     maximum: '',
@@ -107,6 +113,10 @@ export function getControls(remote_id, panel_id) {
   })
 }
 
+/*
+*
+* MOVED TO GENERIC
+
 export function addControl(remote_id, panel_id, control_data) {
   let refList = ['admin', 'synthremotes', remote_id, 'panels', panel_id, 'controls'];
   var ref = firebase.database().ref(refList.join('/'));
@@ -124,3 +134,4 @@ export function addControl(remote_id, panel_id, control_data) {
   });
 }
 
+*/

@@ -91,6 +91,7 @@ const RangeForm = Component({
     let controlSubType = this.props.selectedSubType;
     let data = {
       name: this.props.name,
+      short: this.props.short,
       parameter: this.props.parameter,
       minimum: this.props.minimum,
       maximum: this.props.maximum,
@@ -122,6 +123,13 @@ const RangeForm = Component({
           id="parameter_name"
           value={this.props.name}
           onChange={(event) => midicontrols.setName(event.target.value)}
+        />
+        <Input
+          placeholder="Short Name"
+          type="text"
+          id="short_name"
+          value={this.props.short}
+          onChange={(event) => midicontrols.setShort(event.target.value)}
         />
         <Input
           placeholder="Parameter Number"
@@ -158,6 +166,7 @@ const RangeForm = Component({
   }
 }, (state) => ({
   name: state.midicontrols.name,
+  short: state.midicontrols.short,
   parameter: state.midicontrols.parameter,
   minimum: state.midicontrols.minimum,
   maximum: state.midicontrols.maximum,
@@ -175,6 +184,11 @@ const ToggleForm = Component({
           placeholder="Parameter Name"
           type="text"
         />
+        <Input
+          placeholder="Short Name"
+          type="text"
+        />
+
         <Input
           placeholder="Parameter Number"
           type="number"
@@ -202,6 +216,10 @@ const ListForm = Component({
       <div>
         <Input
           placeholder="Parameter Name"
+          type="text"
+        />
+        <Input
+          placeholder="Short Name"
           type="text"
         />
         <Input

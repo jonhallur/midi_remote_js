@@ -1,5 +1,6 @@
 import { Component } from 'jumpsuit'
 import { deleteSynthRemotePanel, swapSynthRemotePanels} from '../../state/synthpanels'
+import {removeFromCollectionByIndex, swapCollectionItemsByIndex} from '../../state/genericfirebase'
 import {DragSource, DropTarget} from 'react-dnd'
 import {ITEMTYPE} from '../../pojos/constants'
 
@@ -7,7 +8,7 @@ import {ITEMTYPE} from '../../pojos/constants'
 const rowSource = {
   beginDrag(props) {
     return {
-      control_id: props.control_id,
+      panel_id: props.panel_id,
       index: props.index
     }
   }
@@ -25,39 +26,45 @@ const rowTarget = {
   },
 
   drop(props, monitor, component) {
-    let source = props.control_id;
-    let target = monitor.getItem().control_id;
-    if (source === undefined || target === undefined)
+    let source_index = props.panel_id;
+    let target_index = monitor.getItem().panel_id;
+    if (source_index === undefined || target_index === undefined)
     {
       return;
     }
-    swapSynthRemotePanels(component.props.params.key, source, target);
+    let {remote_id} = props.params;
+    let pathList = ['admin/synthremotes', remote_id, 'panels'];
+    swapCollectionItemsByIndex(pathList, source_index, target_index);
+    //swapSynthRemotePanels(component.props.params.remote_id, source_index, target_index);
   }
 };
 
 
 const SynthPanelRow = Component({
     deleteField(event) {
-        event.preventDefault();
-        var id = event.target.id;
-        deleteSynthRemotePanel(this.props.params.key, id);
+      event.preventDefault();
+      //deleteSynthRemotePanel(this.props.params.remote_id, event.target.id);
+      let {remote_id} = this.props.params;
+      let pathList = ['admin/synthremotes', remote_id, 'panels'];
+      removeFromCollectionByIndex(pathList, event.target.id)
     },
 
     render() {
-        const { connectDragSource, connectDropTarget, isOver } = this.props;
-        let href='/admin/synthremote/' + this.props.params.key + '/panel/edit/' + this.props.control_id;
-        return connectDragSource(connectDropTarget(
-            <tr className={isOver ? 'warning' : ''}>
-                <td>
-                    <a href={href}>{this.props.panel.name}</a>
-                </td>
-                <td>
-                    <a id={this.props.control_id} href="#" onClick={this.deleteField}>
-                      <span id={this.props.control_id} className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
-                    </a>
-                </td>
-            </tr>
-        ))
+      const { connectDragSource, connectDropTarget, isOver } = this.props;
+      let {remote_id} = this.props.params;
+      let hrefList= ['/admin/synthremote', remote_id, 'panel/edit', this.props.panel_id ];
+      return connectDragSource(connectDropTarget(
+        <tr className={isOver ? 'warning' : ''}>
+          <td>
+            <a href={hrefList.join('/')}>{this.props.panel.name}</a>
+          </td>
+          <td>
+            <a id={this.props.panel_id} href="#" onClick={this.deleteField}>
+              <span id={this.props.panel_id} className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+            </a>
+          </td>
+        </tr>
+      ))
     }
 });/**
  * Created by jonhallur on 07/09/16.

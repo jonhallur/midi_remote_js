@@ -5,12 +5,14 @@ import { Component } from 'jumpsuit'
 import SynthRemoteForm from '../components/forms/synthremoteform'
 import SynthRemotePanelForm  from '../components/forms/synthremotepanelform'
 import {getSynthRemote} from '../state/synthremotes'
+import synthpanels from '../state/synthpanels'
 import SynthRemotePanelList from '../components/lists/synthremotepanellist'
 
 
 export default Component({
     componentDidMount() {
-        getSynthRemote(this.props.params.key)
+      getSynthRemote(this.props.params.remote_id);
+      synthpanels.setPanelName('');
     },
 
     render () {

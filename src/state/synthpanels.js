@@ -27,16 +27,20 @@ const synthpanels = State('synthpanels', {
     synthpanelsReady: false
   }),
 
+  setPanelName: (state, payload) => ({
+    synthpanel: { name: payload, controls: state.synthpanel.controls }
+  }),
+
 });
 
 export default synthpanels
 
-export function addPanel(key, name) {
-  if(!(key && name !== undefined)) {
+export function addPanel(remote_id, name) {
+  if(!(remote_id && name !== undefined)) {
     console.log("broken input");
     return;
   }
-  var ref = firebase.database().ref('admin/synthremotes/' + key + '/panels');
+  var ref = firebase.database().ref('admin/synthremotes/' + remote_id + '/panels');
   ref.once("value").then(function(snapshot) {
     if(snapshot.exists()) {
       let panels = [];
@@ -50,7 +54,34 @@ export function addPanel(key, name) {
   });
 }
 
+export function updatePanelName(pathList, name) {
+  var ref = firebase.database().ref(pathList.join('/'));
+  ref.once('value', function (snapshot) {
+    if(snapshot.exists()) {
+      ref.update({name: name});
+    }
+    else {
+      console.log("Error, trying to update non existing snapshot")
+    }
+    //console.log(snapshot.val());
+  })
+}
 
+
+
+export function getSynthPanel(pathList) {
+  firebase.database().ref(pathList.join('/')).on("value", function(snapshot) {
+    var data = snapshot.val();
+    var controls = [];
+    if (data.controls !== undefined) {
+      data.controls.forEach(panel => controls.push(panel));
+    }
+    synthpanels.setPanel({
+      name: data.name,
+      controls: controls
+    });
+  });
+}
 
 export function swapSynthRemotePanels(key, source, target) {
   var ref = firebase.database().ref('admin/synthremotes/' +  key + '/panels');
