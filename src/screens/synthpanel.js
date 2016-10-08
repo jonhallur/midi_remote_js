@@ -6,6 +6,7 @@ import SynthPanelForm from '../components/forms/synthremotepanelform'
 import SynthRemoteControlForm from '../components/forms/synthremotecontrolform'
 import SynthRemoteControlList from '../components/lists/synthremotecontrollist'
 import {getSynthPanel} from '../state/synthpanels'
+import {getSynthRemote} from '../state/synthremotes'
 import midicontrols from '../state/midicontrols'
 
 export default Component({
@@ -13,12 +14,15 @@ export default Component({
     let {remote_id, panel_id} = this.props.params;
     let pathList = ['admin/synthremotes', remote_id, 'panels', panel_id];
     getSynthPanel(pathList);
+    getSynthRemote(remote_id);
   },
 
   render() {
+    let {remote_id} = this.props.params;
+    let remote_url = '/admin/synthremote/edit/' +  remote_id;
     return (
       <div>
-        <h3>Edit {this.props.panelName} Panel</h3>
+        <h3>Edit {this.props.panelName} Panel of <a href={remote_url}>{this.props.synthremote.name}</a></h3>
         <div className="panel panel-default">
           <div className="panel-heading">
             <h4>Edit Basic Info
@@ -75,5 +79,6 @@ export default Component({
   showBasicPanel: state.midicontrols.showBasicPanel,
   showCreatePanel: state.midicontrols.showCreatePanel,
   showControlsPanel: state.midicontrols.showControlsPanel,
-  panelName: state.synthpanels.synthpanel.name
+  panelName: state.synthpanels.synthpanel.name,
+  synthremote: state.synthremotes.synthremote
 }))

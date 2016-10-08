@@ -1,6 +1,6 @@
 import {Component} from 'jumpsuit'
 import {getControls} from '../../state/midicontrols'
-import {ITEMTYPE} from '../../pojos/constants'
+import {ITEMTYPE, SUBCONTROLTYPE} from '../../pojos/constants'
 import {DragSource, DropTarget} from 'react-dnd'
 import {swapCollectionItemsByIndex, removeFromCollectionByIndex} from "../../state/genericfirebase";
 
@@ -65,10 +65,15 @@ const MidiControlRow = Component({
         listGroupColoring = 'disabled list-group-item'
       }
     }
+    let extraInfo = '';
+    if (this.props.control.type === SUBCONTROLTYPE.RANGE.toString()) {
+      let stringList = [" - From:", this.props.control.minimum, "to:", this.props.control.maximum, "- Default:", this.props.control.default];
+      extraInfo = stringList.join(' ');
+    }
     return connectDragSource(connectDropTarget(
       <div className={listGroupColoring}>
         <strong>{this.props.control.name}</strong> - #{this.props.control.parameter}&nbsp;
-        - From: {this.props.control.minimum} to: {this.props.control.maximum} - Default: {this.props.control.default}
+        {extraInfo}
           <a
             className="badge"
             id={this.props.control_id}

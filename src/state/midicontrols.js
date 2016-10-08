@@ -18,6 +18,9 @@ const midicontrols = State('midicontrols', {
     default: '',
     onValue: '',
     offValue: '',
+    defaultToggle: false,
+    nameList: '',
+    valueList: '',
     controls: [],
     types: [
       {value: CONTROLTYPE.SYSEX, name: 'System Exclusive'},
@@ -68,6 +71,26 @@ const midicontrols = State('midicontrols', {
     default: payload
   }),
 
+  setOnValue: (state, payload) => ({
+    onValue: payload
+  }),
+
+  setOffValue: (state, payload) => ({
+    offValue: payload
+  }),
+
+  setDefaultToggle: (state, payload) => ({
+    defaultToggle: payload
+  }),
+
+  setNameList: (state, payload) => ({
+    nameList: payload
+  }),
+
+  setValueList: (state, payload) => ({
+    valueList: payload
+  }),
+
   setControls: (state, payload) => ({
     controls: payload
   }),
@@ -78,6 +101,24 @@ const midicontrols = State('midicontrols', {
     parameter: '',
     minimum: '',
     maximum: '',
+    default: ''
+  }),
+
+  clearToggleInputs: (state, payload) => ({
+    name: '',
+    short: '',
+    parameter: '',
+    onValue: '',
+    offValue: '',
+    defaultToggle: false
+  }),
+
+  clearListInputs: (state, payload) => ({
+    name: '',
+    short: '',
+    parameter: '',
+    nameList: '',
+    valueList: '',
     default: ''
   }),
 
