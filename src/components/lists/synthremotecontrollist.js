@@ -66,9 +66,15 @@ const MidiControlRow = Component({
       }
     }
     let extraInfo = '';
-    if (this.props.control.type === SUBCONTROLTYPE.RANGE.toString()) {
+    if (this.props.control.subtype === SUBCONTROLTYPE.RANGE.toString()) {
       let stringList = [" - From:", this.props.control.minimum, "to:", this.props.control.maximum, "- Default:", this.props.control.default];
       extraInfo = stringList.join(' ');
+    }
+    else if (this.props.control.subtype === SUBCONTROLTYPE.TOGGLE.toString()) {
+      extraInfo = " - Toggle, Default: " + (this.props.control.default ? 'On' : 'Off');
+    }
+    else if (this.props.control.subtype === SUBCONTROLTYPE.LIST.toString()) {
+      extraInfo = " - List, Length: " + this.props.control.options.length;
     }
     return connectDragSource(connectDropTarget(
       <div className={listGroupColoring}>

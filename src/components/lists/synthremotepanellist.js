@@ -53,10 +53,13 @@ const SynthPanelRow = Component({
       const { connectDragSource, connectDropTarget, isOver } = this.props;
       let {remote_id} = this.props.params;
       let hrefList= ['/admin/synthremote', remote_id, 'panel/edit', this.props.panel_id ];
+      console.log(this.props.panel);
       return connectDragSource(connectDropTarget(
         <tr className={isOver ? 'warning' : ''}>
           <td>
-            <a href={hrefList.join('/')}>{this.props.panel.name}</a>
+            <a href={hrefList.join('/')}>
+              {this.props.panel.name}
+            </a> - # Controls: {this.props.panel['controls'] !== undefined ? this.props.panel.controls.length : 0}
           </td>
           <td>
             <a id={this.props.panel_id} href="#" onClick={this.deleteField}>

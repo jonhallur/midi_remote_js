@@ -56,10 +56,8 @@ export default Component({
 
 const SysExFormExtra = Component({
   componentDidMount() {
-
     if (this.props.manufacturerId) {
-      getSysExHeaderFromManufacturerId(this.props.manufacturerId)
-
+      getSysExHeaderFromManufacturerId(this.props.manufacturerId);
     }
   },
 
@@ -68,12 +66,11 @@ const SysExFormExtra = Component({
     <div>
       <Selector
         id="compatibleSysExHeaders"
-        value={this.props.selectedSysexHeader}
+        value={this.props.selectedSysExHeader}
         data={this.props.compatibleSysExHeaders}
         label="Available SysExHeaders"
         default_text="Select SysEx Header"
         eventhandler={(event) => midicontrols.setSelectedSysExHeader(event.target.value)}
-
       />
     </div>
    )
@@ -273,17 +270,27 @@ const ToggleForm = Component({
   selectedSysExHeader: state.midicontrols.selectedSysExHeader,
 }));
 
+function createNameValueList(nameList, valueList) {
+  if (nameList.length !== valueList.length) {
+    throw RangeError("Lists do not have the same length, can't create name-value combo list");
+  }
+  let nameValueList = [];
+  for (let i=0; i<nameList.length; i++) {
+    nameValueList.push({name: nameList[i], value: valueList[i]})
+  }
+  return nameValueList
+}
 const ListForm = Component({
   onAddBtnClick(event) {
     event.preventDefault();
     let controlType = this.props.selectedType;
     let controlSubType = this.props.selectedSubType;
+    let nameValueList = createNameValueList(this.props.nameList.split(','), this.props.valueList.split(','));
     let data = {
       name: this.props.name,
       short: this.props.short,
       parameter: this.props.parameter,
-      names: this.props.nameList.split(','),
-      values: this.props.valueList.split(','),
+      options: nameValueList,
       default: this.props.default,
       sysexheaderid: this.props.selectedSysExHeader,
       type: controlType,
