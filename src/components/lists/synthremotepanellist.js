@@ -1,9 +1,30 @@
 import { Component } from 'jumpsuit'
-import { deleteSynthRemotePanel, swapSynthRemotePanels} from '../../state/synthpanels'
 import {removeFromCollectionByIndex, swapCollectionItemsByIndex} from '../../state/genericfirebase'
 import {DragSource, DropTarget} from 'react-dnd'
 import {ITEMTYPE} from '../../pojos/constants'
 
+export default Component({
+  render () {
+    let params = this.props.params;
+    return (
+      <table className="table table-hover">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Remove</th>
+        </tr>
+        </thead>
+        <tbody>
+        {this.props.panels.map(function (panel, index) {
+          return <SourceTargetSynthPanelRow params={params} panel_id={index} key={index} panel={panel}/>
+        })}
+        </tbody>
+      </table>
+    )
+  }
+}, (state) => ({
+  panels: state.synthremotes.synthremote.panels
+}))
 
 const rowSource = {
   beginDrag(props) {
@@ -15,14 +36,10 @@ const rowSource = {
 };
 
 const rowTarget = {
-  hover(props, monitor, component) {
-    const dragIndex = monitor.getItem().index;
-    const hoverIndex = props.index;
-
-    // Don't replace items with themselves
-    if (dragIndex === hoverIndex) {
-      return;
-    }
+  canDrop(props, monitor, component) {
+    const dragIndex = monitor.getItem().panel_id;
+    const hoverIndex = props.panel_id;
+    return dragIndex !== hoverIndex;
   },
 
   drop(props, monitor, component) {
@@ -50,12 +67,20 @@ const SynthPanelRow = Component({
     },
 
     render() {
-      const { connectDragSource, connectDropTarget, isOver } = this.props;
+      const { connectDragSource, connectDropTarget, isOver, canDrop } = this.props;
       let {remote_id} = this.props.params;
       let hrefList= ['/admin/synthremote', remote_id, 'panel/edit', this.props.panel_id ];
-      console.log(this.props.panel);
+      let colorStyle = '';
+      if(isOver) {
+        if (canDrop) {
+          colorStyle='info'
+        }
+        else {
+          colorStyle='danger'
+        }
+      }
       return connectDragSource(connectDropTarget(
-        <tr className={isOver ? 'warning' : ''}>
+        <tr className={colorStyle}>
           <td>
             <a href={hrefList.join('/')}>
               {this.props.panel.name}
@@ -69,13 +94,12 @@ const SynthPanelRow = Component({
         </tr>
       ))
     }
-});/**
- * Created by jonhallur on 07/09/16.
- */
+});
 
 const TargetSynthPanelRow = DropTarget(ITEMTYPE.LISTROW, rowTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver()
+    isOver: monitor.isOver(),
+    canDrop: monitor.canDrop(),
 }))(SynthPanelRow);
 
 const SourceTargetSynthPanelRow = DragSource(ITEMTYPE.LISTROW, rowSource, (connect, monitor) => ({
@@ -83,29 +107,3 @@ const SourceTargetSynthPanelRow = DragSource(ITEMTYPE.LISTROW, rowSource, (conne
   isDragging: monitor.isDragging()
 }))(TargetSynthPanelRow);
 
-
-export default Component({
-  render () {
-    let params = this.props.params;
-
-    return (
-
-      <table className="table table-hover">
-        <thead>
-        <tr>
-          <th>Name</th>
-          <th>Remove</th>
-        </tr>
-        </thead>
-        <tbody>
-        {this.props.panels.map(function (panel, index) {
-          return <SourceTargetSynthPanelRow params={params} panel_id={index} key={index} panel={panel}/>
-        })}
-        </tbody>
-      </table>
-
-    )
-  }
-}, (state) => ({
-  panels: state.synthremotes.synthremote.panels
-}))

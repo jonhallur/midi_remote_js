@@ -22,8 +22,8 @@ export default Component({
                 </tr>
                 </thead>
                 <tbody>
-                {synthremotes ? Object.keys(synthremotes).map(function (key) {
-                    return <SynthRemoteRow synthremote_id={key} key={key} synthremote={synthremotes[key]}/>
+                {this.props.synthremotes ? this.props.synthremotes.map(function (remote) {
+                    return <SynthRemoteRow synthremote_id={remote.key} key={remote.key} synthremote={remote}/>
                 }) : <Loader/> }
                 </tbody>
             </table>

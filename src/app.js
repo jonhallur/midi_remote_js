@@ -12,6 +12,7 @@ import SysExHeader from 'screens/sysexheader'
 import SynthRemotes from 'screens/synthremotes'
 import SynthRemote from 'screens/synthremote'
 import SynthPanel from 'screens/synthpanel'
+import UserSynthRemote from 'screens/usersynthremote'
 
 
 Render(datasource, (
@@ -27,6 +28,7 @@ Render(datasource, (
                 <Route path="synthremote/edit/:remote_id" component={SynthRemote} />
                 <Route path="synthremote/:remote_id/panel/edit/:panel_id" component={SynthPanel} />
             </Route>
+            <Route path="synthremote/:remote_id" component={UserSynthRemote} />
         </Route>
     </Router>
 ));

@@ -60,8 +60,14 @@ export function addSynthRemote(name, manufacturer_id) {
 export function getSynthRemotes() {
     initializeFirebase();
     firebase.database().ref('admin/synthremotes').on("value", function(snapshot) {
-        var data = snapshot.val();
-        synthremotes.setSynthRemotes(data);
+      let synthremotelist = [];
+      snapshot.forEach(function(child) {
+        synthremotelist.push({...child.val(), key:child.key})
+      });
+      synthremotes.setSynthRemotes(synthremotelist);
+
+      //var data = snapshot.val();
+      //synthremotes.setSynthRemotes(data);
     }, function(errorObject) {
         console.log("sysexheaders read failed", errorObject);
     });
@@ -77,7 +83,8 @@ export function getSynthRemote(key) {
         synthremotes.setSynthRemote({
             name: data.name,
             manufacturer_id: data.manufacturer_id,
-            panels: panels
+            panels: panels,
+            key: snapshot.key
         });
     });
 }

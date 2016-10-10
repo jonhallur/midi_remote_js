@@ -22,7 +22,7 @@ export default Component({
                         <IndexLink to="/admin/manufacturers">Manufacturers</IndexLink>
                     </li>
                     <li className="presentation">
-                    <IndexLink to="/admin/sysexheaders">SysEx Headers</IndexLink>
+                        <IndexLink to="/admin/sysexheaders">SysEx Headers</IndexLink>
                     </li>
                     <li className="presentation">
                         <IndexLink to="/admin/synthremotes">Synth Remotes</IndexLink>
