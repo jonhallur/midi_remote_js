@@ -3,9 +3,11 @@
  */
 import {State} from 'jumpsuit'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
+import {getSingleSysexheader} from './sysexheaders'
 
-var type_to_function = {};
-type_to_function[CONTROLTYPE.SYSEX] = handleSysExControl;
+var TYPEFUNCTIONS = {[CONTROLTYPE.SYSEX]: handleSysExControl};
+var SUBTYPEFUNCTIONS = {[SUBCONTROLTYPE.RANGE]: handleRangeControl};
+
 
 
 const activesynthremote = State('activesynthremote',{
@@ -13,7 +15,8 @@ const activesynthremote = State('activesynthremote',{
     remote_id: '',
     name: '',
     panels: [],
-    synthPrototype: {}
+    synthPrototype: {},
+    sysexheaders: {}
 
   },
 
@@ -21,29 +24,38 @@ const activesynthremote = State('activesynthremote',{
     name: payload.name,
     remote_id: payload.key,
     synthPrototype: payload
+  }),
+
+  setSysexheader: (state, payload) => ({
+    sysexheaders: {...state.sysexheaders, payload}
   })
-
-
 });
 
 export default activesynthremote;
 
-export function createActiveSynthRemote(synthremote) {
+export function createActiveSynthRemote(synthremote, sysexheaders) {
   activesynthremote.setSynthRemote(synthremote);
   for(let panel of synthremote.panels) {
     for(let control of panel.controls) {
-      //TYPE_TO_FUNCTION[control.type](control)
-      console.log(control.type);
-      console.log(type_to_function[control.type.toString()]);
-      console.log(type_to_function);
+      handleControl(control);
     }
   }
 }
 
+function handleControl(control) {
+  TYPEFUNCTIONS[control.type](control);
+}
+
 function handleSysExControl(control) {
-  console.log("Handle sysex". control.name)
+  let sysex_id = control.sysexheaderid;
+  let sysexheader = getSingleSysexheader(sysex_id, sysexheaderCallback);
+
 }
 
 function handleRangeControl(control) {
   console.log(control.name)
+}
+
+function sysexheaderCallback(key, data) {
+  activesynthremote.setSysexheader({key: key, value: data})
 }

@@ -12,7 +12,7 @@ export default Component({
 
   componentWillReceiveProps: function (nextProps) {
     if (this.props.synthremote.name === '') {
-      createActiveSynthRemote(nextProps.synthremote);
+      createActiveSynthRemote(nextProps.synthremote, nextProps.sysexheaders);
     }
   },
 
@@ -25,6 +25,7 @@ export default Component({
   }
 }, (state) => ({
   synthremote: state.synthremotes.synthremote,
-  remote_id: state.activesynthremote.remote_id
+  sysexheaders: state.activesynthremote.sysexheaders,
+
 
 }))

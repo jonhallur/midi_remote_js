@@ -152,22 +152,24 @@ export function clearSysexheader() {
     sysexheaders.setManufacturerIdField('');
 }
 
-export  function getSingleSysexheader(key) {
-    console.log("key", key);
+export  function getSingleSysexheader(key, extraUpdateFunc=null) {
     firebase.database().ref('admin/sysexheaders/' + key).on("value", function(snapshot) {
         let data = snapshot.val();
         let fields = [];
         if(data.fields !== undefined) {
-            fields = data.fields.forEach(field => fields.push(field))
+            data.fields.forEach(field => fields.push(field))
         }
         data.fields = fields;
-        sysexheaders.setSysexheader(snapshot.val());
+        if (extraUpdateFunc === null) {
+            sysexheaders.setSysexheader(snapshot.val());
+        }
+        else {
+            extraUpdateFunc(key, data);
+        }
     });
-    return null;
 }
 
 export function getSysExHeaderFromManufacturerId(manufacturerId) {
-    console.log("manud", manufacturerId);
     firebase.database().ref('admin/sysexheaders').on('value', function(snapshot) {
         let compatibleSysExHeaders = [];
         snapshot.forEach(function(item) {
