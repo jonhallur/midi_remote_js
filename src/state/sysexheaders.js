@@ -75,14 +75,25 @@ export function getSysexheaders() {
     });
 }
 
-export function addSysexheader(name, manufacturer_id) {
+export function addSysexheader(name, manufacturer_id, manufacturer_data) {
     var key = firebase.database().ref('admin/sysexheaders');
     key.orderByChild("name").equalTo(name).once('value', function(snapshot) {
         if (snapshot.exists()) {
             console.log(name, " already exists")
         }
         else {
-            key.push({name: name, manufacturer_id: manufacturer_id, fields: []});
+            let fields = [];
+            if (manufacturer_data.length === 1) {
+                fields = [{name: "Manufacturer ID", value: manufacturer_data[0]}]
+            }
+            else if (manufacturer_data.length === 2) {
+                fields = [
+                    {name: "Manufacturer Extended ID", value: 0},
+                    {name: "Manufacturer Extended ID MSB", value: manufacturer_data[0]},
+                    {name: "Manufacturer Extended ID LSB", value: manufacturer_data[1]}
+                ]
+            }
+            key.push({name: name, manufacturer_id: manufacturer_id,  fields: fields});
         }
     });
 }

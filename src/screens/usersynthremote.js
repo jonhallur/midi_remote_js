@@ -12,7 +12,7 @@ export default Component({
 
   componentWillReceiveProps: function (nextProps) {
     if (this.props.synthremote.name === '') {
-      createActiveSynthRemote(nextProps.synthremote, nextProps.sysexheaders);
+      createActiveSynthRemote(nextProps.synthremote);
     }
   },
 

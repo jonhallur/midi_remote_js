@@ -15,9 +15,9 @@ export default Component({
             console.log("Empty name not allowed");
             return;
         }
-        var id = [this.props.manufacturerId];
+        var id = [Number(this.props.manufacturerId)];
         if (this.props.extendedHeader) {
-            id = [this.props.manufacturerMsbId, this.props.manufacturerLsbId];
+            id = [Number(this.props.manufacturerMsbId), Number(this.props.manufacturerLsbId)];
 
         }
         if(this.props.manufacturerReady) {

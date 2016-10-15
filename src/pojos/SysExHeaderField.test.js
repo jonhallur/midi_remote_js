@@ -1,7 +1,7 @@
 /**
  * Created by jonh on 29.6.2016.
  */
-import { chai } from 'meteor/practicalmeteor:chai';
+import chai from 'chai';
 import { SysExHeaderField, SysExHeaderChannelModifiedField } from './SysExHeaderField.js'
 
 describe('SysExHeaderField', function () {
@@ -56,8 +56,5 @@ describe('SysExHeaderField', function () {
     var obj = {name: name, constant: constant};
     var channel_field = new SysExHeaderChannelModifiedField(obj);
     chai.assert.strictEqual(channel_field.get_value(channel_modifier), (constant+channel_modifier-1));
-  });
-  it('', () => {
-
   });
 });

@@ -30,7 +30,7 @@ export class SysExHeader {
     }
   }
   generate_header() {
-    header = [0xF0];
+    let header = [0xF0];
     this.fields.forEach((item) => {
       header.push(item.get_value());
     });
@@ -46,7 +46,7 @@ export class SysExHeaderChannel extends SysExHeader {
     if (hex_channel === undefined) {
       throw TypeError('channel is undefined');
     }
-    header = [0xF0];
+    let header = [0xF0];
     this.fields.forEach((item)=> {
       if (item instanceof SysExHeaderChannelModifiedField) {
         header.push(item.get_value(hex_channel));

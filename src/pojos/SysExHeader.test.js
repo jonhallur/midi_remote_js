@@ -1,17 +1,17 @@
-import { chai } from 'meteor/practicalmeteor:chai';
+import chai from 'chai'
 import {SysExHeader, SysExHeaderChannel} from './SysExHeader.js'
 import {SysExHeaderField, SysExHeaderChannelModifiedField} from './SysExHeaderField.js'
 
 const SYSEX_STATUS = 0xF0;
 
 function assert_throws(name, fields) {
-  obj = {name: name, fields: fields};
+  let obj = {name: name, fields: fields};
   chai.assert.throws(() => {
     new SysExHeader(obj);
-  });
+  }); 
 }
 function assert_does_not_throw(name, fields) {
-  obj = {name: name, fields: fields};
+  let obj = {name: name, fields: fields};
   chai.assert.doesNotThrow(() => {
     new SysExHeader(obj);
   });

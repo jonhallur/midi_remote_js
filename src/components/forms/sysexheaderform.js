@@ -6,16 +6,28 @@ import sysexheaders, {addSysexheader} from '../../state/sysexheaders'
 import {eventValueHandler} from '../../utils/handlers'
 import Loader from '../loader'
 
+function getDataFromId(manufacturers, manufacturer_id) {
+  let fields = [];
+  Object.keys(manufacturers).map((key) => {
+    if (key === manufacturer_id) {
+      console.log(manufacturers[key]);
+      fields = manufacturers[key].manufacturer_sys_ex_id;
+
+    }
+  });
+  return fields;
+}
 export default Component({
     componentDidMount() {
         getManufacturers();
     },
 
     submitForm(event) {
-        event.preventDefault();
-        var name = this.props.sysexheaderName;
-        var manufacturer_id = this.props.sysexheaderManufacturerId;
-        addSysexheader(name, manufacturer_id);
+      event.preventDefault();
+      var name = this.props.sysexheaderName;
+      var manufacturer_id = this.props.sysexheaderManufacturerId;
+      let manufacturer_data = getDataFromId(this.props.manufacturers, manufacturer_id);
+      addSysexheader(name, manufacturer_id, manufacturer_data);
     },
 
 
