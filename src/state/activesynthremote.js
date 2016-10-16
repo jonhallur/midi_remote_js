@@ -23,7 +23,8 @@ const activesynthremote = State('activesynthremote',{
     name: '',
     panels: [],
     synthPrototype: {},
-    sysexheaders: []
+    sysexheaders: [],
+    controlValues: {},
 
   },
 
@@ -35,6 +36,14 @@ const activesynthremote = State('activesynthremote',{
 
   setSysexheader: (state, payload) => ({
     sysexheaders: [...state.sysexheaders, payload]
+  }),
+
+  addPanel: (state, payload) => ({
+    panels: [...state.panels, payload]
+  }),
+
+  setControlValues: (state, payload) => ({
+    controlValues: {...state.controlValues, [payload.uuid]: payload.value}
   })
 });
 
@@ -43,49 +52,58 @@ export default activesynthremote;
 export function createActiveSynthRemote(synthremote) {
   activesynthremote.setSynthRemote(synthremote);
   for(let panel of synthremote.panels) {
+    let controls = [];
     for(let control of panel.controls) {
-      handleControl(control);
+      controls.push(handleControl(control));
     }
+    activesynthremote.addPanel({name: panel.name, key: panel.key, controls: controls})
   }
 }
 
 function handleControl(control) {
-  TYPEFUNCTIONS[control.type](control);
+  return TYPEFUNCTIONS[control.type](control);
 }
 
 function handleSysExControl(control) {
   let header_id = control.sysexheaderid;
-  getSingleSysexheader(header_id, sysexheaderCallback);
-  SUBTYPEFUNCTIONS[control.subtype](control);
+  if(!isHeaderInList(header_id)) {
+    getSingleSysexheader(header_id, sysexheaderCallback);
+  }
+  return SUBTYPEFUNCTIONS[control.subtype](control);
 
 }
 
 function handleRangeControl(control) {
-  console.log(control.name)
+  return control;
 }
 
 function handleListControl(control) {
-  console.log(control.name)
+  return control;
 }
 
 function handleToggleControl(control) {
-  console.log(control.name)
+  return control;
 }
 
 function handleBitmaskControl(control) {
   console.log(control.name)
 }
 
-function sysexheaderCallback(key, data) {
+function isHeaderInList(key) {
   let sysexheaders = activesynthremote.getState().sysexheaders;
-  let notInList = true;
+  let notInList = false;
   for (let i = 0; i < sysexheaders.length; i++) {
     let item = sysexheaders[i];
     if (item.key === key) {
-      notInList = false;
+      notInList = true;
       break;
     }
   }
+  return notInList;
+}
+
+function sysexheaderCallback(key, data) {
+  var notInList = !isHeaderInList(key);
   if(notInList) {
     let fields = [];
     data.fields.map(field => {

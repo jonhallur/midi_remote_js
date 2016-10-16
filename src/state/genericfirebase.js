@@ -2,6 +2,7 @@
  * Created by jonh on 6.10.2016.
  */
 import firebase from 'firebase'
+import * as uuid from "uuid";
 
 export function addToCollection(pathList, data) {
   var ref = firebase.database().ref(pathList.join('/'));
@@ -9,11 +10,11 @@ export function addToCollection(pathList, data) {
     if(snapshot.exists()) {
       let collection = [];
       snapshot.val().forEach(item => collection.push(item));
-      collection.push(data);
+      collection.push({...data, key: uuid.v4()});
       ref.set(collection);
     }
     else {
-      ref.set([data]);
+      ref.set([{...data, key: uuid.v4()}]);
     }
   });
 }

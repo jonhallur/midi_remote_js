@@ -77,8 +77,10 @@ export function getSynthRemote(key) {
     firebase.database().ref('admin/synthremotes/' + key).on("value", function(snapshot) {
         var data = snapshot.val();
         var panels = [];
+        var index = 0;
         if (data.panels !== undefined) {
-          data.panels.forEach(panel => panels.push(panel));
+          data.panels.forEach(panel => panels.push({...panel, key: panel.key }));
+          index++;
         }
         synthremotes.setSynthRemote({
             name: data.name,

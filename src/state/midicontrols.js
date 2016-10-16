@@ -1,6 +1,7 @@
 import {State} from 'jumpsuit'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 import firebase from 'firebase'
+import uuid from 'uuid'
 
 const midicontrols = State('midicontrols', {
   initial: {
@@ -147,8 +148,7 @@ export function getControls(remote_id, panel_id) {
   firebase.database().ref(refList.join('/')).on('value', function(snapshot) {
     let controlList = [];
     snapshot.forEach(function(child) {
-      let controlData = {...child.val(), key: child.key};
-      controlList.push(controlData);
+      controlList.push(child.val());
     });
     midicontrols.setControls(controlList);
   })

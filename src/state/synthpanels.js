@@ -2,6 +2,7 @@
  * Created by jonh on 15.9.2016.
  */
 import {State} from 'jumpsuit'
+import uuid from 'uuid'
 
 var firebase = require('firebase');
 
@@ -45,11 +46,11 @@ export function addPanel(remote_id, name) {
     if(snapshot.exists()) {
       let panels = [];
       snapshot.val().forEach(panel => panels.push(panel));
-      panels.push({name:name, controls: []});
+      panels.push({name:name, key: uuid.v4(), controls: []});
       ref.set(panels);
     }
     else {
-      ref.set([{name: name, controls: []}]);
+      ref.set([{name: name, key: uuid.v4(), controls: []}]);
     }
   });
 }
@@ -67,8 +68,6 @@ export function updatePanelName(pathList, name) {
   })
 }
 
-
-
 export function getSynthPanel(pathList) {
   firebase.database().ref(pathList.join('/')).on("value", function(snapshot) {
     var data = snapshot.val();
@@ -78,7 +77,8 @@ export function getSynthPanel(pathList) {
     }
     synthpanels.setPanel({
       name: data.name,
-      controls: controls
+      controls: controls,
+      key: data.key
     });
   });
 }
