@@ -25,8 +25,10 @@
     "jquery": "^3.1.1",
     "jquery-knob": "^1.2.11",
     "jumpsuit": "^0.7.0",
+    "lodash": "^4.16.4",
     "react-dnd": "^2.1.4",
     "react-dnd-html5-backend": "^2.1.2",
-    "uuid": "^2.0.3"
+    "uuid": "^2.0.3",
+    "webmidi": "^2.0.0-beta.1"
   }
 }

@@ -6,6 +6,7 @@ import {getSynthRemote} from '../state/synthremotes'
 import activeSynthRemote, {createActiveSynthRemote} from '../state/activesynthremote'
 import jQuery from 'jquery'
 import '../pojos/jquery-knob'
+import MidiDevices from '../components/mididevices'
 
 export default Component({
   componentDidMount() {
@@ -21,6 +22,7 @@ export default Component({
   render() {
     return (
       <div>
+        <MidiDevices/>
         <h2>UserSynthRemote {this.props.synthremote.name}</h2>
         {this.props.panels.map((panel, index) => (
           <Panel key={index} id={index} panel={panel} />
@@ -56,7 +58,6 @@ const Control = Component({
   componentDidMount() {
     jQuery('.dial').knob({
       'release': function (v) {
-        console.log(this.$[0].id);
         activeSynthRemote.setControlValues({uuid: this.$[0].id, value: v})
       }
     });
@@ -68,24 +69,32 @@ const Control = Component({
 
   render() {
     return (
-      <input
-        type="text"
-        className="dial"
-        value={this.props.control.default}
-        onChange={event => this.handleKnobChange(this.props.control.parameter, this.props.index)}
-        id={this.props.control.key}
-        title={this.props.control.name}
-        data-param-num={this.props.control.parameter}
-        data-width="60"
-        data-height="60"
-        data-fgColor="#66CC66"
-        data-angleOffset="-135"
-        data-angleArc="270"
-        data-thickness="0.55"
-        data-skin="tron"
-        data-min={this.props.control.min}
-        data-max={this.props.control.max}
-      />
+      <div className="midi-control-box">
+        <div className="midi-control-label">
+          <p>{this.props.control.short}</p>
+        </div>
+        <div className="dial-box">
+          <input
+            type="text"
+            className="dial"
+            value={this.props.control.default}
+            onChange={event => this.handleKnobChange(this.props.control.parameter, this.props.index)}
+            id={this.props.control.key}
+            title={this.props.control.name}
+            data-param-num={this.props.control.parameter}
+            data-width="60"
+            data-height="60"
+            data-fgColor="#66CC66"
+            data-angleOffset="-135"
+            data-angleArc="270"
+            data-thickness="0.55"
+            data-skin="tron"
+            data-min={this.props.control.min}
+            data-max={this.props.control.max}
+          />
+        </div>
+      </div>
+
     )
   }
 });

@@ -6,6 +6,7 @@ import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 import {getSingleSysexheader} from './sysexheaders'
 import {SysExHeader} from "../pojos/SysExHeader";
 import {SysExHeaderField, SysExHeaderChannelModifiedField} from "../pojos/SysExHeaderField";
+import _ from 'lodash'
 
 var TYPEFUNCTIONS = {[CONTROLTYPE.SYSEX]: handleSysExControl};
 var SUBTYPEFUNCTIONS = {
@@ -55,8 +56,10 @@ export function createActiveSynthRemote(synthremote) {
     let controls = [];
     for(let control of panel.controls) {
       controls.push(handleControl(control));
+      activesynthremote.setControlValues({uuid: control.key, value: control.default})
     }
-    activesynthremote.addPanel({name: panel.name, key: panel.key, controls: controls})
+    activesynthremote.addPanel({name: panel.name, key: panel.key, controls: controls});
+
   }
 }
 
@@ -91,15 +94,8 @@ function handleBitmaskControl(control) {
 
 function isHeaderInList(key) {
   let sysexheaders = activesynthremote.getState().sysexheaders;
-  let notInList = false;
-  for (let i = 0; i < sysexheaders.length; i++) {
-    let item = sysexheaders[i];
-    if (item.key === key) {
-      notInList = true;
-      break;
-    }
-  }
-  return notInList;
+  let index = _.findIndex(sysexheaders, ["key", key]);
+  return index !== -1;
 }
 
 function sysexheaderCallback(key, data) {
@@ -117,4 +113,8 @@ function sysexheaderCallback(key, data) {
     let sysexheader = new SysExHeader({name: data.name, fields: fields});
     activesynthremote.setSysexheader({key: key, value: sysexheader});
   }
+}
+
+export function sendSysExData(key) {
+  let sysexheaders = activesynthremote.getState().sysexheaders;
 }
