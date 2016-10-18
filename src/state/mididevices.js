@@ -8,8 +8,11 @@ const mididevices = State('mididevices', {
   initial: {
     inputs: [],
     outputs: [],
+    channels: [...Array(16)].map((v,i)=> ({name: i+1, value: i+1})),
     selectedOutput: '',
     selectedInput: '',
+    selectedOutputChannel: '',
+    selectedInputChannel: '',
 
   },
 
@@ -27,6 +30,14 @@ const mididevices = State('mididevices', {
 
   setSelectedOutput: (state, payload) => ({
     selectedOutput: payload
+  }),
+
+  setSelectedInputChannel: (state, payload) => ({
+    selectedInputChannel: payload
+  }),
+
+  setSelectedOutputChannel: (state, payload) => ({
+    selectedOutputChannel: payload
   }),
 });
 
@@ -53,5 +64,5 @@ export function initializeMidi() {
         )
       );
     }
-  })
+  }, true)
 }

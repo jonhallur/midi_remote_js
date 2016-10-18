@@ -21,6 +21,14 @@ export default Component({
           eventhandler={event => mididevices.setSelectedInput(event.target.value)}
         />
         <Selector
+          label=""
+          default_text="Channel"
+          value={this.props.selectedInputChannel}
+          data={this.props.midiChannels}
+          eventhandler={event => mididevices.setSelectedInputChannel(event.target.value)}
+        />
+
+        <Selector
           label="Out"
           default_text="Select Output"
           value={this.props.selectedOutput}
@@ -28,6 +36,15 @@ export default Component({
           id="midi-outputs"
           eventhandler={event => mididevices.setSelectedOutput(event.target.value)}
         />
+
+        <Selector
+          label=""
+          default_text="Channel"
+          value={this.props.selectedOutputChannel}
+          data={this.props.midiChannels}
+          eventhandler={event => mididevices.setSelectedOutputChannel(event.target.value)}
+        />
+
       </form>
     )
   }
@@ -35,5 +52,8 @@ export default Component({
   inputs: state.mididevices.inputs,
   outputs: state.mididevices.outputs,
   selectedInput: state.mididevices.selectedInput,
-  selectedOutput: state.mididevices.selectedOutput
+  selectedOutput: state.mididevices.selectedOutput,
+  midiChannels: state.mididevices.channels,
+  selectedOutputChannel: state.mididevices.selectedOutputChannel,
+  selectedInputChannel: state.mididevices.selectedInputChannel,
 }))

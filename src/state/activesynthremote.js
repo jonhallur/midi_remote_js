@@ -2,11 +2,13 @@
  * Created by jonh on 9.10.2016.
  */
 import {State} from 'jumpsuit'
-import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
+import mididevices from './mididevices'
+import {CONTROLTYPE, SUBCONTROLTYPE, EOX} from '../pojos/constants'
 import {getSingleSysexheader} from './sysexheaders'
-import {SysExHeader} from "../pojos/SysExHeader";
+import {SysExHeaderChannel} from '../pojos/SysExHeader'
 import {SysExHeaderField, SysExHeaderChannelModifiedField} from "../pojos/SysExHeaderField";
 import _ from 'lodash'
+import WebMidi from 'webmidi'
 
 var TYPEFUNCTIONS = {[CONTROLTYPE.SYSEX]: handleSysExControl};
 var SUBTYPEFUNCTIONS = {
@@ -101,23 +103,35 @@ function isHeaderInList(key) {
 function sysexheaderCallback(key, data) {
   var notInList = !isHeaderInList(key);
   if(notInList) {
-    let fields = [];
-    data.fields.map(field => {
-      if (field.channel_mod) {
-        fields.push(new SysExHeaderChannelModifiedField({name: field.name, constant: field.value}))
-      }
-      else {
-        fields.push(new SysExHeaderField({name: field.name, value: field.value}))
-      }
-    });
-    let sysexheader = new SysExHeader({name: data.name, fields: fields});
-    activesynthremote.setSysexheader({key: key, value: sysexheader});
+    activesynthremote.setSysexheader({key: key, value: data});
   }
 }
 
 export function sendSysExData(header_id, param_id, value) {
   let sysexheaders = activesynthremote.getState().sysexheaders;
   let header = sysexheaders[_.findIndex(sysexheaders, ['key', header_id])];
-  let header_instance = Object.assign(new SysExHeader, header.value);
-  console.log(header_instance.generate_header());
+  let data = header.value;
+  let fields = [];
+  data.fields.map(field => {
+    if (field.channel_mod) {
+      fields.push(new SysExHeaderChannelModifiedField({name: field.name, constant: field.value}))
+    }
+    else {
+      fields.push(new SysExHeaderField({name: field.name, value: field.value}))
+    }
+  });
+  let sysexheader = new SysExHeaderChannel({name: data.name, fields: fields});
+  let {selectedOutputChannel, selectedOutput} = mididevices.getState();
+  let sysex_payload = sysexheader.generate_header(Number(selectedOutputChannel));
+  sysex_payload.push(Number(param_id));
+  sysex_payload.push(value);
+  sysex_payload.push(EOX);
+  let output = WebMidi.getOutputById(selectedOutput);
+  var status = sysex_payload.shift();
+  sysex_payload.pop();
+  let manufacturer = sysex_payload.shift()
+  console.log(manufacturer, sysex_payload);
+  output.sendSysex(manufacturer, sysex_payload)
+
+
 }

@@ -87,6 +87,8 @@ const Control = Component({
             onChange={event => this.handleKnobChange(this.props.control.parameter, this.props.index)}
             id={this.props.control.key}
             title={this.props.control.name}
+            data-min={this.props.control.minimum}
+            data-max={this.props.control.maximum}
             data-sysex-id={this.props.control.sysexheaderid}
             data-param-num={this.props.control.parameter}
             data-width="60"
@@ -96,8 +98,6 @@ const Control = Component({
             data-angleArc="270"
             data-thickness="0.55"
             data-skin="tron"
-            data-min={this.props.control.min}
-            data-max={this.props.control.max}
           />
         </div>
       </div>
