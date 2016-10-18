@@ -115,6 +115,9 @@ function sysexheaderCallback(key, data) {
   }
 }
 
-export function sendSysExData(key) {
+export function sendSysExData(header_id, param_id, value) {
   let sysexheaders = activesynthremote.getState().sysexheaders;
+  let header = sysexheaders[_.findIndex(sysexheaders, ['key', header_id])];
+  let header_instance = Object.assign(new SysExHeader, header.value);
+  console.log(header_instance.generate_header());
 }

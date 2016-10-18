@@ -3,7 +3,7 @@
  */
 import {Component} from 'jumpsuit'
 import {getSynthRemote} from '../state/synthremotes'
-import activeSynthRemote, {createActiveSynthRemote} from '../state/activesynthremote'
+import activeSynthRemote, {createActiveSynthRemote, sendSysExData} from '../state/activesynthremote'
 import jQuery from 'jquery'
 import '../pojos/jquery-knob'
 import MidiDevices from '../components/mididevices'
@@ -58,7 +58,13 @@ const Control = Component({
   componentDidMount() {
     jQuery('.dial').knob({
       'release': function (v) {
-        activeSynthRemote.setControlValues({uuid: this.$[0].id, value: v})
+        let knob = this.$[0];
+        let control_id = knob.id;
+        let param_num = jQuery(knob).attr('data-param-num');
+        let sysex_id = jQuery(knob).attr('data-sysex-id');
+        activeSynthRemote.setControlValues({uuid: control_id, value: v});
+        sendSysExData(sysex_id, param_num, v)
+
       }
     });
   },
@@ -81,6 +87,7 @@ const Control = Component({
             onChange={event => this.handleKnobChange(this.props.control.parameter, this.props.index)}
             id={this.props.control.key}
             title={this.props.control.name}
+            data-sysex-id={this.props.control.sysexheaderid}
             data-param-num={this.props.control.parameter}
             data-width="60"
             data-height="60"

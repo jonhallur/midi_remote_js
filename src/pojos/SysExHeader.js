@@ -22,7 +22,7 @@ export class SysExHeader {
         }
       });
       if(should_throw) {
-        throw TypeError('At least one item in fields is not of type SysExHeaderFiled');
+        throw TypeError('At least one item in fields is not of type SysExHeaderField');
       }
       else {
         this.fields = fields;
