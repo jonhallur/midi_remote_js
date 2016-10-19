@@ -2,11 +2,12 @@
  * Created by jonh on 9.10.2016.
  */
 import {Component} from 'jumpsuit'
-import {getSynthRemote} from '../state/synthremotes'
-import activeSynthRemote, {createActiveSynthRemote, sendSysExData} from '../state/activesynthremote'
-import jQuery from 'jquery'
 import '../pojos/jquery-knob'
+import {getSynthRemote} from '../state/synthremotes'
+import {createActiveSynthRemote} from '../state/activesynthremote'
 import MidiDevices from '../components/mididevices'
+import JQueryKnob from '../components/midicontrols/rangeknob'
+import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 
 export default Component({
   componentDidMount() {
@@ -40,13 +41,18 @@ const Panel = Component({
   render() {
     let panel_key = this.props.id;
     return (
-      <div className="panel panel-default">
+      <div className="panel panel-default" id={this.props.id}>
         <div className="panel-heading">
           <h3 className="panel-title">{this.props.panel.name}</h3>
         </div>
         <div className="panel-body">
           {this.props.panel.controls.map((control, index) => (
-            <Control key={index} index={index} control={control} id={panel_key} />
+            <div className="midi-control-box"  key={'control_' + index}>
+              <div className="midi-control-label">
+                <p>{control.short}</p>
+              </div>
+              <ControlDelegator index={index} control={control} />
+            </div>
           ))}
         </div>
       </div>
@@ -54,54 +60,36 @@ const Panel = Component({
   }
 });
 
-const Control = Component({
-  componentDidMount() {
-    jQuery('.dial').knob({
-      'release': function (v) {
-        let knob = this.$[0];
-        let control_id = knob.id;
-        let param_num = jQuery(knob).attr('data-param-num');
-        let sysex_id = jQuery(knob).attr('data-sysex-id');
-        activeSynthRemote.setControlValues({uuid: control_id, value: v});
-        sendSysExData(sysex_id, param_num, v)
-
-      }
-    });
-  },
-
-  handleKnobChange(parameter, event) {
-    console.log(parameter, event);
-  },
-
+const ControlDelegator = Component({
   render() {
-    return (
-      <div className="midi-control-box">
-        <div className="midi-control-label">
-          <p>{this.props.control.short}</p>
-        </div>
-        <div className="dial-box">
-          <input
-            type="text"
-            className="dial"
-            value={this.props.control.default}
-            onChange={event => this.handleKnobChange(this.props.control.parameter, this.props.index)}
-            id={this.props.control.key}
-            title={this.props.control.name}
-            data-min={this.props.control.minimum}
-            data-max={this.props.control.maximum}
-            data-sysex-id={this.props.control.sysexheaderid}
-            data-param-num={this.props.control.parameter}
-            data-width="60"
-            data-height="60"
-            data-fgColor="#66CC66"
-            data-angleOffset="-135"
-            data-angleArc="270"
-            data-thickness="0.55"
-            data-skin="tron"
-          />
-        </div>
-      </div>
+    let {index, control} = this.props;
+    let {type, subtype} = control;
+    let control_map = {
+      [CONTROLTYPE.SYSEX]: {
+      [SUBCONTROLTYPE.RANGE]: <JQueryKnob key={'knob_' + index} index={index} control={control} />,
+        [SUBCONTROLTYPE.LIST]: <ListControl key={'list_' + index} index={index} control={control} />
+      }
+    };
+    return control_map[type][subtype];
+  }
+});
 
+const ListControl = Component({
+  render() {
+    let {control} = this.props;
+    let options = [];
+    control.options.forEach(item => options.push(item));
+    return (
+      <div className="drop-down-box">
+        <select className="drop-down-select">
+          <option disabled value="">select</option>
+          {
+            options.map(item => (
+              <option className="drop-down-option" key={'option_' + item.value} value={item.value}>{item.name}</option>
+            ))
+          }
+        </select>
+      </div>
     )
   }
 });

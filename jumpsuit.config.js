@@ -9,6 +9,15 @@ module.exports = {
   styles: {
     extensions: ['.css', '.styl'],
     action: buildStyles
+  },
+
+  module: {
+    loaders: [
+      {
+        test: /\.(ttf|eot|svg|woff(2)?)(\S+)?$/,
+        loader: 'file-loader?name=[hash].[ext]'
+      }
+    ]
   }
 };
 

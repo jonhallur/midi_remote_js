@@ -2,6 +2,7 @@
  * Created by jonh on 16.7.2016.
  */
 import {SysExHeaderField, SysExHeaderChannelModifiedField} from './SysExHeaderField.js'
+import _ from 'lodash'
 
 export class SysExHeader {
   constructor({ name = '', fields = [] } = {}) {
@@ -42,11 +43,14 @@ export class SysExHeaderChannel extends SysExHeader {
   constructor({ name = '', fields = []} = {}) {
     super({name: name, fields: fields});
   }
-  generate_header(hex_channel) {
+  generate_header(hex_channel, status_byte=[0xF0]) {
     if (hex_channel === undefined) {
       throw TypeError('channel is undefined');
     }
-    let header = [0xF0];
+    if (!_.isArray(status_byte)) {
+      throw TypeError('status_byte is not a list');
+    }
+    let header = status_byte;
     this.fields.forEach((item)=> {
       if (item instanceof SysExHeaderChannelModifiedField) {
         header.push(item.get_value(hex_channel));

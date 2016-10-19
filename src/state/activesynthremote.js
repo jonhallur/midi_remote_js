@@ -122,16 +122,22 @@ export function sendSysExData(header_id, param_id, value) {
   });
   let sysexheader = new SysExHeaderChannel({name: data.name, fields: fields});
   let {selectedOutputChannel, selectedOutput} = mididevices.getState();
-  let sysex_payload = sysexheader.generate_header(Number(selectedOutputChannel));
+  let sysex_payload = sysexheader.generate_header(Number(selectedOutputChannel), []);
   sysex_payload.push(Number(param_id));
   sysex_payload.push(value);
-  sysex_payload.push(EOX);
   let output = WebMidi.getOutputById(selectedOutput);
-  var status = sysex_payload.shift();
-  sysex_payload.pop();
-  let manufacturer = sysex_payload.shift()
-  console.log(manufacturer, sysex_payload);
-  output.sendSysex(manufacturer, sysex_payload)
+
+  let manufacturer_bytes;
+  let data_bytes;
+  if(sysex_payload[0] === 0) {
+    manufacturer_bytes = sysex_payload.slice(0,2);
+    data_bytes = sysex_payload.slice(3);
+  }
+  else {
+    manufacturer_bytes = sysex_payload.shift();
+    data_bytes = sysex_payload;
+  }
+  output.sendSysex(manufacturer_bytes, data_bytes)
 
 
 }

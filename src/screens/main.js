@@ -1,5 +1,6 @@
 import { Component } from 'jumpsuit'
 import {getSynthRemotes} from '../state/synthremotes'
+import {NotificationContainer} from 'react-notifications'
 
 export default Component({
   componentDidMount() {
@@ -9,6 +10,7 @@ export default Component({
   render () {
     return (
       <div>
+        <NotificationContainer/>
         <h2>Select Synth Remote</h2>
         <div className="list-group">
           {this.props.synthremotes.map(remote => (
