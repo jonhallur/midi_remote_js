@@ -4,10 +4,12 @@
 import {Component} from 'jumpsuit'
 import '../pojos/jquery-knob'
 import {getSynthRemote} from '../state/synthremotes'
-import {createActiveSynthRemote} from '../state/activesynthremote'
+import activeSynthRemote, {createActiveSynthRemote, sendSysExData} from '../state/activesynthremote'
 import MidiDevices from '../components/mididevices'
 import JQueryKnob from '../components/midicontrols/rangeknob'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
+import {NotificationManager} from 'react-notifications'
+import jQuery from 'jquery'
 
 export default Component({
   componentDidMount() {
@@ -39,13 +41,20 @@ export default Component({
 
 const Panel = Component({
   render() {
-    let panel_key = this.props.id;
     return (
-      <div className="panel panel-default" id={this.props.id}>
+      <div className="panel panel-default" id={this.props.panel.key}>
         <div className="panel-heading">
-          <h3 className="panel-title">{this.props.panel.name}</h3>
+          <h3 className="panel-title">{this.props.panel.name}
+          <div className="badge float-right">
+              <span
+                className="glyphicon glyphicon-align-justify"
+                aria-hidden="true"
+                onClick={e => activeSynthRemote.togglePanel(this.props.panel.key)}
+              />
+          </div>
+          </h3>
         </div>
-        <div className="panel-body">
+        <div className={this.props.showPanel[this.props.panel.key] ? "panel-body" : "collapse"} id={'panel_' + this.props.id}>
           {this.props.panel.controls.map((control, index) => (
             <div className="midi-control-box"  key={'control_' + index}>
               <div className="midi-control-label">
@@ -58,7 +67,9 @@ const Panel = Component({
       </div>
     )
   }
-});
+}, (state) => ({
+  showPanel: state.activesynthremote.showPanel
+}));
 
 const ControlDelegator = Component({
   render() {
@@ -75,21 +86,49 @@ const ControlDelegator = Component({
 });
 
 const ListControl = Component({
+  handleListChange(event) {
+    event.preventDefault();
+    let selector = event.target;
+    let value = selector.value;
+    let param_num = jQuery(selector).attr('data-param-num');
+    let sysex_key = jQuery(selector).attr('data-sysex-id');
+
+    let selector_key = selector.id;
+    activeSynthRemote.setControlValues({uuid: selector_key, value: value});
+    sendSysExData(sysex_key, param_num, value);
+
+  },
+
   render() {
-    let {control} = this.props;
+    let {control, controlValues} = this.props;
     let options = [];
     control.options.forEach(item => options.push(item));
     return (
       <div className="drop-down-box">
-        <select className="drop-down-select">
+        <select
+          id={control.key}
+          className="drop-down-select"
+          value={controlValues[control.key]}
+          onChange={this.handleListChange}
+          data-param-num={control.parameter}
+          data-sysex-id={control.sysexheaderid}
+        >
           <option disabled value="">select</option>
           {
             options.map(item => (
-              <option className="drop-down-option" key={'option_' + item.value} value={item.value}>{item.name}</option>
+              <option
+                className="drop-down-option"
+                key={'option_' + item.value}
+                value={item.value}
+              >{item.name}</option>
             ))
           }
         </select>
       </div>
     )
   }
-});
+}, (state) => ({
+  selectedOutput: state.mididevices.selectedOutput,
+  selectedOutputChannel: state.mididevices.selectedOutputChannel,
+  controlValues: state.activesynthremote.controlValues
+}));

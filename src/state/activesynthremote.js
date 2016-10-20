@@ -28,6 +28,7 @@ const activesynthremote = State('activesynthremote',{
     synthPrototype: {},
     sysexheaders: [],
     controlValues: {},
+    showPanel: {}
 
   },
 
@@ -47,6 +48,14 @@ const activesynthremote = State('activesynthremote',{
 
   setControlValues: (state, payload) => ({
     controlValues: {...state.controlValues, [payload.uuid]: payload.value}
+  }),
+
+  togglePanel: (state, payload) => ({
+    showPanel: {...state.showPanel, [payload]: !state.showPanel[payload]}
+  }),
+
+  setPanel: (state, payload) => ({
+    showPanel: {...state.showPanel, [payload]: true}
   })
 });
 
@@ -61,6 +70,7 @@ export function createActiveSynthRemote(synthremote) {
       activesynthremote.setControlValues({uuid: control.key, value: control.default})
     }
     activesynthremote.addPanel({name: panel.name, key: panel.key, controls: controls});
+    activesynthremote.setPanel(panel.key);
 
   }
 }
@@ -107,7 +117,7 @@ function sysexheaderCallback(key, data) {
   }
 }
 
-export function sendSysExData(header_id, param_id, value) {
+function createSysExHeader(header_id, param_id, value, selectedOutputChannel) {
   let sysexheaders = activesynthremote.getState().sysexheaders;
   let header = sysexheaders[_.findIndex(sysexheaders, ['key', header_id])];
   let data = header.value;
@@ -121,23 +131,42 @@ export function sendSysExData(header_id, param_id, value) {
     }
   });
   let sysexheader = new SysExHeaderChannel({name: data.name, fields: fields});
-  let {selectedOutputChannel, selectedOutput} = mididevices.getState();
-  let sysex_payload = sysexheader.generate_header(Number(selectedOutputChannel), []);
-  sysex_payload.push(Number(param_id));
-  sysex_payload.push(value);
-  let output = WebMidi.getOutputById(selectedOutput);
+  let generatedHeader = sysexheader.generate_header(Number(selectedOutputChannel), []);
+  generatedHeader.push(Number(param_id));
+  generatedHeader.push(value);
+  return generatedHeader;
+}
 
+function PrepareOutput(sysex_payload) {
   let manufacturer_bytes;
   let data_bytes;
-  if(sysex_payload[0] === 0) {
-    manufacturer_bytes = sysex_payload.slice(0,2);
+  if (sysex_payload[0] === 0) {
+    manufacturer_bytes = sysex_payload.slice(0, 2);
     data_bytes = sysex_payload.slice(3);
   }
   else {
     manufacturer_bytes = sysex_payload.shift();
     data_bytes = sysex_payload;
   }
-  output.sendSysex(manufacturer_bytes, data_bytes)
+  return {manufacturer_bytes: manufacturer_bytes, data_bytes: data_bytes};
+}
 
+function midiIsReady(selectedOutputChannel, selectedOutput) {
+  if (selectedOutput === '' || selectedOutputChannel === '') {
+    NotificationManager.error("Output or channel not selected", "MIDI Error", 3000);
+    return false;
+  }
+  return true;
+}
 
+export function sendSysExData(header_id, param_id, value) {
+  let {selectedOutputChannel, selectedOutput} = mididevices.getState();
+  if (midiIsReady(selectedOutputChannel, selectedOutput)) {
+    var sysex_payload = createSysExHeader(header_id, param_id, value, selectedOutputChannel);
+    let output = WebMidi.getOutputById(selectedOutput);
+    let outputBytes = PrepareOutput(sysex_payload);
+    let manufacturer_bytes = outputBytes.manufacturer_bytes;
+    let data_bytes = outputBytes.data_bytes;
+    output.sendSysex(manufacturer_bytes, data_bytes)
+  }
 }
