@@ -3,10 +3,11 @@
  */
 import {State} from 'jumpsuit'
 import mididevices from './mididevices'
-import {CONTROLTYPE, SUBCONTROLTYPE, EOX} from '../pojos/constants'
+import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 import {getSingleSysexheader} from './sysexheaders'
 import {SysExHeaderChannel} from '../pojos/SysExHeader'
 import {SysExHeaderField, SysExHeaderChannelModifiedField} from "../pojos/SysExHeaderField";
+import {NotificationManager} from 'react-notifications'
 import _ from 'lodash'
 import WebMidi from 'webmidi'
 

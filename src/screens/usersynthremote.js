@@ -7,6 +7,8 @@ import {getSynthRemote} from '../state/synthremotes'
 import activeSynthRemote, {createActiveSynthRemote, sendSysExData} from '../state/activesynthremote'
 import MidiDevices from '../components/mididevices'
 import JQueryKnob from '../components/midicontrols/rangeknob'
+import ListControl from '../components/midicontrols/dropdown'
+import Toggle from '../components/midicontrols/toggle'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 import {NotificationManager} from 'react-notifications'
 import jQuery from 'jquery'
@@ -77,58 +79,11 @@ const ControlDelegator = Component({
     let {type, subtype} = control;
     let control_map = {
       [CONTROLTYPE.SYSEX]: {
-      [SUBCONTROLTYPE.RANGE]: <JQueryKnob key={'knob_' + index} index={index} control={control} />,
-        [SUBCONTROLTYPE.LIST]: <ListControl key={'list_' + index} index={index} control={control} />
+        [SUBCONTROLTYPE.RANGE]: <JQueryKnob key={index} index={index} control={control} />,
+        [SUBCONTROLTYPE.LIST]: <ListControl key={index} index={index} control={control} />,
+        [SUBCONTROLTYPE.TOGGLE]: <Toggle key={index} index={index} control={control} />
       }
     };
     return control_map[type][subtype];
   }
 });
-
-const ListControl = Component({
-  handleListChange(event) {
-    event.preventDefault();
-    let selector = event.target;
-    let value = selector.value;
-    let param_num = jQuery(selector).attr('data-param-num');
-    let sysex_key = jQuery(selector).attr('data-sysex-id');
-
-    let selector_key = selector.id;
-    activeSynthRemote.setControlValues({uuid: selector_key, value: value});
-    sendSysExData(sysex_key, param_num, value);
-
-  },
-
-  render() {
-    let {control, controlValues} = this.props;
-    let options = [];
-    control.options.forEach(item => options.push(item));
-    return (
-      <div className="drop-down-box">
-        <select
-          id={control.key}
-          className="drop-down-select"
-          value={controlValues[control.key]}
-          onChange={this.handleListChange}
-          data-param-num={control.parameter}
-          data-sysex-id={control.sysexheaderid}
-        >
-          <option disabled value="">select</option>
-          {
-            options.map(item => (
-              <option
-                className="drop-down-option"
-                key={'option_' + item.value}
-                value={item.value}
-              >{item.name}</option>
-            ))
-          }
-        </select>
-      </div>
-    )
-  }
-}, (state) => ({
-  selectedOutput: state.mididevices.selectedOutput,
-  selectedOutputChannel: state.mididevices.selectedOutputChannel,
-  controlValues: state.activesynthremote.controlValues
-}));

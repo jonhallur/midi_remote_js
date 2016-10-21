@@ -19,12 +19,6 @@ export default Component({
   },
 
   handleKnobChange(knob, v) {
-    let selectedOutput = this.props.selectedOutput;
-    let selectedOutputChannel = this.props.selectedOutputChannel;
-    if (selectedOutput === '' || selectedOutputChannel === '') {
-      NotificationManager.error("Output or channel not selected", "MIDI Error", 3000);
-      return;
-    }
     let knob_key = knob.id;
     let param_num = jQuery(knob).attr('data-param-num');
     let sysex_key = jQuery(knob).attr('data-sysex-id');
@@ -50,7 +44,7 @@ export default Component({
           data-param-num={this.props.control.parameter}
           data-width="60"
           data-height="60"
-          data-fgColor="#66CC66"
+          data-fgColor="#87d068"
           data-angleOffset="-135"
           data-angleArc="270"
           data-thickness="0.55"
@@ -60,7 +54,5 @@ export default Component({
     )
   }
 }, (state) => ({
-  selectedOutput: state.mididevices.selectedOutput,
-  selectedOutputChannel: state.mididevices.selectedOutputChannel,
   controlValues: state.activesynthremote.controlValues
 }));
