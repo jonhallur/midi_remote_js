@@ -3,13 +3,14 @@
  */
 import {Component} from 'jumpsuit'
 import Selector from '../input/arrayselector'
-import Input from '../input/input'
-import CheckBox from '../input/checkbox'
 import midicontrols from '../../state/midicontrols'
 import {getSysExHeaderFromManufacturerId} from '../../state/sysexheaders'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../../pojos/constants'
 import {getSynthRemote} from '../../state/synthremotes'
-import {addToCollection} from '../../state/genericfirebase'
+import RangeForm from './sysexrangecontrolform'
+import ToggleForm from './sysextogglecontrolform'
+import ListForm from './sysexlistcontrolform'
+import BitMaskForm from './sysexbitmaskcontrolform'
 
 export default Component({
   componentDidMount() {
@@ -21,6 +22,7 @@ export default Component({
     let isRange = this.props.selectedSubType === SUBCONTROLTYPE.RANGE.toString();
     let isToggle = this.props.selectedSubType === SUBCONTROLTYPE.TOGGLE.toString();
     let isList = this.props.selectedSubType === SUBCONTROLTYPE.LIST.toString();
+    let isBitMask = this.props.selectedSubType === SUBCONTROLTYPE.BITMASK.toString();
     return (
       <form className="form-horizontal">
         <Selector
@@ -42,7 +44,8 @@ export default Component({
         />
         {isRange ? <RangeForm params={this.props.params} /> : '' }
         {isToggle ? <ToggleForm params={this.props.params} /> : '' }
-        {isList ? <ListForm params={this.props.params} /> : ''}
+        {isList ? <ListForm params={this.props.params} /> : '' }
+        {isBitMask ? <BitMaskForm params={this.props.params} /> : '' }
       </form>
     )
   }
@@ -81,293 +84,4 @@ const SysExFormExtra = Component({
   manufacturerId: state.synthremotes.synthremote.manufacturer_id
 }));
 
-const RangeForm = Component({
-  onAddBtnClick(event) {
-    event.preventDefault();
-    let controlType = this.props.selectedType;
-    let controlSubType = this.props.selectedSubType;
-    let data = {
-      name: this.props.name,
-      short: this.props.short,
-      parameter: this.props.parameter,
-      minimum: this.props.minimum,
-      maximum: this.props.maximum,
-      default: this.props.default,
-      sysexheaderid: this.props.selectedSysExHeader,
-      type: controlType,
-      subtype: controlSubType
-    };
-    let {remote_id, panel_id} = this.props.params;
-    let pathList = ['admin', 'synthremotes', remote_id, 'panels', panel_id, 'controls'];
-    addToCollection(pathList, data);
-    midicontrols.clearRangeInputs();
-  },
 
-  render() {
-    let inputList = [
-      this.props.name,
-      this.props.short,
-      this.props.parameter,
-      this.props.minimum,
-      this.props.maximum,
-      this.props.default
-    ];
-    let showCreateButton = inputList.reduce(function(a,b) {return a && b});
-    return (
-      <div>
-        <Input
-          placeholder="Parameter Name"
-          type="text"
-          id="parameter_name"
-          value={this.props.name}
-          onChange={(event) => midicontrols.setName(event.target.value)}
-        />
-        <Input
-          placeholder="Short Name"
-          type="text"
-          id="short_name"
-          value={this.props.short}
-          onChange={(event) => midicontrols.setShort(event.target.value)}
-        />
-        <Input
-          placeholder="Parameter Number"
-          type="number"
-          id="parameter_number"
-          value={this.props.parameter}
-          onChange={(event) => midicontrols.setParameter(event.target.value)}
-        />
-        <Input
-          placeholder="Minimum Value"
-          type="number"
-          id="parameter_minimum"
-          value={this.props.minimum}
-          onChange={(event) => midicontrols.setMinimum(event.target.value)}
-        />
-        <Input
-          placeholder="Maximum Value"
-          type="number"
-          id="parameter_maximum"
-          value={this.props.maximum}
-          onChange={(event) => midicontrols.setMaximum(event.target.value)}
-        />
-        <Input
-          placeholder="Default Value"
-          type="number"
-          id="parameter_default"
-          value={this.props.default}
-          onChange={(event) => midicontrols.setDefault(event.target.value)}
-        />
-        <button className={showCreateButton ? "btn btn-default" : "hidden"} onClick={this.onAddBtnClick}>Add Range</button>
-
-      </div>
-    )
-  }
-}, (state) => ({
-  name: state.midicontrols.name,
-  short: state.midicontrols.short,
-  parameter: state.midicontrols.parameter,
-  minimum: state.midicontrols.minimum,
-  maximum: state.midicontrols.maximum,
-  default: state.midicontrols.default,
-  selectedType: state.midicontrols.selectedType,
-  selectedSubType: state.midicontrols.selectedSubType,
-  selectedSysExHeader: state.midicontrols.selectedSysExHeader,
-}));
-
-const ToggleForm = Component({
-  onAddBtnClick(event) {
-    event.preventDefault();
-    let controlType = this.props.selectedType;
-    let controlSubType = this.props.selectedSubType;
-    let data = {
-      name: this.props.name,
-      short: this.props.short,
-      parameter: this.props.parameter,
-      onvalue: this.props.onValue,
-      offvalue: this.props.offValue,
-      default: this.props.defaultToggle,
-      sysexheaderid: this.props.selectedSysExHeader,
-      type: controlType,
-      subtype: controlSubType
-    };
-    let {remote_id, panel_id} = this.props.params;
-    let pathList = ['admin', 'synthremotes', remote_id, 'panels', panel_id, 'controls'];
-    addToCollection(pathList, data);
-    midicontrols.clearToggleInputs();
-  },
-
-  render() {
-    let inputList = [
-      this.props.name,
-      this.props.short,
-      this.props.parameter,
-      this.props.onValue,
-      this.props.offValue,
-    ];
-    let showCreateButton = inputList.reduce(function(a,b) {return a && b});
-    return (
-      <div>
-        <Input
-          placeholder="Parameter Name"
-          type="text"
-          id="parameter_name"
-          value={this.props.name}
-          onChange={(event) => midicontrols.setName(event.target.value)}
-        />
-        <Input
-          placeholder="Short Name"
-          type="text"
-          id="short_name"
-          value={this.props.short}
-          onChange={(event) => midicontrols.setShort(event.target.value)}
-        />
-        <Input
-          placeholder="Parameter Number"
-          type="number"
-          id="parameter_number"
-          value={this.props.parameter}
-          onChange={(event) => midicontrols.setParameter(event.target.value)}
-        />
-        <Input
-          placeholder="On Value"
-          type="number"
-          id="on_value"
-          value={this.props.onValue}
-          onChange={(event) => midicontrols.setOnValue(event.target.value)}
-        />
-        <Input
-          placeholder="Off Value"
-          type="number"
-          id="off_value"
-          value={this.props.offValue}
-          onChange={(event) => midicontrols.setOffValue(event.target.value)}
-        />
-        <div className="row">
-          <div className="col-sm-2"></div>
-          <div className="col-sm-10">
-            <button
-              type="button"
-              className={this.props.defaultToggle ? 'btn btn-primary' : 'btn btn-default'}
-              onClick={event => midicontrols.setDefaultToggle(!this.props.defaultToggle)}
-            >{this.props.defaultToggle ? 'Default On' : 'Default Off'}
-            </button>
-          </div>
-        </div>
-
-        <button className={showCreateButton ? "btn btn-default" : "hidden"} onClick={this.onAddBtnClick}>Add Toggle</button>
-      </div>
-    )
-  }
-}, (state) => ({
-  name: state.midicontrols.name,
-  short: state.midicontrols.short,
-  parameter: state.midicontrols.parameter,
-  onValue: state.midicontrols.onValue,
-  offValue: state.midicontrols.offValue,
-  defaultToggle: state.midicontrols.defaultToggle,
-  selectedType: state.midicontrols.selectedType,
-  selectedSubType: state.midicontrols.selectedSubType,
-  selectedSysExHeader: state.midicontrols.selectedSysExHeader,
-}));
-
-function createNameValueList(nameList, valueList) {
-  if (nameList.length !== valueList.length) {
-    throw RangeError("Lists do not have the same length, can't create name-value combo list");
-  }
-  let nameValueList = [];
-  for (let i=0; i<nameList.length; i++) {
-    nameValueList.push({name: nameList[i], value: valueList[i]})
-  }
-  return nameValueList
-}
-const ListForm = Component({
-  onAddBtnClick(event) {
-    event.preventDefault();
-    let controlType = this.props.selectedType;
-    let controlSubType = this.props.selectedSubType;
-    let nameValueList = createNameValueList(this.props.nameList.split(','), this.props.valueList.split(','));
-    let data = {
-      name: this.props.name,
-      short: this.props.short,
-      parameter: this.props.parameter,
-      options: nameValueList,
-      default: this.props.default,
-      sysexheaderid: this.props.selectedSysExHeader,
-      type: controlType,
-      subtype: controlSubType
-    };
-    let {remote_id, panel_id} = this.props.params;
-    let pathList = ['admin', 'synthremotes', remote_id, 'panels', panel_id, 'controls'];
-    addToCollection(pathList, data);
-    midicontrols.clearListInputs();
-  },
-
-  render() {
-    let inputList = [
-      this.props.name,
-      this.props.short,
-      this.props.parameter,
-      this.props.nameList,
-      this.props.valueList,
-      this.props.default
-    ];
-    let showCreateButton = inputList.reduce(function(a,b) {return a && b});
-    return (
-      <div>
-        <Input
-          placeholder="Parameter Name"
-          type="text"
-          id="parameter_name"
-          value={this.props.name}
-          onChange={(event) => midicontrols.setName(event.target.value)}
-        />
-        <Input
-          placeholder="Short Name"
-          type="text"
-          id="short_name"
-          value={this.props.short}
-          onChange={(event) => midicontrols.setShort(event.target.value)}
-        />
-        <Input
-          placeholder="Parameter Number"
-          type="number"
-          id="parameter_number"
-          value={this.props.parameter}
-          onChange={(event) => midicontrols.setParameter(event.target.value)}
-        />
-        <Input
-          placeholder="Name list (comma separated)"
-          type="text"
-          id="name_list"
-          value={this.props.nameList}
-          onChange={event => midicontrols.setNameList(event.target.value)}
-        />
-        <Input
-          placeholder="Value list (comma separated)"
-          type="text"
-          id="value_list"
-          value={this.props.valueList}
-          onChange={event => midicontrols.setValueList(event.target.value)}
-        />
-        <Input
-          placeholder="Default Value (from 0 index)"
-          type="number"
-          id="parameter_default"
-          value={this.props.default}
-          onChange={(event) => midicontrols.setDefault(event.target.value)}
-        />
-        <button className={showCreateButton ? "btn btn-default" : "hidden"} onClick={this.onAddBtnClick}>Add List</button>
-      </div>
-    )
-  }
-}, (state) => ({
-  name: state.midicontrols.name,
-  short: state.midicontrols.short,
-  parameter: state.midicontrols.parameter,
-  nameList: state.midicontrols.nameList,
-  valueList: state.midicontrols.valueList,
-  default: state.midicontrols.default,
-  selectedType: state.midicontrols.selectedType,
-  selectedSubType: state.midicontrols.selectedSubType,
-  selectedSysExHeader: state.midicontrols.selectedSysExHeader,
-}));

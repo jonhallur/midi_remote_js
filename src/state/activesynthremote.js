@@ -102,7 +102,7 @@ function handleToggleControl(control) {
 }
 
 function handleBitmaskControl(control) {
-  console.log(control.name)
+  return control;
 }
 
 function isHeaderInList(key) {

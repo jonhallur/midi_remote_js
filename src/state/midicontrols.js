@@ -22,6 +22,7 @@ const midicontrols = State('midicontrols', {
     defaultToggle: false,
     nameList: '',
     valueList: '',
+    numBits: '',
     controls: [],
     types: [
       {value: CONTROLTYPE.SYSEX, name: 'System Exclusive'},
@@ -92,6 +93,10 @@ const midicontrols = State('midicontrols', {
     valueList: payload
   }),
 
+  setNumBits: (state, payload) => ({
+    numBits: payload
+  }),
+
   setControls: (state, payload) => ({
     controls: payload
   }),
@@ -120,6 +125,14 @@ const midicontrols = State('midicontrols', {
     parameter: '',
     nameList: '',
     valueList: '',
+    default: ''
+  }),
+
+  clearBitMaskInputs: (state, payload) => ({
+    name: '',
+    short: '',
+    parameter: '',
+    numBits: '',
     default: ''
   }),
 
