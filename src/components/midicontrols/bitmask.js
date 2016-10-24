@@ -20,10 +20,12 @@ export default Component({
 
   render () {
     let {control, controlValues} = this.props;
+    let bitArray = [...Array(Number(control.numbits)).keys()];
+    bitArray.reverse();
     return (
       <div className="bit-mask-box">
         {
-          [...Array(Number(control.numbits)).keys()].map(index => (
+          bitArray.map(index => (
             <input
               key={index}
               type="checkbox"

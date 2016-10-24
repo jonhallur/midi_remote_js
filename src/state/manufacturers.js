@@ -3,7 +3,7 @@
  */
 
 import { State } from 'jumpsuit';
-import {firebase_initialized, initializeFirebase} from './test'
+import {firebase_initialized, initializeFirebase} from './authentication'
 
 var firebase = require('firebase');
 
