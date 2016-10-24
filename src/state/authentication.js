@@ -49,7 +49,7 @@ export function startFirebaseAuthStateMonitor() {
   });
 }
 
-export function loginUser(email, password) {
+export function loginEmailUser(email, password) {
   firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
     // Handle Errors here.
     var errorCode = error.code;
@@ -65,6 +65,19 @@ export function signOutUser(){
     NotificationManager.error("Could not sign user out", "Authentication", 5000)
   });
 }
+
+export function createEmailUser(email, password) {
+  firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    NotificationManager.error(errorMessage, "Create User Error: " + errorCode, 5000)
+  }).then(function() {
+
+    loginEmailUser(email, password)
+  });
+}
+
 export function initializeFirebase() {
   if (firebase_initialized) {
     return;

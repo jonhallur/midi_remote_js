@@ -2,7 +2,7 @@
  * Created by jonh on 23.10.2016.
  */
 import {Component} from 'jumpsuit'
-import authentication, {loginUser, signOutUser} from '../state/authentication'
+import authentication, {loginEmailUser, signOutUser, createEmailUser} from '../state/authentication'
 import Modal from 'react-modal'
 import Input from './input/input'
 
@@ -23,12 +23,19 @@ const customStyles = {
 export default Component({
   loginUserClick(event) {
     let {loginEmail, loginPassword} = this.props;
-    loginUser(loginEmail, loginPassword);
+    loginEmailUser(loginEmail, loginPassword);
     authentication.setUsingKeyValue({key: 'showLoginModal', value: false})
   },
 
   logoutUserClick(event) {
     signOutUser()
+  },
+
+  signupUserClick(event) {
+    let {loginEmail, loginPassword} = this.props;
+    createEmailUser(loginEmail, loginPassword);
+    authentication.setUsingKeyValue({key: 'showLoginModal', value: false})
+
   },
 
   render () {

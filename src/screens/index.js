@@ -13,7 +13,7 @@ var app = Component({
     startFirebaseAuthStateMonitor();
     let showLogin = this.props.showLoginModal;
     return (
-      <div className='container'>
+      <div className='container-fluid'>
         <div className="container-fluid">
           <nav className="navbar navbar-default" role="search">
             <div className="navbar-header">
@@ -27,7 +27,7 @@ var app = Component({
         <NotificationContainer/>
         {this.props.user
           ? this.props.children
-          : <div className="alert alert-info" role="alert">Please log in to view content</div>
+          : <div className="alert alert-info" role="alert">Your are not Logged in. Please log in to view content.</div>
         }
       </div>
     )
