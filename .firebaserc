@@ -1,5 +1,11 @@
 {
   "projects": {
     "default": "midi-remote-23d30"
-  }
+  },
+  "rewrites": [
+    {
+      "source": "**",
+      "destination": "/index.html"
+    }
+  ]
 }
