@@ -59,7 +59,6 @@ export default Component({
         }
         <Modal
           isOpen={this.props.showLoginModal}
-          onAfterOpen={e => console.log("on after open")}
           onRequestClose={e => authentication.setUsingKeyValue({key: 'showLoginModal', value: false})}
           closeTimeoutMS={10}
           style={customStyles}>
@@ -84,7 +83,7 @@ export default Component({
             <div className="form-group">
               <p>
                 <button
-                  type="button"
+                  type="submit"
                   className="btn btn-primary btn-block"
                   disabled={!inputValid}
                   onClick={this.loginUserClick}
@@ -93,6 +92,7 @@ export default Component({
                   type="button"
                   className="btn btn-default btn-block"
                   disabled={!inputValid}
+                  value="Submit"
                   onClick={this.signupUserClick}
                 >Signup</button>
               </p>
