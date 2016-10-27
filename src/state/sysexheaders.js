@@ -5,8 +5,6 @@ import { State } from 'jumpsuit';
 import { initializeFirebase} from './authentication'
 import firebase from 'firebase'
 
-//var firebase = require('firebase');
-
 const sysexheaders = State('sysexheaders', {
     initial: {
         sysexheader: {

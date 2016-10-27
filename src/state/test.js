@@ -1,6 +1,5 @@
 
 import { State } from 'jumpsuit';
-var firebase = require('firebase');
 
 
 

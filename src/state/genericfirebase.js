@@ -1,7 +1,8 @@
 /**
  * Created by jonh on 6.10.2016.
  */
-import firebase from 'firebase'
+
+import firebase from 'firebase';
 import * as uuid from "uuid";
 
 export function addToCollection(pathList, data) {

@@ -4,8 +4,8 @@
 
 import { State } from 'jumpsuit';
 import {firebase_initialized, initializeFirebase} from './authentication'
+import firebase from 'firebase'
 
-var firebase = require('firebase');
 
 const manufacturers = State('manufacturers', {
     initial: {

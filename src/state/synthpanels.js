@@ -3,8 +3,7 @@
  */
 import {State} from 'jumpsuit'
 import uuid from 'uuid'
-
-var firebase = require('firebase');
+import firebase from 'firebase'
 
 const synthpanels = State('synthpanels', {
   initial: {

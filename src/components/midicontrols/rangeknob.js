@@ -2,28 +2,26 @@
  * Created by jonh on 9.10.2016.
  */
 import {Component} from 'jumpsuit'
-import {NotificationManager} from 'react-notifications'
 import jQuery from 'jquery'
 import '../../pojos/jquery-knob'
 import activeSynthRemote, {sendSysExData} from '../../state/activesynthremote'
+import _ from 'lodash'
+
+const debouncedUpdateKnob = _.debounce((parameter, sysexheaderid, key, value) => {
+  activeSynthRemote.setControlValues({uuid: key, value: value});
+  sendSysExData(sysexheaderid, parameter, value);
+  console.log(parameter, value);
+}, 100);
+
 
 export default Component({
   componentDidMount() {
-    let _this = this;
-    jQuery('.dial').knob({
-      'release': function (v) {
-        let knob = this.$[0];
-        _this.handleKnobChange(knob, v);
+    let {parameter, sysexheaderid, key} = this.props.control;
+    jQuery('.dial_' + key).knob({
+      'release': function (value) {
+        debouncedUpdateKnob(parameter, sysexheaderid, key, value);
       }
     });
-  },
-
-  handleKnobChange(knob, v) {
-    let knob_key = knob.id;
-    let param_num = jQuery(knob).attr('data-param-num');
-    let sysex_key = jQuery(knob).attr('data-sysex-id');
-    activeSynthRemote.setControlValues({uuid: knob_key, value: v});
-    sendSysExData(sysex_key, param_num, v)
   },
 
   render() {
@@ -32,7 +30,7 @@ export default Component({
       <div className="dial-box">
         <input
           type="text"
-          className="dial"
+          className={'dial_' + this.props.control.key}
           value={this.props.controlValues[this.props.control.key]}
           onChange={e => console.log("changes")}
           id={this.props.control.key}

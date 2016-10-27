@@ -1,7 +1,6 @@
 import {State} from 'jumpsuit'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 import firebase from 'firebase'
-import uuid from 'uuid'
 
 const midicontrols = State('midicontrols', {
   initial: {

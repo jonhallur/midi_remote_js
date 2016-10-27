@@ -3,8 +3,7 @@
  */
 import { State } from 'jumpsuit';
 import { initializeFirebase} from './authentication'
-
-var firebase = require('firebase');
+import firebase from 'firebase'
 
 const synthremotes = State('synthremotes', {
     initial: {
