@@ -4,6 +4,7 @@
 import { State } from 'jumpsuit';
 import { initializeFirebase} from './authentication'
 import firebase from 'firebase'
+import {NotificationManager} from 'react-notifications'
 
 const synthremotes = State('synthremotes', {
     initial: {
@@ -56,9 +57,9 @@ export function addSynthRemote(name, manufacturer_id) {
     });
 }
 
-export function getSynthRemotes() {
+export function getSynthRemotes(ref_path='admin/synthremotes') {
     initializeFirebase();
-    firebase.database().ref('admin/synthremotes').on("value", function(snapshot) {
+    firebase.database().ref(ref_path).on("value", function(snapshot) {
       let synthremotelist = [];
       snapshot.forEach(function(child) {
         synthremotelist.push({...child.val(), key:child.key})
@@ -72,8 +73,8 @@ export function getSynthRemotes() {
     });
 }
 
-export function getSynthRemote(key) {
-    firebase.database().ref('admin/synthremotes/' + key).on("value", function(snapshot) {
+export function getSynthRemote(key, refPath='admin/synthremotes/') {
+    firebase.database().ref(refPath + key).on("value", function(snapshot) {
         var data = snapshot.val();
         var panels = [];
         if (data.panels !== undefined) {
@@ -98,4 +99,35 @@ export function removeSynthremote(key) {
             console.log("sysexheader removal error")
         }
     })
+}
+
+export function publishSynthRemote(key) {
+  firebase.database().ref('admin/synthremotes/' + key).once('value', function(snapshot) {
+    if (snapshot.exists()) {
+      console.log("SourceFound");
+      let versionKey = 'version';
+      let sourceData = snapshot.val();
+      let target = firebase.database().ref('public/synthremotes/' + key);
+      target.once('value', function(targetSnapshot) {
+        let targetVersion = 1;
+        if(targetSnapshot.exists()) {
+          console.log("Target Found");
+          let targetData = targetSnapshot.val();
+          targetVersion = targetData[versionKey] + 1;
+          firebase.database().ref('public/oldersynthremotes/' + key).push(targetData);
+          sourceData[versionKey] = targetVersion;
+          target.set(sourceData)
+        }
+        else {
+          console.log("Target not found");
+          sourceData[versionKey] = targetVersion;
+          target.set(sourceData);
+        }
+      })
+    }
+    else {
+      console.log("source not found");
+      NotificationManager.error("Synth source not found", "PublishSynthRemote")
+    }
+  })
 }

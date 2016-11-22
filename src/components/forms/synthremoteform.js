@@ -6,7 +6,7 @@ import Input from '../input/input'
 import Button from '../input/button'
 import Selector from '../input/selector'
 import {getManufacturers} from '../../state/manufacturers'
-import synthremotes, {addSynthRemote} from '../../state/synthremotes'
+import synthremotes, {addSynthRemote, publishSynthRemote} from '../../state/synthremotes'
 import Loader from '../loader'
 
 export default Component({
@@ -20,14 +20,21 @@ export default Component({
     },
     updateNameField(event) {
         let name = event.target.value;
-        let object = {name: name, manufacturer_id: this.props.synthremoteManufacturerId}
+        let object = {name: name, manufacturer_id: this.props.synthremoteManufacturerId};
         synthremotes.setSynthRemote(object)
     },
 
     updateManufacturerId(event) {
         let man_id = event.target.value;
-        let object = {name: this.props.synthremoteName, manufacturer_id: man_id}
+        let object = {name: this.props.synthremoteName, manufacturer_id: man_id};
         synthremotes.setSynthRemote(object)
+    },
+
+    onPublishSynthClick(event) {
+      event.preventDefault();
+      console.log("on publish");
+      publishSynthRemote(this.props.params.remote_id)
+
     },
 
     render() {
@@ -37,6 +44,7 @@ export default Component({
         var value = this.props.synthremoteManufacturerId;
         var data = this.props.manufacturers;
         var handler = this.updateManufacturerId;
+        let {remote_id} = this.props.params || false;
         const selector = <Selector
                             id={id}
                             label={label}
@@ -55,6 +63,7 @@ export default Component({
                     placeholder="Model Name"/>
                 {selector_or_wait}
                 <Button label={this.props.synthremoteReady ? 'Update' : 'Create'} />
+                <button className={remote_id ? "btn btn-primary" : "hidden"} onClick={this.onPublishSynthClick} >Publish synth</button>
             </form>
             )
 
