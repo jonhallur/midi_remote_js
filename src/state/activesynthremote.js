@@ -62,6 +62,11 @@ const activesynthremote = State('activesynthremote',{
 
 export default activesynthremote;
 
+function getLastSavedUserSettings(synthremote) {
+  let version = synthremote.version;
+  let remote_id = synthremote.key;
+}
+
 export function createActiveSynthRemote(synthremote) {
   activesynthremote.setSynthRemote(synthremote);
   for(let panel of synthremote.panels) {
@@ -72,7 +77,7 @@ export function createActiveSynthRemote(synthremote) {
     }
     activesynthremote.addPanel({name: panel.name, key: panel.key, controls: controls});
     activesynthremote.setPanel(panel.key);
-
+    getLastSavedUserSettings(synthremote)
   }
 }
 

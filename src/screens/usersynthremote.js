@@ -14,7 +14,7 @@ import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 
 export default Component({
   componentDidMount() {
-    getSynthRemote(this.props.params.remote_id);
+    getSynthRemote(this.props.params.remote_id, 'public/synthremotes/');
   },
 
   componentWillReceiveProps: function (nextProps) {

@@ -9,7 +9,7 @@ import {getSynthRemotes} from '../state/synthremotes'
 export default Component({
     componentDidMount() {
         console.log("Component SynthRemotes MOUNTED");
-        getSynthRemotes();
+        getSynthRemotes('public/synthremotes');
     },
 
     render() {

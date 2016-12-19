@@ -1,10 +1,10 @@
 import { Component } from 'jumpsuit'
 import {getSynthRemotes} from '../state/synthremotes'
-import {NotificationContainer, Notifications} from 'react-notifications'
+import {NotificationContainer} from 'react-notifications'
 
 export default Component({
   componentDidMount() {
-    getSynthRemotes();
+    getSynthRemotes('public/synthremotes');
   },
 
   render () {
