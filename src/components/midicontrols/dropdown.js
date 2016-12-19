@@ -9,15 +9,10 @@ import jQuery from 'jquery'
 export default Component({
   handleListChange(event) {
     event.preventDefault();
-    let selector = event.target;
-    let value = selector.value;
-    let param_num = jQuery(selector).attr('data-param-num');
-    let sysex_key = jQuery(selector).attr('data-sysex-id');
-
-    let selector_key = selector.id;
-    activeSynthRemote.setControlValues({uuid: selector_key, value: value});
-    sendSysExData(sysex_key, param_num, value);
-
+    let {value} = event.target;
+    if(this.props.onValueChange !== undefined && typeof this.props.onValueChange === "function") {
+      this.props.onValueChange(value);
+    }
   },
 
   render() {
@@ -31,8 +26,6 @@ export default Component({
           className="drop-down-select"
           value={controlValues[control.key]}
           onChange={this.handleListChange}
-          data-param-num={control.parameter}
-          data-sysex-id={control.sysexheaderid}
         >
           <option disabled value="">select</option>
           {

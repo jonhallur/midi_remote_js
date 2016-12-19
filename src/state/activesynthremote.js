@@ -67,8 +67,8 @@ export function createActiveSynthRemote(synthremote) {
   for(let panel of synthremote.panels) {
     let controls = [];
     for(let control of panel.controls) {
-      controls.push(handleControl(control));
       activesynthremote.setControlValues({uuid: control.key, value: control.default})
+      controls.push(handleControl(control));
     }
     activesynthremote.addPanel({name: panel.name, key: panel.key, controls: controls});
     activesynthremote.setPanel(panel.key);

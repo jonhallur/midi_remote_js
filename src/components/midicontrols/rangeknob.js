@@ -25,7 +25,6 @@ export default Component({
   },
 
   render() {
-
     return (
       <div className="dial-box">
         <input

@@ -8,14 +8,13 @@ import jQuery from 'jquery'
 export default Component({
   handleCheckBoxClick(event) {
     let id = event.target.id;
-    let {key, parameter, sysexheaderid} = this.props.control;
+    let {key} = this.props.control;
     let currentValue = this.props.controlValues[key];
     let currentCheckbox = event.target.checked;
     let value = currentCheckbox ? Number(currentValue) | (1 << id) : Number(currentValue) ^ (1 << id);
-    activesynthremote.setControlValues({uuid: key, value: value});
-    sendSysExData(sysexheaderid, parameter, value);
-
-
+    if(this.props.onValueChange !== undefined && typeof this.props.onValueChange === "function") {
+      this.props.onValueChange(value);
+    }
   },
 
   render () {
@@ -32,7 +31,6 @@ export default Component({
               id={index}
               checked={Boolean(Number(controlValues[control.key]) & Number((1 << index)))}
               onChange={this.handleCheckBoxClick}
-
             />
           ))
         }

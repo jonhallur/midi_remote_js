@@ -61,7 +61,9 @@ export default Component({
           isOpen={this.props.showLoginModal}
           onRequestClose={e => authentication.setUsingKeyValue({key: 'showLoginModal', value: false})}
           closeTimeoutMS={10}
-          style={customStyles}>
+          style={customStyles}
+          contentLabel="Login"
+        >
 
           <h1>Login</h1>
           <form className="form-horizontal">

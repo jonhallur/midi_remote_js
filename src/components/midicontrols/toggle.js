@@ -7,9 +7,9 @@ import activeSynthRemote, {sendSysExData} from '../../state/activesynthremote'
 
 export default Component({
   handleToggleClick(value) {
-    let {key, parameter, sysexheaderid} = this.props.control;
-    activeSynthRemote.setControlValues({uuid: key, value: value});
-    sendSysExData(sysexheaderid, parameter, value);
+    if(this.props.onValueChange !== undefined && typeof this.props.onValueChange === "function") {
+      this.props.onValueChange(Number(value));
+    }
   },
 
   render() {

@@ -1,0 +1,28 @@
+.jknob-container {
+    border-radius: 3px;
+    width: 74px;
+    height: 97px;
+    background-color: #eee;
+    margin: 2px;
+    float: left;
+}
+
+.jknob-arc {
+    border-radius: 3px;
+    width: 75px;
+    height: 75px;
+    background-color: #fff;
+}
+
+.jknob-canvas {
+    width: 75px;
+    height: 75px;
+}
+
+.jknob-label {
+    text-align: center;
+    margin: 5px 5px;
+    background-color: white;
+    border-radius: 3px;
+    font-family: sans-serif;
+}
