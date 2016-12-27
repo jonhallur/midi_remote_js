@@ -14,21 +14,18 @@ function degrees(radians) {
 
 export default Component({
   componentDidMount () {
-    this.value = this.props.control.default;
     this.range = this.props.control.maximum - this.props.control.minimum;
-    this.position = this.value / this.range;
-    this.updateCanvas(true);
-    this.lastValue = this.value;
+    this.setDefaultValue(true)
   },
   componentDidUpdate() {
-    this.updateCanvas()
+    //this.updateCanvas()
   },
 
   updateCanvas(initial=false) {
     if (this.value === this.lastValue) {
       return;
     }
-    if(this.props.onValueChange !== undefined && typeof this.props.onValueChange === "function" && !initial) {
+    if((this.props.onValueChange !== undefined) && (typeof this.props.onValueChange === "function") && !initial) {
       this.props.onValueChange(this.value);
     }
     this.lastValue = this.value;
@@ -77,10 +74,13 @@ export default Component({
   },
 
   updatePosition(event) {
-    let {layerX, layerY} = event.nativeEvent;
     event.preventDefault();
-    let localX = layerX - HALF_WIDTH;
-    let localY = layerY - HALF_WIDTH;
+    let {layerX, layerY, clientX, clientY, target} = event.nativeEvent;
+    let X = (clientX) - target.getBoundingClientRect().left;
+    let Y = (clientY) - target.getBoundingClientRect().top;
+    let localX = (layerX || X) - HALF_WIDTH;
+    let localY = (layerY || Y) - HALF_WIDTH;
+    console.log(localX, localY)
     let rad = Math.atan2(localX, localY);
     let position = rad / Math.PI / 2;
     let percentage = 0;
@@ -98,7 +98,6 @@ export default Component({
       else {
         percentage = 1;
       }
-
     }
     return percentage
   },
@@ -106,23 +105,32 @@ export default Component({
   scalePercentage(percentage) {
     return Math.round(percentage * this.range);
   },
-
+  setDefaultValue (initial=false) {
+    this.value = this.props.control.default;
+    this.position = (this.value - this.props.control.minimum) / this.range;
+    this.updateCanvas(initial);
+    this.lastValue = this.position;
+  },
   onMouseMove(event) {
     if(this.mouseDown) {
       this.position = this.updatePosition(event);
       this.value = this.scalePercentage(this.position);
       this.updateCanvas()
-
     }
   },
 
   onMouseUp(event) {
     event.preventDefault();
-    this.position = this.updatePosition(event);
-    this.value = this.scalePercentage(this.position);
-    this.mouseDown = false;
-    this.updateCanvas()
-
+    if(this.mouseDown) {
+      this.mouseDown = false;
+      if (event.nativeEvent.ctrlKey) {
+        this.setDefaultValue()
+      } else {
+        this.position = this.updatePosition(event);
+        this.value = this.scalePercentage(this.position);
+        this.updateCanvas()
+      }
+    }
   },
 
   onMouseDown(event) {
@@ -149,8 +157,7 @@ export default Component({
   },
 
   render () {
-    let {key, name, short} = this.props.control;
-    let label = short ? short.substring(0,8) : '';
+    let {key, name} = this.props.control;
     return (
         <div
           id={key}

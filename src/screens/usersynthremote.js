@@ -29,8 +29,8 @@ export default Component({
         <MidiDevices/>
         <h2>UserSynthRemote {this.props.synthremote.name}</h2>
         {this.props.panels.map((panel, index) => (
-          <div className="col-lg-4">
-            <Panel key={index} id={index} panel={panel} />
+          <div key={index} className="col-lg-4">
+            <Panel id={index} panel={panel} />
           </div>
         ))}
       </div>
