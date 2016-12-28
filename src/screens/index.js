@@ -4,7 +4,7 @@ import { DragDropContext } from 'react-dnd';
 import {initializeFirebase, startFirebaseAuthStateMonitor} from '../state/authentication'
 import {NotificationContainer} from 'react-notifications'
 import Login from '../components/login'
-
+require('react-notifications');
 
 var app = Component({
 

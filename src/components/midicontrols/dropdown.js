@@ -3,8 +3,6 @@
  */
 import {Component} from 'jumpsuit'
 import '../../pojos/jquery-knob'
-import activeSynthRemote, {sendSysExData} from '../../state/activesynthremote'
-import jQuery from 'jquery'
 
 export default Component({
   handleListChange(event) {

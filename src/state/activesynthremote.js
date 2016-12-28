@@ -7,6 +7,8 @@ import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 import {getSingleSysexheader} from './sysexheaders'
 import {SysExHeaderChannel} from '../pojos/SysExHeader'
 import {SysExHeaderField, SysExHeaderChannelModifiedField} from "../pojos/SysExHeaderField";
+import {toggleTimedErrorFeedback} from "./mididevices"
+import {getLastSavedRemoteSettings, setRemoteSettingsValue} from './synthremotes'
 import {NotificationManager} from 'react-notifications'
 import _ from 'lodash'
 import WebMidi from 'webmidi'
@@ -24,6 +26,7 @@ var SUBTYPEFUNCTIONS = {
 const activesynthremote = State('activesynthremote',{
   initial: {
     remote_id: '',
+    version: '',
     name: '',
     panels: [],
     synthPrototype: {},
@@ -36,6 +39,7 @@ const activesynthremote = State('activesynthremote',{
   setSynthRemote: (state, payload) => ({
     name: payload.name,
     remote_id: payload.key,
+    version: payload.version,
     synthPrototype: payload
   }),
 
@@ -46,6 +50,9 @@ const activesynthremote = State('activesynthremote',{
   addPanel: (state, payload) => ({
     panels: [...state.panels, payload]
   }),
+  clearPanels: (state, payload) => ({
+    panels: []
+  }),
 
   setControlValues: (state, payload) => ({
     controlValues: {...state.controlValues, [payload.uuid]: payload.value}
@@ -55,7 +62,7 @@ const activesynthremote = State('activesynthremote',{
     showPanel: {...state.showPanel, [payload]: !state.showPanel[payload]}
   }),
 
-  setPanel: (state, payload) => ({
+  showPanel: (state, payload) => ({
     showPanel: {...state.showPanel, [payload]: true}
   })
 });
@@ -65,18 +72,21 @@ export default activesynthremote;
 function getLastSavedUserSettings(synthremote) {
   let version = synthremote.version;
   let remote_id = synthremote.key;
+  getLastSavedRemoteSettings(remote_id, version);
 }
 
 export function createActiveSynthRemote(synthremote) {
+  NotificationManager.info("Creating Remote", synthremote.name);
+  activesynthremote.clearPanels();
   activesynthremote.setSynthRemote(synthremote);
   for(let panel of synthremote.panels) {
     let controls = [];
     for(let control of panel.controls) {
-      activesynthremote.setControlValues({uuid: control.key, value: control.default})
+      activesynthremote.setControlValues({uuid: control.key, value: control.default});
       controls.push(handleControl(control));
     }
     activesynthremote.addPanel({name: panel.name, key: panel.key, controls: controls});
-    activesynthremote.setPanel(panel.key);
+    activesynthremote.showPanel(panel.key);
     getLastSavedUserSettings(synthremote)
   }
 }
@@ -124,6 +134,7 @@ function sysexheaderCallback(key, data) {
 }
 
 function createSysExHeader(header_id, param_id, value, selectedOutputChannel) {
+
   let sysexheaders = activesynthremote.getState().sysexheaders;
   let header = sysexheaders[_.findIndex(sysexheaders, ['key', header_id])];
   let data = header.value;
@@ -159,13 +170,19 @@ function PrepareOutput(sysex_payload) {
 
 function midiIsReady(selectedOutputChannel, selectedOutput) {
   if (selectedOutput === '' || selectedOutputChannel === '') {
-    NotificationManager.error("Output or channel not selected", "MIDI Error", 3000);
+    //NotificationManager.error("Output or channel not selected", "MIDI Error", 3000);
+    toggleTimedErrorFeedback();
     return false;
   }
   return true;
 }
 
-export function sendSysExData(header_id, param_id, value) {
+const sendDebouncedUpdates = _.debounce((control_key, value) => {
+  let {remote_id, version} = activesynthremote.getState();
+  setRemoteSettingsValue(remote_id, version, control_key, value);
+}, 500, {'trailing': true});
+
+export function sendSysExData(header_id, param_id, value, key) {
   let {selectedOutputChannel, selectedOutput} = mididevices.getState();
   if (midiIsReady(selectedOutputChannel, selectedOutput)) {
     var sysex_payload = createSysExHeader(header_id, param_id, value, selectedOutputChannel);
@@ -173,6 +190,15 @@ export function sendSysExData(header_id, param_id, value) {
     let outputBytes = PrepareOutput(sysex_payload);
     let manufacturer_bytes = outputBytes.manufacturer_bytes;
     let data_bytes = outputBytes.data_bytes;
-    output.sendSysex(manufacturer_bytes, data_bytes)
+    output.sendSysex(manufacturer_bytes, data_bytes);
+    sendDebouncedUpdates(key, value)
+  }
+}
+
+export function setControlSettingsFromRemoteData(settings) {
+  for(let control in settings) {
+    if(settings.hasOwnProperty(control)) {
+      activesynthremote.setControlValues({uuid: control, value: settings[control]});
+    }
   }
 }

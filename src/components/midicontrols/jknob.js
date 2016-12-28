@@ -17,8 +17,10 @@ export default Component({
     this.range = this.props.control.maximum - this.props.control.minimum;
     this.setDefaultValue(true)
   },
-  componentDidUpdate() {
-    //this.updateCanvas()
+
+  componentWillReceiveProps(nextProps) {
+    this.value = nextProps.controlValues[this.props.control.key];
+    this.updateCanvas();
   },
 
   updateCanvas(initial=false) {
@@ -80,7 +82,6 @@ export default Component({
     let Y = (clientY) - target.getBoundingClientRect().top;
     let localX = (layerX || X) - HALF_WIDTH;
     let localY = (layerY || Y) - HALF_WIDTH;
-    console.log(localX, localY)
     let rad = Math.atan2(localX, localY);
     let position = rad / Math.PI / 2;
     let percentage = 0;
@@ -190,5 +191,5 @@ export default Component({
 
     )
 }}, (state) => ({
-
+  controlValues: state.activesynthremote.controlValues
 }))

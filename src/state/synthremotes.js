@@ -5,6 +5,8 @@ import { State } from 'jumpsuit';
 import { initializeFirebase} from './authentication'
 import firebase from 'firebase'
 import {NotificationManager} from 'react-notifications'
+import authenication from './authentication'
+import {setControlSettingsFromRemoteData} from './activesynthremote'
 
 const synthremotes = State('synthremotes', {
     initial: {
@@ -87,6 +89,21 @@ export function getSynthRemote(key, refPath='admin/synthremotes/') {
             key: snapshot.key
         });
     });
+}
+
+export function getLastSavedRemoteSettings(key, version) {
+  let {user} = authenication.getState();
+  let path_list = ['public', 'users', user.uid, key, version];
+  firebase.database().ref(path_list.join('/')).once('value', function(snapshot) {
+    let data = snapshot.val();
+    setControlSettingsFromRemoteData(data)
+  })
+}
+
+export function setRemoteSettingsValue(key, version, control, value) {
+  let {user} = authenication.getState();
+  let path_list = ['public', 'users', user.uid, key, version, control];
+  firebase.database().ref(path_list.join('/')).set(value)
 }
 
 export function removeSynthremote(key) {

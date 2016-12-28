@@ -3,7 +3,7 @@ import {Component} from 'jumpsuit'
 export default Component({
     render() {
         return (
-            <div className="form-group">
+            <div className={this.props.outputError ? "form-group has-error" : "form-group"}>
                 <label
                     htmlFor={this.props.id}
                     className="col-sm-2 control-label"

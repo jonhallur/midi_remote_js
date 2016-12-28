@@ -2,8 +2,6 @@
  * Created by jonh on 23.10.2016.
  */
 import {Component} from 'jumpsuit'
-import activesynthremote, {sendSysExData} from '../../state/activesynthremote'
-import jQuery from 'jquery'
 
 export default Component({
   handleCheckBoxClick(event) {

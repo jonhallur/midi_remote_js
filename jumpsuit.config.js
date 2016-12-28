@@ -6,6 +6,10 @@ var nib = require('nib')
 var stylusEntry = path.resolve('src/app.styl')
 
 module.exports = {
+  hsr: {
+    maxAge: 1000, // Max age for Hot State Replacement
+    shouldCatchErrors: true // Should Hot State replacement catch errors?
+  },
   styles: {
     extensions: ['.css', '.styl'],
     action: buildStyles

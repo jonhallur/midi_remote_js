@@ -3,7 +3,6 @@
  */
 import {Component} from 'jumpsuit'
 import Switch from 'rc-switch'
-import activeSynthRemote, {sendSysExData} from '../../state/activesynthremote'
 
 export default Component({
   handleToggleClick(value) {

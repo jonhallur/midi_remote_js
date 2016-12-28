@@ -27,7 +27,7 @@
     "jumpsuit": "^0.7.0",
     "lodash": "^4.16.4",
     "rc-switch": "^1.4.2",
-    "react-addons-css-transition-group": "^15.3.2",
+    "react-addons-css-transition-group": "^15.4.1",
     "react-dial": "^1.0.1",
     "react-dnd": "^2.1.4",
     "react-dnd-html5-backend": "^2.1.2",

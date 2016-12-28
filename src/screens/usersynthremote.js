@@ -79,8 +79,7 @@ const ControlDelegator = Component({
   handleOnValueChange(value) {
     let {key, sysexheaderid, parameter} = this.props.control;
     activeSynthRemote.setControlValues({uuid: key, value: value});
-    sendSysExData(sysexheaderid, parameter, value);
-    console.log("midi send", sysexheaderid, parameter, value);
+    sendSysExData(sysexheaderid, parameter, value, key);
   },
 
   render() {

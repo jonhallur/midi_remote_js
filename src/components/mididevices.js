@@ -29,6 +29,7 @@ export default Component({
         />
 
         <Selector
+          outputError={this.props.outputError}
           label="Out"
           default_text="Select Output"
           value={this.props.selectedOutput}
@@ -38,6 +39,7 @@ export default Component({
         />
 
         <Selector
+          outputError={this.props.outputError}
           label=""
           default_text="Channel"
           value={this.props.selectedOutputChannel}
@@ -56,4 +58,5 @@ export default Component({
   midiChannels: state.mididevices.channels,
   selectedOutputChannel: state.mididevices.selectedOutputChannel,
   selectedInputChannel: state.mididevices.selectedInputChannel,
+  outputError: state.mididevices.outputError
 }))
