@@ -7,7 +7,7 @@ var stylusEntry = path.resolve('src/app.styl')
 
 module.exports = {
   hsr: {
-    maxAge: 1000, // Max age for Hot State Replacement
+    maxAge: 10, // Max age for Hot State Replacement
     shouldCatchErrors: true // Should Hot State replacement catch errors?
   },
   styles: {

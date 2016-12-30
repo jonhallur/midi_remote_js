@@ -2,15 +2,29 @@
  * Created by jonh on 17.10.2016.
  */
 import mididevices, {initializeMidi} from '../state/mididevices'
+import {saveLastUsedMidiDevice} from '../state/synthremotes'
 import {Component} from 'jumpsuit'
 import Selector from './input/arrayselector'
+import TreeSelector from 'rc-tree-select'
 
 export default Component({
   componentDidMount() {
     initializeMidi();
   },
 
+  onMidiOutputSelected(value) {
+    if (value === undefined) {
+      return;
+    }
+    let [device, channel] = value.split(',');
+    mididevices.setSelectedOutput(device);
+    mididevices.setSelectedOutputChannel(channel);
+    saveLastUsedMidiDevice(device, channel);
+  },
+
   render() {
+    let {outputs, selectedOutput, selectedOutputChannel} = this.props;
+    let selectedDeviceChannel = selectedOutput && selectedOutputChannel ? outputs[selectedOutput].name + ' - Ch: ' + (selectedOutputChannel) : '';
     return (
       <form className="form-inline">
         <Selector
@@ -28,25 +42,21 @@ export default Component({
           eventhandler={event => mididevices.setSelectedInputChannel(event.target.value)}
         />
 
-        <Selector
-          outputError={this.props.outputError}
-          label="Out"
-          default_text="Select Output"
-          value={this.props.selectedOutput}
-          data={this.props.outputs}
-          id="midi-outputs"
-          eventhandler={event => mididevices.setSelectedOutput(event.target.value)}
+        <TreeSelector
+          style={{ width: 175 }}
+          transitionName="rc-tree-select-dropdown-slide-up"
+          choiceTransitionName="rc-tree-select-selection__choice-zoom"
+          dropdownStyle={{ maxHeight: 300, overflow: 'auto' }}
+          placeholder={<i>Select Midi Device</i>}
+          treeData={this.props.outputMap}
+          treeLine treeDefaultExpandAll
+          showSearch={false}
+          treeNodeFilterProp="label"
+          filterTreeNode={true}
+          treeDataSimpleMode={{id: 'key', rootPId: 0}}
+          value={selectedDeviceChannel}
+          onChange={this.onMidiOutputSelected}
         />
-
-        <Selector
-          outputError={this.props.outputError}
-          label=""
-          default_text="Channel"
-          value={this.props.selectedOutputChannel}
-          data={this.props.midiChannels}
-          eventhandler={event => mididevices.setSelectedOutputChannel(event.target.value)}
-        />
-
       </form>
     )
   }
@@ -58,5 +68,6 @@ export default Component({
   midiChannels: state.mididevices.channels,
   selectedOutputChannel: state.mididevices.selectedOutputChannel,
   selectedInputChannel: state.mididevices.selectedInputChannel,
-  outputError: state.mididevices.outputError
+  outputError: state.mididevices.outputError,
+  outputMap: state.mididevices.outputMap
 }))

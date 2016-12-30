@@ -14,8 +14,8 @@ const mididevices = State('mididevices', {
     selectedOutputChannel: '',
     selectedInputChannel: '',
     outputError: false,
-    errorHandle: null
-
+    errorHandle: null,
+    outputMap: [],
   },
   setError: (state, payload) => ({
     outputError: true
@@ -35,6 +35,9 @@ const mididevices = State('mididevices', {
 
   setOutputs: (state, payload) => ({
     outputs: payload
+  }),
+  setOutputMap: (state, payload) => ({
+    outputMap: payload
   }),
 
   setSelectedInput: (state, payload) => ({
@@ -62,6 +65,7 @@ export function initializeMidi() {
       console.log("WebMidi could not be enabled", err)
     }
     else {
+      let outputs = [];
       mididevices.setInputs(
         WebMidi.inputs.map(
           input => (
@@ -76,6 +80,21 @@ export function initializeMidi() {
           )
         )
       );
+      WebMidi.outputs.map(
+        (output) => {
+          let {name, id} = output;
+          id = Number(id);
+          outputs.push({key: id+1, pId: 0, label: name});
+          outputs = outputs.concat([...Array(16)].map((v,i)=> (
+            {
+              key: (id+1)*100+i,
+              pId: id+1,
+              label: "Channel " + (i+1),
+              value: [id, i+1].toString()
+            })));
+        }
+      );
+      mididevices.setOutputMap(outputs);
     }
   }, true)
 }
@@ -95,4 +114,15 @@ export function toggleTimedErrorFeedback() {
     clearActiveTimeout();
   }, 5000);
   mididevices.setErrorHandle(handle)
+}
+
+export function setMidiDeviceFromName(name, channel) {
+  WebMidi.outputs.map(
+    (output) => {
+      if(output.name === name) {
+        mididevices.setSelectedOutput(output.id);
+        mididevices.setSelectedOutputChannel(channel);
+      }
+    }
+  )
 }

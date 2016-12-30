@@ -14,21 +14,28 @@ function degrees(radians) {
 
 export default Component({
   componentDidMount () {
-    this.range = this.props.control.maximum - this.props.control.minimum;
-    this.setDefaultValue(true)
+    this.range = Number(this.props.control.maximum - this.props.control.minimum);
+    this.setDefaultValues()
   },
 
   componentWillReceiveProps(nextProps) {
-    this.value = nextProps.controlValues[this.props.control.key];
+    this.value = Number(nextProps.controlValues[this.props.control.key]);
+    this.position = (this.value - this.props.control.minimum) / this.range;
     this.updateCanvas();
   },
 
-  updateCanvas(initial=false) {
+  updateMidi() {
+    if(this.value !== this.lastMidiValueSent) {
+      if((this.props.onValueChange !== undefined) && (typeof this.props.onValueChange === "function")) {
+        this.props.onValueChange(this.value);
+        this.lastMidiValueSent = this.value;
+      }
+    }
+  },
+
+  updateCanvas() {
     if (this.value === this.lastValue) {
       return;
-    }
-    if((this.props.onValueChange !== undefined) && (typeof this.props.onValueChange === "function") && !initial) {
-      this.props.onValueChange(this.value);
     }
     this.lastValue = this.value;
     let canvas = this.refs.canvas.getContext('2d');
@@ -106,17 +113,18 @@ export default Component({
   scalePercentage(percentage) {
     return Math.round(percentage * this.range);
   },
-  setDefaultValue (initial=false) {
-    this.value = this.props.control.default;
+  setDefaultValues () {
+    this.value = Number(this.props.control.default);
     this.position = (this.value - this.props.control.minimum) / this.range;
-    this.updateCanvas(initial);
+    this.updateCanvas();
     this.lastValue = this.position;
   },
   onMouseMove(event) {
     if(this.mouseDown) {
       this.position = this.updatePosition(event);
       this.value = this.scalePercentage(this.position);
-      this.updateCanvas()
+      this.updateCanvas();
+      this.updateMidi();
     }
   },
 
@@ -125,11 +133,13 @@ export default Component({
     if(this.mouseDown) {
       this.mouseDown = false;
       if (event.nativeEvent.ctrlKey) {
-        this.setDefaultValue()
+        this.setDefaultValues();
+        this.updateMidi();
       } else {
         this.position = this.updatePosition(event);
         this.value = this.scalePercentage(this.position);
-        this.updateCanvas()
+        this.updateCanvas();
+        this.updateMidi();
       }
     }
   },
@@ -154,7 +164,8 @@ export default Component({
       this.position = 1;
     }
     this.value = this.scalePercentage(this.position);
-    this.updateCanvas()
+    this.updateCanvas();
+    this.updateMidi();
   },
 
   render () {

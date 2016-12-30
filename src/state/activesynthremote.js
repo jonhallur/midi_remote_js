@@ -9,9 +9,9 @@ import {SysExHeaderChannel} from '../pojos/SysExHeader'
 import {SysExHeaderField, SysExHeaderChannelModifiedField} from "../pojos/SysExHeaderField";
 import {toggleTimedErrorFeedback} from "./mididevices"
 import {getLastSavedRemoteSettings, setRemoteSettingsValue} from './synthremotes'
-import {NotificationManager} from 'react-notifications'
 import _ from 'lodash'
 import WebMidi from 'webmidi'
+import {getLastUsedMidiDevice} from "./synthremotes";
 
 var TYPEFUNCTIONS = {[CONTROLTYPE.SYSEX]: handleSysExControl};
 var SUBTYPEFUNCTIONS = {
@@ -32,7 +32,11 @@ const activesynthremote = State('activesynthremote',{
     synthPrototype: {},
     sysexheaders: [],
     controlValues: {},
-    showPanel: {}
+    showPanel: {},
+    synthRemoteReady: false,
+    synthRemoteCreating: false,
+    synthRemoteLoading: false,
+    synthRemoteSending: false,
 
   },
 
@@ -64,19 +68,45 @@ const activesynthremote = State('activesynthremote',{
 
   showPanel: (state, payload) => ({
     showPanel: {...state.showPanel, [payload]: true}
-  })
+  }),
+
+  setLoading: (state, payload) => ({
+    synthRemoteReady: false,
+    synthRemoteCreating: false,
+    synthRemoteLoading: true,
+    synthRemoteSending: false,
+  }),
+  setCreating: (state, payload) => ({
+    synthRemoteReady: false,
+    synthRemoteCreating: true,
+    synthRemoteLoading: false,
+    synthRemoteSending: false,
+  }),
+  setReady: (state, payload) => ({
+    synthRemoteReady: true,
+    synthRemoteCreating: false,
+    synthRemoteLoading: false,
+    synthRemoteSending: false,
+  }),
+  setSending: (state, payload) => ({
+    synthRemoteReady: false,
+    synthRemoteCreating: false,
+    synthRemoteLoading: false,
+    synthRemoteSending: true,
+  }),
 });
 
 export default activesynthremote;
 
 function getLastSavedUserSettings(synthremote) {
+  activesynthremote.setSending();
   let version = synthremote.version;
   let remote_id = synthremote.key;
   getLastSavedRemoteSettings(remote_id, version);
 }
 
 export function createActiveSynthRemote(synthremote) {
-  NotificationManager.info("Creating Remote", synthremote.name);
+  activesynthremote.setCreating();
   activesynthremote.clearPanels();
   activesynthremote.setSynthRemote(synthremote);
   for(let panel of synthremote.panels) {
@@ -87,8 +117,8 @@ export function createActiveSynthRemote(synthremote) {
     }
     activesynthremote.addPanel({name: panel.name, key: panel.key, controls: controls});
     activesynthremote.showPanel(panel.key);
-    getLastSavedUserSettings(synthremote)
   }
+  getLastSavedUserSettings(synthremote)
 }
 
 function handleControl(control) {
@@ -134,7 +164,6 @@ function sysexheaderCallback(key, data) {
 }
 
 function createSysExHeader(header_id, param_id, value, selectedOutputChannel) {
-
   let sysexheaders = activesynthremote.getState().sysexheaders;
   let header = sysexheaders[_.findIndex(sysexheaders, ['key', header_id])];
   let data = header.value;
@@ -196,9 +225,14 @@ export function sendSysExData(header_id, param_id, value, key) {
 }
 
 export function setControlSettingsFromRemoteData(settings) {
+  activesynthremote.setSending();
+  console.log("Apply settings");
   for(let control in settings) {
     if(settings.hasOwnProperty(control)) {
       activesynthremote.setControlValues({uuid: control, value: settings[control]});
     }
   }
+  getLastUsedMidiDevice();
+  activesynthremote.setReady();
 }
+

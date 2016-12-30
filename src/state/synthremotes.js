@@ -6,7 +6,9 @@ import { initializeFirebase} from './authentication'
 import firebase from 'firebase'
 import {NotificationManager} from 'react-notifications'
 import authenication from './authentication'
-import {setControlSettingsFromRemoteData} from './activesynthremote'
+import {setControlSettingsFromRemoteData, createActiveSynthRemote} from './activesynthremote'
+import mididevices, {setMidiDeviceFromName} from './mididevices'
+import activesynthremote from './activesynthremote'
 
 const synthremotes = State('synthremotes', {
     initial: {
@@ -76,24 +78,29 @@ export function getSynthRemotes(ref_path='admin/synthremotes') {
 }
 
 export function getSynthRemote(key, refPath='admin/synthremotes/') {
-    firebase.database().ref(refPath + key).on("value", function(snapshot) {
-        var data = snapshot.val();
-        var panels = [];
-        if (data.panels !== undefined) {
-          data.panels.forEach(panel => panels.push({...panel, key: panel.key }));
-        }
-        synthremotes.setSynthRemote({
-            name: data.name,
-            manufacturer_id: data.manufacturer_id,
-            panels: panels,
-            key: snapshot.key
-        });
-    });
+  firebase.database().ref(refPath + key).once("value", function(snapshot) {
+    let data = snapshot.val();
+    let panels = [];
+    if (data.panels !== undefined) {
+      data.panels.forEach(panel => panels.push({...panel, key: panel.key }));
+    }
+    let synthremote = {
+      name: data.name,
+      manufacturer_id: data.manufacturer_id,
+      panels: panels,
+      version: data.version,
+      key: snapshot.key
+    };
+    synthremotes.setSynthRemote(synthremote);
+    if(refPath !== 'admin/synthremotes/') {
+      createActiveSynthRemote(synthremote);
+    }
+  });
 }
 
 export function getLastSavedRemoteSettings(key, version) {
   let {user} = authenication.getState();
-  let path_list = ['public', 'users', user.uid, key, version];
+  let path_list = ['public', 'users', user.uid, key, version, 'controls'];
   firebase.database().ref(path_list.join('/')).once('value', function(snapshot) {
     let data = snapshot.val();
     setControlSettingsFromRemoteData(data)
@@ -102,7 +109,7 @@ export function getLastSavedRemoteSettings(key, version) {
 
 export function setRemoteSettingsValue(key, version, control, value) {
   let {user} = authenication.getState();
-  let path_list = ['public', 'users', user.uid, key, version, control];
+  let path_list = ['public', 'users', user.uid, key, version, 'controls', control];
   firebase.database().ref(path_list.join('/')).set(value)
 }
 
@@ -145,6 +152,28 @@ export function publishSynthRemote(key) {
     else {
       console.log("source not found");
       NotificationManager.error("Synth source not found", "PublishSynthRemote")
+    }
+  })
+}
+
+export function saveLastUsedMidiDevice(device_id, channel) {
+  let {remote_id, version} = activesynthremote.getState();
+  let {user} = authenication.getState();
+  let path_list = ['public', 'users', user.uid, remote_id, version, 'mididevice'];
+  let { outputs } = mididevices.getState();
+  let name = outputs[device_id].name;
+  firebase.database().ref(path_list.concat(['name']).join('/')).set(name);
+  firebase.database().ref(path_list.concat(['channel']).join('/')).set(channel);
+}
+
+export function getLastUsedMidiDevice() {
+  let {remote_id, version} = activesynthremote.getState();
+  let {user} = authenication.getState();
+  let path_list = ['public', 'users', user.uid, remote_id, version, 'mididevice'];
+  firebase.database().ref(path_list.join('/')).once('value', function(snapshot) {
+    let data = snapshot.val();
+    if(data !== null) {
+      setMidiDeviceFromName(data.name, data.channel);
     }
   })
 }

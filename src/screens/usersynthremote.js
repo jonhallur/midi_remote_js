@@ -11,18 +11,14 @@ import ListControl from '../components/midicontrols/dropdown'
 import Toggle from '../components/midicontrols/toggle'
 import BitMask from '../components/midicontrols/bitmask'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
+import ActiveSynthModal from './modals/activesynthremotemodal'
+import activesynthremote from '../state/activesynthremote'
 
 export default Component({
   componentDidMount() {
+    activesynthremote.setLoading();
     getSynthRemote(this.props.params.remote_id, 'public/synthremotes/');
   },
-
-  componentWillReceiveProps: function (nextProps) {
-    if (this.props.synthremote.name === '') {
-      createActiveSynthRemote(nextProps.synthremote);
-    }
-  },
-
   render() {
     return (
       <div>
@@ -33,13 +29,23 @@ export default Component({
             <Panel id={index} panel={panel} />
           </div>
         ))}
+        <ActiveSynthModal
+          ready={this.props.synthRemoteReady}
+          creating={this.props.synthRemoteCreating}
+          loading={this.props.synthRemoteLoading}
+          sending={this.props.synthRemoteSending}
+        />
       </div>
     )
   }
 }, (state) => ({
   synthremote: state.synthremotes.synthremote,
   sysexheaders: state.activesynthremote.sysexheaders,
-  panels: state.activesynthremote.panels
+  panels: state.activesynthremote.panels,
+  synthRemoteReady: state.activesynthremote.synthRemoteReady,
+  synthRemoteCreating: state.activesynthremote.synthRemoteCreating,
+  synthRemoteLoading: state.activesynthremote.synthRemoteLoading,
+  synthRemoteSending: state.activesynthremote.synthRemoteSending
 }))
 
 const Panel = Component({
