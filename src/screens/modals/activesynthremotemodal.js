@@ -16,17 +16,22 @@ const customStyles = {
 };
 
 export default Component({
-  componentWillReceiveProps: function (nextProps) {
-
-  },
   render () {
-    let ready = !this.props.ready ? 'Synth remote is not ready' : '';
-    let creating = this.props.creating ? 'Synth remote creating' : '';
-    let loading = this.props.loading ? 'Loading synth remote' : '';
-    let sending = this.props.sending ? 'Sending bulk MIDI patch Data' : '';
+    let {
+      synthRemoteReady,
+      synthRemoteCreating,
+      synthRemoteLoading,
+      synthRemoteSending,
+      controlsToSend,
+      controlsSent
+    } = this.props;
+    let ready = !synthRemoteReady ? 'Synth remote is not ready' : '';
+    let creating = synthRemoteCreating ? 'Synth remote creating' : '';
+    let loading = synthRemoteLoading ? 'Loading synth remote' : '';
+    let sending = synthRemoteSending ? `Sending bulk MIDI patch Data ${controlsSent} of ${controlsToSend}` : '';
     return (
       <Modal
-        isOpen={!this.props.ready}
+        isOpen={!synthRemoteReady}
         style={customStyles}
         contentLabel="Example Modal">
         <h2 ref="subtitle">Please wait</h2>
@@ -35,4 +40,11 @@ export default Component({
         <h4>{sending}</h4>
       </Modal>
     )
-}})
+}}, (state) => ({
+  synthRemoteReady: state.activesynthremote.synthRemoteReady,
+  synthRemoteCreating: state.activesynthremote.synthRemoteCreating,
+  synthRemoteLoading: state.activesynthremote.synthRemoteLoading,
+  synthRemoteSending: state.activesynthremote.synthRemoteSending,
+  controlsToSend: state.activesynthremote.controlsToSend,
+  controlsSent: state.activesynthremote.controlsSent
+}))

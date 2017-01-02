@@ -11,7 +11,7 @@ import {toggleTimedErrorFeedback} from "./mididevices"
 import {getLastSavedRemoteSettings, setRemoteSettingsValue} from './synthremotes'
 import _ from 'lodash'
 import WebMidi from 'webmidi'
-import {getLastUsedMidiDevice} from "./synthremotes";
+import {getLastUsedMidiDevice, getUserRemotePresets} from "./synthremotes";
 
 var TYPEFUNCTIONS = {[CONTROLTYPE.SYSEX]: handleSysExControl};
 var SUBTYPEFUNCTIONS = {
@@ -29,6 +29,7 @@ const activesynthremote = State('activesynthremote',{
     version: '',
     name: '',
     panels: [],
+    presets: [],
     synthPrototype: {},
     sysexheaders: [],
     controlValues: {},
@@ -37,9 +38,11 @@ const activesynthremote = State('activesynthremote',{
     synthRemoteCreating: false,
     synthRemoteLoading: false,
     synthRemoteSending: false,
-
+    saveRemoteOpen: false,
+    saveRemoteName: '',
+    controlsToSend: 0,
+    controlsSent: 0,
   },
-
   setSynthRemote: (state, payload) => ({
     name: payload.name,
     remote_id: payload.key,
@@ -94,12 +97,30 @@ const activesynthremote = State('activesynthremote',{
     synthRemoteLoading: false,
     synthRemoteSending: true,
   }),
+  setSaveRemoteName: (state, payload) => ({
+    saveRemoteName: payload
+  }),
+  toggleSaveRemote: (state, payload) => ({
+    saveRemoteOpen: !state.saveRemoteOpen
+  }),
+  setSynthRemotePresets: (state, payload) => ({
+    presets: payload
+  }),
+  setAllControlValues: (state, payload) => ({
+    controlValues: payload
+  }),
+  setControlsToSend: (state, payload) => ({
+    controlsToSend: payload,
+    controlsSent: 0
+  }),
+  tickControlsSent: (state, payload) => ({
+    controlsSent: ++state.controlsSent
+  })
 });
 
 export default activesynthremote;
 
 function getLastSavedUserSettings(synthremote) {
-  activesynthremote.setSending();
   let version = synthremote.version;
   let remote_id = synthremote.key;
   getLastSavedRemoteSettings(remote_id, version);
@@ -109,6 +130,8 @@ export function createActiveSynthRemote(synthremote) {
   activesynthremote.setCreating();
   activesynthremote.clearPanels();
   activesynthremote.setSynthRemote(synthremote);
+  getUserRemotePresets();
+  getLastUsedMidiDevice();
   for(let panel of synthremote.panels) {
     let controls = [];
     for(let control of panel.controls) {
@@ -118,7 +141,7 @@ export function createActiveSynthRemote(synthremote) {
     activesynthremote.addPanel({name: panel.name, key: panel.key, controls: controls});
     activesynthremote.showPanel(panel.key);
   }
-  getLastSavedUserSettings(synthremote)
+  getLastSavedUserSettings(synthremote);
 }
 
 function handleControl(control) {
@@ -199,7 +222,6 @@ function PrepareOutput(sysex_payload) {
 
 function midiIsReady(selectedOutputChannel, selectedOutput) {
   if (selectedOutput === '' || selectedOutputChannel === '') {
-    //NotificationManager.error("Output or channel not selected", "MIDI Error", 3000);
     toggleTimedErrorFeedback();
     return false;
   }
@@ -220,19 +242,46 @@ export function sendSysExData(header_id, param_id, value, key) {
     let manufacturer_bytes = outputBytes.manufacturer_bytes;
     let data_bytes = outputBytes.data_bytes;
     output.sendSysex(manufacturer_bytes, data_bytes);
-    sendDebouncedUpdates(key, value)
-  }
-}
-
-export function setControlSettingsFromRemoteData(settings) {
-  activesynthremote.setSending();
-  console.log("Apply settings");
-  for(let control in settings) {
-    if(settings.hasOwnProperty(control)) {
-      activesynthremote.setControlValues({uuid: control, value: settings[control]});
+    if (key) {
+      sendDebouncedUpdates(key, value);
     }
   }
-  getLastUsedMidiDevice();
-  activesynthremote.setReady();
 }
 
+export function setControlSettingsFromRemoteData(settings, partial=true) {
+  if(partial) {
+    for(let control in settings) {
+      if(settings.hasOwnProperty(control)) {
+        activesynthremote.setControlValues({uuid: control, value: settings[control]});
+      }
+    }
+  }
+  else {
+    activesynthremote.setAllControlValues(settings);
+  }
+  sendAllControlValues()
+}
+
+export function sendAllControlValues() {
+  let {controlValues, panels} = activesynthremote.getState();
+  let controls = [];
+  for(let panel of panels) {
+    for(let control of panel.controls) {
+      controls.push(Object.assign(control, {value: controlValues[control.key]}))
+    }
+  }
+  activesynthremote.setControlsToSend(controls.length);
+  activesynthremote.setSending();
+  sendTimeOutSysEx(controls);
+}
+
+function sendTimeOutSysEx(listToSend) {
+  if(listToSend.length === 0) {
+    activesynthremote.setReady();
+    return;
+  }
+  let settings = listToSend.pop();
+  sendSysExData(settings.sysexheaderid, settings.parameter, settings.value, null);
+  activesynthremote.tickControlsSent();
+  setTimeout(sendTimeOutSysEx.bind(null, listToSend), 10);
+}

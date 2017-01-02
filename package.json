@@ -26,6 +26,7 @@
     "jquery-knob": "^1.2.11",
     "jumpsuit": "^0.7.0",
     "lodash": "^4.16.4",
+    "rc-select": "^6.6.11",
     "rc-switch": "^1.4.2",
     "rc-tree-select": "^1.8.6",
     "react-addons-css-transition-group": "^15.4.1",

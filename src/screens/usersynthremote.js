@@ -3,8 +3,8 @@
  */
 import {Component} from 'jumpsuit'
 import '../pojos/jquery-knob'
-import {getSynthRemote} from '../state/synthremotes'
-import activeSynthRemote, {createActiveSynthRemote, sendSysExData} from '../state/activesynthremote'
+import synthremotes, {getSynthRemote, getUserRemotePresets} from '../state/synthremotes'
+import activeSynthRemote, {sendSysExData} from '../state/activesynthremote'
 import MidiDevices from '../components/mididevices'
 import ReactKnob from '../components/midicontrols/jknob'
 import ListControl from '../components/midicontrols/dropdown'
@@ -13,6 +13,7 @@ import BitMask from '../components/midicontrols/bitmask'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 import ActiveSynthModal from './modals/activesynthremotemodal'
 import activesynthremote from '../state/activesynthremote'
+import Presets from '../components/presets'
 
 export default Component({
   componentDidMount() {
@@ -22,19 +23,18 @@ export default Component({
   render() {
     return (
       <div>
-        <MidiDevices/>
-        <h2>UserSynthRemote {this.props.synthremote.name}</h2>
+        <div className="panel panel-default">
+          <div className="panel-body">
+            <MidiDevices/>
+            <Presets/>
+          </div>
+        </div>
         {this.props.panels.map((panel, index) => (
           <div key={index} className="col-lg-4">
             <Panel id={index} panel={panel} />
           </div>
         ))}
-        <ActiveSynthModal
-          ready={this.props.synthRemoteReady}
-          creating={this.props.synthRemoteCreating}
-          loading={this.props.synthRemoteLoading}
-          sending={this.props.synthRemoteSending}
-        />
+        <ActiveSynthModal/>
       </div>
     )
   }
@@ -42,10 +42,7 @@ export default Component({
   synthremote: state.synthremotes.synthremote,
   sysexheaders: state.activesynthremote.sysexheaders,
   panels: state.activesynthremote.panels,
-  synthRemoteReady: state.activesynthremote.synthRemoteReady,
-  synthRemoteCreating: state.activesynthremote.synthRemoteCreating,
-  synthRemoteLoading: state.activesynthremote.synthRemoteLoading,
-  synthRemoteSending: state.activesynthremote.synthRemoteSending
+
 }))
 
 const Panel = Component({

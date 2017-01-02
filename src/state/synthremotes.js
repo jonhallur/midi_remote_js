@@ -103,7 +103,7 @@ export function getLastSavedRemoteSettings(key, version) {
   let path_list = ['public', 'users', user.uid, key, version, 'controls'];
   firebase.database().ref(path_list.join('/')).once('value', function(snapshot) {
     let data = snapshot.val();
-    setControlSettingsFromRemoteData(data)
+    setControlSettingsFromRemoteData(data);
   })
 }
 
@@ -175,5 +175,24 @@ export function getLastUsedMidiDevice() {
     if(data !== null) {
       setMidiDeviceFromName(data.name, data.channel);
     }
+  })
+}
+
+export function saveUserRemotePreset(remote_id, version, name, controlValues) {
+  let {user} = authenication.getState();
+  let path_list = ['public', 'users', user.uid, remote_id, version, 'presets'];
+  firebase.database().ref(path_list.join('/')).push({name: name, controlValues: controlValues})
+}
+
+export function getUserRemotePresets() {
+  let {user} = authenication.getState();
+  let {remote_id, version} = activesynthremote.getState();
+  let path_list = ['public', 'users', user.uid, remote_id, version, 'presets'];
+  firebase.database().ref(path_list.join('/')).on('value', function (snapshot) {
+    let presets = [];
+    snapshot.forEach(function(child) {
+      presets.push({...child.val(), key:child.key})
+    });
+    activesynthremote.setSynthRemotePresets(presets);
   })
 }

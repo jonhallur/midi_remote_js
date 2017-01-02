@@ -14,6 +14,7 @@ import BitMaskForm from './sysexbitmaskcontrolform'
 
 export default Component({
   componentDidMount() {
+
     getSynthRemote(this.props.params.remote_id);
   },
 
