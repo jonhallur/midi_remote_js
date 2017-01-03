@@ -78,7 +78,7 @@ export function getSynthRemotes(ref_path='admin/synthremotes') {
 }
 
 export function getSynthRemote(key, refPath='admin/synthremotes/') {
-  firebase.database().ref(refPath + key).once("value", function(snapshot) {
+  firebase.database().ref(refPath + key).on("value", function(snapshot) {
     let data = snapshot.val();
     let panels = [];
     if (data.panels !== undefined) {
@@ -92,9 +92,17 @@ export function getSynthRemote(key, refPath='admin/synthremotes/') {
       key: snapshot.key
     };
     synthremotes.setSynthRemote(synthremote);
-    if(refPath !== 'admin/synthremotes/') {
-      createActiveSynthRemote(synthremote);
+  });
+}
+
+export function getUserSynthRemote(key, refPath='public/synthremotes/') {
+  firebase.database().ref(refPath + key).once("value", function(snapshot) {
+    let data = snapshot.val();
+    let panels = [];
+    if (data.panels !== undefined) {
+      data.panels.forEach(panel => panels.push({...panel, key: panel.key }));
     }
+    createActiveSynthRemote(Object.assign(data, {key: snapshot.key}));
   });
 }
 

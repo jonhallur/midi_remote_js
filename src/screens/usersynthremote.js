@@ -14,11 +14,12 @@ import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 import ActiveSynthModal from './modals/activesynthremotemodal'
 import activesynthremote from '../state/activesynthremote'
 import Presets from '../components/presets'
+import {getUserSynthRemote} from "../state/synthremotes";
 
 export default Component({
   componentDidMount() {
     activesynthremote.setLoading();
-    getSynthRemote(this.props.params.remote_id, 'public/synthremotes/');
+    getUserSynthRemote(this.props.params.remote_id, 'public/synthremotes/')
   },
   render() {
     return (
@@ -30,9 +31,7 @@ export default Component({
           </div>
         </div>
         {this.props.panels.map((panel, index) => (
-          <div key={index} className="col-lg-4">
-            <Panel id={index} panel={panel} />
-          </div>
+            <Panel key={index} id={index} panel={panel} />
         ))}
         <ActiveSynthModal/>
       </div>
@@ -49,27 +48,29 @@ const Panel = Component({
   render() {
     let {panel, showPanel, id} = this.props;
     return (
-      <div className="panel panel-default" id={panel.key}>
-        <div className="panel-heading">
-          <h3 className="panel-title">{panel.name}
-          <div className="badge float-right">
-              <span
-                className={showPanel[panel.key] ? "glyphicon glyphicon-triangle-bottom" : "glyphicon glyphicon-triangle-left"}
-                aria-hidden="true"
-                onClick={e => activeSynthRemote.togglePanel(panel.key)}
-              />
-          </div>
-          </h3>
-        </div>
-        <div className={showPanel[panel.key] ? "panel-body" : "collapse"} id={'panel_' + id}>
-          {panel.controls.map((control) => (
-            <div className="midi-control-box"  key={control.key}>
-              <div className="midi-control-label">
-                <p>{control.short}</p>
-              </div>
-              <ControlDelegator control={control} />
+      <div className={showPanel[panel.key] ? "col-lg-4" : "col-lg-2"}>
+        <div className="panel panel-default" id={panel.key}>
+          <div className="panel-heading">
+            <h3 className="panel-title">{panel.name}
+            <div className="badge float-right" onClick={e => activeSynthRemote.togglePanel(panel.key)}>
+                <span
+                  className={showPanel[panel.key] ? "glyphicon glyphicon-triangle-bottom" : "glyphicon glyphicon-triangle-left"}
+                  aria-hidden="true"
+
+                />
             </div>
-          ))}
+            </h3>
+          </div>
+          <div className={showPanel[panel.key] ? "panel-body" : "collapse"} id={'panel_' + id}>
+            {panel.controls.map((control) => (
+              <div className="midi-control-box"  key={control.key}>
+                <div className="midi-control-label">
+                  <p>{control.short}</p>
+                </div>
+                <ControlDelegator control={control} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     )

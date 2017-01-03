@@ -11,11 +11,75 @@ import RangeForm from './sysexrangecontrolform'
 import ToggleForm from './sysextogglecontrolform'
 import ListForm from './sysexlistcontrolform'
 import BitMaskForm from './sysexbitmaskcontrolform'
+import * as _ from "lodash";
+import {addToCollection} from "../../state/genericfirebase";
+
+
+function addTsvControl (lines, params) {
+  let line = lines.shift();
+  let [default_value, maximum, minimum, name, parameter, short, subtype, sysexheaderid, type] = line.split('\t');
+  let data = {
+    name: name,
+    short: short,
+    parameter: parameter,
+    default: default_value,
+    sysexheaderid: sysexheaderid,
+    type: type,
+    subtype: subtype
+  };
+  if (Number(subtype) === 0) {
+    Object.assign(data, {minimum: minimum, maximum: maximum,})
+  }
+  else if (Number(subtype) === 1) {
+    Object.assign(data, {onvalue: maximum, offvalue: minimum})
+  }
+  else if (Number(subtype) === 2) {
+    let nameValueList = _.zipWith(
+      maximum.split(','),
+      minimum.split(','),
+      (name, value) => (
+      {name: name, value: value}
+      )
+    );
+    Object.assign(data, {options: nameValueList})
+  }
+  else if (Number(subtype) === 3) {
+    Object.assign(data, {numbits: maximum})
+  }
+  else {
+    console.log(subtype);
+    throw Error("Unknown subtype");
+  }
+  console.log("adding ", data);
+  let {remote_id, panel_id} = params;
+  let pathList = ['admin', 'synthremotes', remote_id, 'panels', panel_id, 'controls'];
+  addToCollection(pathList, data);
+  setTimeout(() => {
+    if(lines.length !==0) {
+      addTsvControl(lines, params)
+    }
+  }, 500);
+}
 
 export default Component({
   componentDidMount() {
-
     getSynthRemote(this.props.params.remote_id);
+  },
+
+
+  onFileInputChange(event) {
+    event.preventDefault();
+    let params = this.props.params;
+    let file = event.target.files[0];
+    if (file) {
+      let reader = new FileReader();
+      reader.onload = (function(aFile) {
+        let lines = aFile.target.result.split('\r\n');
+        lines.shift();
+        addTsvControl(lines, params);
+      });
+      reader.readAsText(file);
+    }
   },
 
   render() {
@@ -47,6 +111,8 @@ export default Component({
         {isToggle ? <ToggleForm params={this.props.params} /> : '' }
         {isList ? <ListForm params={this.props.params} /> : '' }
         {isBitMask ? <BitMaskForm params={this.props.params} /> : '' }
+        <input type="file" name="tsv" accept="text/tsv+tsv" onChange={this.onFileInputChange} />
+        <span>Select .tsv file</span>
       </form>
     )
   }

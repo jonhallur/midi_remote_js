@@ -74,7 +74,7 @@ export function getSynthPanel(pathList) {
     if (data.controls !== undefined) {
       data.controls.forEach(panel => controls.push(panel));
     }
-
+    synthpanels.setPanel(data)
   });
 }
 

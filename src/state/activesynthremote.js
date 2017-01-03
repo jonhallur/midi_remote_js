@@ -193,10 +193,10 @@ function createSysExHeader(header_id, param_id, value, selectedOutputChannel) {
   let fields = [];
   data.fields.map(field => {
     if (field.channel_mod) {
-      fields.push(new SysExHeaderChannelModifiedField({name: field.name, constant: field.value}))
+      fields.push(new SysExHeaderChannelModifiedField({name: field.name, constant: Number(field.value)}))
     }
     else {
-      fields.push(new SysExHeaderField({name: field.name, value: field.value}))
+      fields.push(new SysExHeaderField({name: field.name, value: Number(field.value)}))
     }
   });
   let sysexheader = new SysExHeaderChannel({name: data.name, fields: fields});
