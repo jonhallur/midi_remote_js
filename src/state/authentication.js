@@ -40,11 +40,14 @@ export function startFirebaseAuthStateMonitor() {
       authentication.setUsingKeyValue({key: 'user', value: user});
       authentication.setUsingKeyValue({key: 'userName', value: user.displayName});
       authentication.setUsingKeyValue({key: 'userEmail', value: user.email});
+      authentication.setUsingKeyValue({key: 'loggedIn', value: true})
 
     } else {
       authentication.setUsingKeyValue({key: 'user', value: ''});
       authentication.setUsingKeyValue({key: 'userName', value: ''});
       authentication.setUsingKeyValue({key: 'userEmail', value: ''});
+      authentication.setUsingKeyValue({key: 'loggedIn', value: false});
+      
     }
   });
 }

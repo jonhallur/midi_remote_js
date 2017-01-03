@@ -22,16 +22,19 @@ const customStyles = {
 
 export default Component({
   loginUserClick(event) {
+    event.preventDefault();
     let {loginEmail, loginPassword} = this.props;
     loginEmailUser(loginEmail, loginPassword);
     authentication.setUsingKeyValue({key: 'showLoginModal', value: false})
   },
 
   logoutUserClick(event) {
+    event.preventDefault();
     signOutUser()
   },
 
   signupUserClick(event) {
+    event.preventDefault();
     let {loginEmail, loginPassword} = this.props;
     createEmailUser(loginEmail, loginPassword);
     authentication.setUsingKeyValue({key: 'showLoginModal', value: false})
@@ -69,7 +72,7 @@ export default Component({
           <form className="form-horizontal">
             <Input
               id="loginEmail"
-              placeholder="Name"
+              placeholder="Email"
               type="text"
               value={this.props.loginEmail}
               onChange={e => authentication.setUsingKeyValue({key: 'loginEmail', value: e.target.value})}

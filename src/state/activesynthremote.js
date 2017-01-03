@@ -243,6 +243,7 @@ export function sendSysExData(header_id, param_id, value, key) {
     let data_bytes = outputBytes.data_bytes;
     output.sendSysex(manufacturer_bytes, data_bytes);
     if (key) {
+      console.log("sending debounced");
       sendDebouncedUpdates(key, value);
     }
   }

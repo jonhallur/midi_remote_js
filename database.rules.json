@@ -5,8 +5,18 @@
       ".write": "auth != null && data.child('allowed').child(auth.uid).exists()"
     },
     "public": {
-      ".read": "auth != null",
-      ".write": "auth != null && root.child('admin/allowed').child(auth.uid).exists()"
+      "oldersynthremotes": {
+        ".read": "auth != null",
+        ".write": "auth != null && root.child('admin/allowed').child(auth.uid).exists()"
+      },
+      "synthremotes": {
+        ".read": "auth != null",
+        ".write": "auth != null && root.child('admin/allowed').child(auth.uid).exists()"
+      },
+      "users": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
     }
   }
 }

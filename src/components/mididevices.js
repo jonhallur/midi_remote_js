@@ -6,6 +6,7 @@ import {saveLastUsedMidiDevice} from '../state/synthremotes'
 import {Component} from 'jumpsuit'
 import TreeSelector from 'rc-tree-select'
 import {setMidiThru} from "../state/mididevices";
+import _ from 'lodash'
 
 export default Component({
   componentDidMount() {
@@ -34,8 +35,10 @@ export default Component({
 
   render() {
     let {inputs, outputs, selectedInput, selectedOutput, selectedInputChannel, selectedOutputChannel} = this.props;
-    let selectedOutDeviceChannel = selectedOutput && selectedOutputChannel ? outputs[selectedOutput].name + ' - Ch: ' + (selectedOutputChannel) : '';
-    let selectedInDeviceChannel = selectedInput && selectedInputChannel ? inputs[selectedInput].name + ' - Ch: ' + (selectedInputChannel) : '';
+    let output = _.find(outputs, (o) => {return o.id === selectedOutput});
+    let input = _.find(inputs, (o) => {return o.id === selectedInput});
+    let selectedOutDeviceChannel = selectedOutput && selectedOutputChannel ? output.name + ' - Ch: ' + (selectedOutputChannel) : '';
+    let selectedInDeviceChannel = selectedInput && selectedInputChannel ? input.name + ' - Ch: ' + (selectedInputChannel) : '';
     return (
       <div className="midi-settings-box">
         <label>

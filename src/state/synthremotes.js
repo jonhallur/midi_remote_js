@@ -9,6 +9,7 @@ import authenication from './authentication'
 import {setControlSettingsFromRemoteData, createActiveSynthRemote} from './activesynthremote'
 import mididevices, {setMidiDeviceFromName} from './mididevices'
 import activesynthremote from './activesynthremote'
+import _ from 'lodash'
 
 const synthremotes = State('synthremotes', {
     initial: {
@@ -165,11 +166,13 @@ export function publishSynthRemote(key) {
 }
 
 export function saveLastUsedMidiDevice(device_id, channel) {
+  console.log(device_id, channel);
   let {remote_id, version} = activesynthremote.getState();
   let {user} = authenication.getState();
   let path_list = ['public', 'users', user.uid, remote_id, version, 'mididevice'];
   let { outputs } = mididevices.getState();
-  let name = outputs[device_id].name;
+  let name =  _.find(outputs, function(o) {return o.value === device_id}).name;
+  console.log(name);
   firebase.database().ref(path_list.concat(['name']).join('/')).set(name);
   firebase.database().ref(path_list.concat(['channel']).join('/')).set(channel);
 }
