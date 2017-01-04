@@ -40,14 +40,15 @@ export function startFirebaseAuthStateMonitor() {
       authentication.setUsingKeyValue({key: 'user', value: user});
       authentication.setUsingKeyValue({key: 'userName', value: user.displayName});
       authentication.setUsingKeyValue({key: 'userEmail', value: user.email});
-      authentication.setUsingKeyValue({key: 'loggedIn', value: true})
+      authentication.setUsingKeyValue({key: 'loggedIn', value: true});
+      authentication.setUsingKeyValue({key: 'showLoginModal', value: false});
 
     } else {
       authentication.setUsingKeyValue({key: 'user', value: ''});
       authentication.setUsingKeyValue({key: 'userName', value: ''});
       authentication.setUsingKeyValue({key: 'userEmail', value: ''});
       authentication.setUsingKeyValue({key: 'loggedIn', value: false});
-      
+      authentication.setUsingKeyValue({key: 'showLoginModal', value: true});
     }
   });
 }
@@ -58,6 +59,9 @@ export function loginEmailUser(email, password) {
     var errorCode = error.code;
     var errorMessage = error.message;
     NotificationManager.error(errorMessage, "Login Error: " + errorCode, 5000)
+  }).then(() => {
+    console.log("Done login");
+    NotificationManager.info("Login Successful", "Authentication")
   });
 }
 
@@ -76,8 +80,9 @@ export function createEmailUser(email, password) {
     var errorMessage = error.message;
     NotificationManager.error(errorMessage, "Create User Error: " + errorCode, 5000)
   }).then(function() {
-
-    loginEmailUser(email, password)
+    setTimeout(() => {
+      loginEmailUser(email, password)
+    }, 5000);
   });
 }
 
