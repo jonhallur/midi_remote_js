@@ -3,6 +3,7 @@
  */
 import WebMidi from 'webmidi'
 import {State} from 'jumpsuit'
+import {NotificationManager} from 'react-notifications'
 
 const mididevices = State('mididevices', {
   initial: {
@@ -136,14 +137,19 @@ export function toggleTimedErrorFeedback() {
 }
 
 export function setMidiDeviceFromName(name, channel) {
+  let midi_found = false;
   WebMidi.outputs.map(
     (output) => {
-      if(output.name === name) {
+      if(output.name === name && !midi_found) {
         mididevices.setSelectedOutput(output.id);
         mididevices.setSelectedOutputChannel(channel);
+        midi_found = true
       }
     }
-  )
+  );
+  if (!midi_found) {
+    NotificationManager.warning("Couldn't find last used MIDI device", "MIDI", 5000);
+  }
 }
 
 export function setMidiThru() {

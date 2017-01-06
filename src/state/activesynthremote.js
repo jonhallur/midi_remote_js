@@ -40,6 +40,8 @@ const activesynthremote = State('activesynthremote',{
     synthRemoteSending: false,
     saveRemoteOpen: false,
     saveRemoteName: '',
+    newSaveRemoteName: '',
+    saveModalOpen: true,
     controlsToSend: 0,
     controlsSent: 0,
   },
@@ -115,7 +117,10 @@ const activesynthremote = State('activesynthremote',{
   }),
   tickControlsSent: (state, payload) => ({
     controlsSent: ++state.controlsSent
-  })
+  }),
+  setUsingKeyValue: (state, payload) => ({
+    [payload.key]: payload.value
+  }),
 });
 
 export default activesynthremote;

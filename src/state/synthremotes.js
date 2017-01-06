@@ -189,10 +189,18 @@ export function getLastUsedMidiDevice() {
   })
 }
 
-export function saveUserRemotePreset(remote_id, version, name, controlValues) {
+export function saveUserRemotePreset(remote_id, version, name, controlValues, overwrite=null) {
   let {user} = authenication.getState();
-  let path_list = ['public', 'users', user.uid, remote_id, version, 'presets'];
-  firebase.database().ref(path_list.join('/')).push({name: name, controlValues: controlValues})
+  let path_list = ['public', 'users', user.uid, remote_id, version, 'presets',];
+  let ref = path_list.join('/');
+  if(overwrite) {
+    firebase.database().ref(ref + '/' + overwrite.key).set({name: name, controlValues: controlValues});
+    NotificationManager.info("Preset Data Overwritten", "Presets")
+  }
+  else {
+    firebase.database().ref(ref).push({name: name, controlValues: controlValues});
+    NotificationManager.info("New Preset Saved", "Presets")
+  }
 }
 
 export function getUserRemotePresets() {
@@ -206,4 +214,12 @@ export function getUserRemotePresets() {
     });
     activesynthremote.setSynthRemotePresets(presets);
   })
+}
+
+export function deleteUserRemotePreset(key) {
+  let {user} = authenication.getState();
+  let {remote_id, version} = activesynthremote.getState();
+  let path_list = ['public', 'users', user.uid, remote_id, version, 'presets', key];
+  let ref = path_list.join('/');
+  firebase.database().ref(ref).remove();
 }

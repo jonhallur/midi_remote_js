@@ -1,11 +1,17 @@
 import {Component} from 'jumpsuit'
 import Select, {Option} from 'rc-select'
 import activesynthremote from '../state/activesynthremote'
-import {saveUserRemotePreset} from '../state/synthremotes'
+import {saveUserRemotePreset, deleteUserRemotePreset} from '../state/synthremotes'
 import _ from 'lodash'
 import {setControlSettingsFromRemoteData} from "../state/activesynthremote";
 
 export default Component({
+  onRemovePresetClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    let key = event.target.id;
+    deleteUserRemotePreset(key);
+  },
   onPresetChange(key) {
     let preset = _.find(this.props.presets, function(o) { return o.key === key});
     let setPartial=false;
@@ -26,16 +32,22 @@ export default Component({
   },
 
   savePresetAndClose() {
-    if(!this.props.saveRemoteOpen) {
+    let {saveRemoteOpen, saveRemoteName, presets} = this.props;
+    if(!saveRemoteOpen) {
       activesynthremote.toggleSaveRemote()
     }
     else {
-      let name = this.props.saveRemoteName;
+      let overwrite = _.find(presets, (o) => (o.name == saveRemoteName));
       let {controlValues, remote_id, version } = activesynthremote.getState();
-      if (name !== '' && name.length > 2) {
+      if (saveRemoteName !== '' && saveRemoteName.length > 2) {
         activesynthremote.setSaveRemoteName('');
         activesynthremote.toggleSaveRemote();
-        saveUserRemotePreset(remote_id, version, name, controlValues);
+        if (overwrite) {
+          saveUserRemotePreset(remote_id, version, saveRemoteName, controlValues, overwrite);
+        }
+        else {
+          saveUserRemotePreset(remote_id, version, saveRemoteName, controlValues)
+        }
       }
       else {
         activesynthremote.toggleSaveRemote();
@@ -44,8 +56,26 @@ export default Component({
   },
 
   render () {
-    let notEmptyAndLongEnough = this.props.saveRemoteName !== '' && this.props.saveRemoteName.length > 2;
-    let readyForSave = (this.props.saveRemoteOpen && notEmptyAndLongEnough);
+    //let notEmptyAndLongEnough = this.props.saveRemoteName !== '' && this.props.saveRemoteName.length > 2;
+    let error = false;
+    let overwrite = false;
+    let errorText = '';
+    let {saveRemoteName, saveRemoteOpen} = this.props;
+    if (!saveRemoteOpen) {
+      error = false;
+      errorText = '';
+      overwrite = false;
+    }
+    else if(saveRemoteName === '' || saveRemoteName.length < 3) {
+      error = true;
+      errorText = "Preset name is too short"
+    }
+    else if (_.findIndex(this.props.presets, function(o) { return o.name === saveRemoteName}) !== -1) {
+      error = true;
+      errorText = "Preset with that name already exists";
+      overwrite = true;
+    }
+    let readyForSave = (saveRemoteOpen && !error);
     let saveIcon = readyForSave ? 'glyphicon glyphicon-floppy-saved' : 'glyphicon glyphicon-floppy-disk';
     return (
       <div>
@@ -57,7 +87,19 @@ export default Component({
         >
           {this.props.presets.map(
             (option) => (
-              <Option label={option.name} key={option.key} value={option.key} id={option.key}>{option.name}</Option>
+              <Option
+                label={option.name}
+                key={option.key}
+                value={option.key}
+                id={option.key}
+              >{option.name}
+                <span className="pull-right" >
+                  <span
+                    onClick={this.onRemovePresetClick}
+                    id={option.key}
+                    className="glyphicon glyphicon-remove"/>
+                </span>
+              </Option>
             )
           )}
 
@@ -66,7 +108,7 @@ export default Component({
           <div className={readyForSave ? "input-group" :"input-group has-error"}>
             <span className="input-group-btn">
               <button
-                className="btn btn-default"
+                className={overwrite ? "btn btn-danger" : "btn btn-default"}
                 onClick={this.onSaveButtonClick}
                 type="button">
                 <span
@@ -80,7 +122,15 @@ export default Component({
               onKeyPress={this.onInputKeydown}
               className={this.props.saveRemoteOpen ? "form-control" : "hidden"}
               value={this.props.saveRemoteName}
-              placeholder="Preset name..." />
+              placeholder="Preset name..."
+            />
+
+          </div>
+          <div className="tooltip bottom" role="tooltip" style={error ? {opacity: 1} : {opacity: 0}}>
+            <div className="tooltip-arrow"></div>
+            <div className="tooltip-inner">
+              {errorText}
+            </div>
           </div>
         </div>
       </div>

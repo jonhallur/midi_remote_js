@@ -19,3 +19,14 @@ export const SUBCONTROLTYPE = {RANGE: 0, TOGGLE: 1, LIST: 2, BITMASK: 3};
 export const ITEMTYPE = {
   LISTROW: 'listrow'
 };
+
+export const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};

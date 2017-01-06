@@ -11,7 +11,7 @@ import ListControl from '../components/midicontrols/dropdown'
 import Toggle from '../components/midicontrols/toggle'
 import BitMask from '../components/midicontrols/bitmask'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
-import ActiveSynthModal from './modals/activesynthremotemodal'
+import ActiveSynthModal from '../components/modals/activesynthremotemodal'
 import activesynthremote from '../state/activesynthremote'
 import Presets from '../components/presets'
 import {getUserSynthRemote} from "../state/synthremotes";
