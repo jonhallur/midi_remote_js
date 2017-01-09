@@ -5,24 +5,36 @@ import {Component} from 'jumpsuit'
 import Input from '../input/input'
 import {addToCollection} from "../../state/genericfirebase";
 import midicontrols from '../../state/midicontrols'
+import {createRangeControlData} from "../../pojos/common_controls";
+import {CONTROLTYPE} from '../../pojos/constants'
+
+const CC_SYSEX_Input = (props) => (
+  <Input
+    placeholder="Parameter Number"
+    type="number"
+    id="parameter_number"
+    value={props.parameter}
+    onChange={(event) => midicontrols.setParameter(event.target.value)}
+  />
+);
+
+const NRPN_Input = (props) => (
+  <div className="alert-danger">
+    Not implemented, please don't use
+  </div>
+);
+
+const OSC_Input = (props) => (
+  <div className="alert-danger">
+    Not implemented, please don't use
+  </div>
+);
 
 
 export default Component({
   onAddBtnClick(event) {
     event.preventDefault();
-    let controlType = this.props.selectedType;
-    let controlSubType = this.props.selectedSubType;
-    let data = {
-      name: this.props.name,
-      short: this.props.short,
-      parameter: this.props.parameter,
-      minimum: this.props.minimum,
-      maximum: this.props.maximum,
-      default: this.props.default,
-      sysexheaderid: this.props.selectedSysExHeader,
-      type: controlType,
-      subtype: controlSubType
-    };
+    let data = createRangeControlData(this.props);
     let {remote_id, panel_id} = this.props.params;
     let pathList = ['admin', 'synthremotes', remote_id, 'panels', panel_id, 'controls'];
     addToCollection(pathList, data);
@@ -39,6 +51,10 @@ export default Component({
       this.props.default
     ];
     let showCreateButton = inputList.reduce(function(a,b) {return a && b});
+    let parameterInput = this.props.type in [CONTROLTYPE.CC, CONTROLTYPE.SYSEX] ? ( <CC_SYSEX_Input props={this.props} /> ) : '';
+    let nrpnInput = Number(this.props.type) === Number(CONTROLTYPE.NRPN) ? ( <NRPN_Input props={this.props} /> ) : '';
+    let oscInput = Number(this.props.type) === Number(CONTROLTYPE.OSC) ? ( <OSC_Input props={this.props} /> ) : '';
+
     return (
       <div>
         <Input
@@ -54,13 +70,6 @@ export default Component({
           id="short_name"
           value={this.props.short}
           onChange={(event) => midicontrols.setShort(event.target.value)}
-        />
-        <Input
-          placeholder="Parameter Number"
-          type="number"
-          id="parameter_number"
-          value={this.props.parameter}
-          onChange={(event) => midicontrols.setParameter(event.target.value)}
         />
         <Input
           placeholder="Minimum Value"
@@ -83,6 +92,10 @@ export default Component({
           value={this.props.default}
           onChange={(event) => midicontrols.setDefault(event.target.value)}
         />
+        { parameterInput }
+        { nrpnInput }
+        { oscInput }
+
         <button className={showCreateButton ? "btn btn-default" : "hidden"} onClick={this.onAddBtnClick}>Add Range</button>
 
       </div>
@@ -95,7 +108,7 @@ export default Component({
   minimum: state.midicontrols.minimum,
   maximum: state.midicontrols.maximum,
   default: state.midicontrols.default,
-  selectedType: state.midicontrols.selectedType,
-  selectedSubType: state.midicontrols.selectedSubType,
-  selectedSysExHeader: state.midicontrols.selectedSysExHeader,
+  type: state.midicontrols.selectedType,
+  subtype: state.midicontrols.selectedSubType,
+  sysexheaderid: state.midicontrols.selectedSysExHeader,
 }));
