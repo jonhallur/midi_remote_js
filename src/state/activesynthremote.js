@@ -13,12 +13,9 @@ import _ from 'lodash'
 import WebMidi from 'webmidi'
 import {getLastUsedMidiDevice, getUserRemotePresets} from "./synthremotes";
 
-var TYPEFUNCTIONS = {[CONTROLTYPE.SYSEX]: handleSysExControl};
-var SUBTYPEFUNCTIONS = {
-  [SUBCONTROLTYPE.RANGE]: handleRangeControl,
-  [SUBCONTROLTYPE.LIST]: handleListControl,
-  [SUBCONTROLTYPE.TOGGLE]: handleToggleControl,
-  [SUBCONTROLTYPE.BITMASK]: handleBitmaskControl
+var TYPEFUNCTIONS = {
+  [CONTROLTYPE.SYSEX]: handleSysExControl,
+  [CONTROLTYPE.CC]: handleCCControl
 };
 
 
@@ -158,24 +155,11 @@ function handleSysExControl(control) {
   if(!isHeaderInList(header_id)) {
     getSingleSysexheader(header_id, sysexheaderCallback);
   }
-  return SUBTYPEFUNCTIONS[control.subtype](control);
-
-}
-
-function handleRangeControl(control) {
   return control;
 }
 
-function handleListControl(control) {
-  return control;
-}
-
-function handleToggleControl(control) {
-  return control;
-}
-
-function handleBitmaskControl(control) {
-  return control;
+function handleCCControl(control) {
+  return control
 }
 
 function isHeaderInList(key) {
@@ -249,6 +233,16 @@ export function sendSysExData(header_id, param_id, value, key) {
     output.sendSysex(manufacturer_bytes, data_bytes);
     if (key) {
       console.log("sending debounced");
+      sendDebouncedUpdates(key, value);
+    }
+  }
+}
+export function sendCCData(parameter, value, key) {
+  let {selectedOutputChannel, selectedOutput} = mididevices.getState();
+  if (midiIsReady(selectedOutputChannel, selectedOutput)) {
+    let output = WebMidi.getOutputById(selectedOutput);
+    output.sendControlChange(parameter, value, selectedOutputChannel);
+    if(key) {
       sendDebouncedUpdates(key, value);
     }
   }

@@ -81,9 +81,15 @@ const Panel = Component({
 
 const ControlDelegator = Component({
   handleOnValueChange(value) {
-    let {key, sysexheaderid, parameter} = this.props.control;
+    let {key, sysexheaderid, parameter, type} = this.props.control;
     activeSynthRemote.setControlValues({uuid: key, value: value});
-    sendSysExData(sysexheaderid, parameter, value, key);
+    if(sysexheaderid) {
+      sendSysExData(sysexheaderid, parameter, value, key);
+    }
+    else if(Number(type) === CONTROLTYPE.CC) {
+      sendCCData(parameter, value, key);
+    }
+
   },
 
   render() {

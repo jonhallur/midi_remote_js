@@ -2,7 +2,6 @@
  * Created by jonh on 9.10.2016.
  */
 import {Component} from 'jumpsuit'
-import '../../pojos/jquery-knob'
 
 export default Component({
   handleListChange(event) {

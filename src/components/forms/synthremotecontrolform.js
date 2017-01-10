@@ -5,14 +5,14 @@ import {Component} from 'jumpsuit'
 import Selector from '../input/arrayselector'
 import midicontrols from '../../state/midicontrols'
 import {getSysExHeaderFromManufacturerId} from '../../state/sysexheaders'
-import {CONTROLTYPE, SUBCONTROLTYPE} from '../../pojos/constants'
 import {getSynthRemote} from '../../state/synthremotes'
-import RangeForm from './sysexrangecontrolform'
+import {CONTROLTYPE, SUBCONTROLTYPE} from '../../pojos/constants'
+import RangeForm from './rangecontrolform'
 import ToggleForm from './sysextogglecontrolform'
 import ListForm from './sysexlistcontrolform'
 import BitMaskForm from './sysexbitmaskcontrolform'
-import * as _ from "lodash";
 import {addToCollection} from "../../state/genericfirebase";
+import * as _ from "lodash";
 
 
 function addTsvControl (lines, params) {
@@ -21,38 +21,46 @@ function addTsvControl (lines, params) {
   let data = {
     name: name,
     short: short,
-    parameter: parameter,
     default: default_value,
-    sysexheaderid: sysexheaderid,
     type: type,
     subtype: subtype
   };
-  if (Number(subtype) === 0) {
-    Object.assign(data, {minimum: minimum, maximum: maximum,})
+
+  //Add type specific Data
+  if(Number(type) === CONTROLTYPE.SYSEX) {
+    data = {...data, sysexheaderid}
   }
-  else if (Number(subtype) === 1) {
-    Object.assign(data, {onvalue: maximum, offvalue: minimum})
+  if(type in [CONTROLTYPE.CC, CONTROLTYPE.SYSEX]) {
+    data = {...data, parameter}
   }
-  else if (Number(subtype) === 2) {
+
+  //Add subtype specific Data
+  if (Number(subtype) === SUBCONTROLTYPE.RANGE) {
+    data = {...data, minimum, maximum}
+  }
+  else if (Number(subtype) === SUBCONTROLTYPE.TOGGLE) {
+    data = {...data, onvalue: maximum, offvalue: minimum}
+  }
+  else if (Number(subtype) === SUBCONTROLTYPE.LIST) {
     let nameValueList = _.zipWith(
       maximum.split(','),
       minimum.split(','),
       (name, value) => (
-      {name: name, value: value}
+      {name, value}
       )
     );
-    Object.assign(data, {options: nameValueList})
+    data = {...data, options: nameValueList}
   }
-  else if (Number(subtype) === 3) {
-    Object.assign(data, {numbits: maximum})
+  else if (Number(subtype) === SUBCONTROLTYPE.BITMASK) {
+    data = {...data, numbits: maximum}
   }
   else {
     console.log(subtype);
     throw Error("Unknown subtype");
   }
+
   console.log("adding ", data);
-  let {remote_id, panel_id} = params;
-  let pathList = ['admin', 'synthremotes', remote_id, 'panels', panel_id, 'controls'];
+  let pathList = ['admin', 'synthremotes', params.remote_id, 'panels', params.panel_id, 'controls'];
   addToCollection(pathList, data);
   setTimeout(() => {
     if(lines.length !==0) {

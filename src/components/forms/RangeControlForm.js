@@ -50,10 +50,11 @@ export default Component({
       this.props.maximum,
       this.props.default
     ];
+    let {type} = this.props;
     let showCreateButton = inputList.reduce(function(a,b) {return a && b});
-    let parameterInput = this.props.type in [CONTROLTYPE.CC, CONTROLTYPE.SYSEX] ? ( <CC_SYSEX_Input props={this.props} /> ) : '';
-    let nrpnInput = Number(this.props.type) === Number(CONTROLTYPE.NRPN) ? ( <NRPN_Input props={this.props} /> ) : '';
-    let oscInput = Number(this.props.type) === Number(CONTROLTYPE.OSC) ? ( <OSC_Input props={this.props} /> ) : '';
+    let parameterInput = type in [CONTROLTYPE.CC, CONTROLTYPE.SYSEX] ? ( <CC_SYSEX_Input props={this.props} /> ) : '';
+    let nrpnInput = Number(type) === CONTROLTYPE.NRPN ? ( <NRPN_Input props={this.props} /> ) : '';
+    let oscInput = Number(type) === CONTROLTYPE.OSC ? ( <OSC_Input props={this.props} /> ) : '';
 
     return (
       <div>
