@@ -3,8 +3,7 @@
  */
 import {Component} from 'jumpsuit'
 import '../pojos/jquery-knob'
-import synthremotes, {getSynthRemote, getUserRemotePresets} from '../state/synthremotes'
-import activeSynthRemote, {sendSysExData} from '../state/activesynthremote'
+import activeSynthRemote, {sendSysExData, sendCCData} from '../state/activesynthremote'
 import MidiDevices from '../components/mididevices'
 import ReactKnob from '../components/midicontrols/jknob'
 import ListControl from '../components/midicontrols/dropdown'
@@ -96,13 +95,11 @@ const ControlDelegator = Component({
     let {index, control} = this.props;
     let {type, subtype} = control;
     let control_map = {
-      [CONTROLTYPE.SYSEX]: {
         [SUBCONTROLTYPE.RANGE]: <ReactKnob key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>,
         [SUBCONTROLTYPE.LIST]: <ListControl key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>,
         [SUBCONTROLTYPE.TOGGLE]: <Toggle key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>,
         [SUBCONTROLTYPE.BITMASK]: <BitMask key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>
-      }
     };
-    return control_map[type][subtype];
+    return control_map[subtype];
   }
 });
