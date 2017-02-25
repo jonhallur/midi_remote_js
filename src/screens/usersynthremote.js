@@ -15,6 +15,7 @@ import ActiveSynthModal from '../components/modals/activesynthremotemodal'
 import activesynthremote from '../state/activesynthremote'
 import Presets from '../components/presets'
 import {getUserSynthRemote} from "../state/synthremotes";
+import {sendCCData} from "../state/activesynthremote";
 
 export default Component({
   componentDidMount() {
@@ -84,6 +85,7 @@ const ControlDelegator = Component({
     let {key, sysexheaderid, parameter, type} = this.props.control;
     activeSynthRemote.setControlValues({uuid: key, value: value});
     if(sysexheaderid) {
+      console.log("header is", sysexheaderid);
       sendSysExData(sysexheaderid, parameter, value, key);
     }
     else if(Number(type) === CONTROLTYPE.CC) {
@@ -96,13 +98,11 @@ const ControlDelegator = Component({
     let {index, control} = this.props;
     let {type, subtype} = control;
     let control_map = {
-      [CONTROLTYPE.SYSEX]: {
         [SUBCONTROLTYPE.RANGE]: <ReactKnob key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>,
         [SUBCONTROLTYPE.LIST]: <ListControl key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>,
         [SUBCONTROLTYPE.TOGGLE]: <Toggle key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>,
         [SUBCONTROLTYPE.BITMASK]: <BitMask key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>
-      }
-    };
-    return control_map[type][subtype];
+      };
+    return control_map[subtype];
   }
 });
