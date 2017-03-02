@@ -5,7 +5,8 @@ import {Component} from 'jumpsuit'
 import Switch from 'rc-switch'
 
 export default Component({
-  handleToggleClick(value) {
+  handleToggleClick(toggleState) {
+    let value = toggleState ? this.props.control.onvalue : this.props.control.offvalue;
     if(this.props.onValueChange !== undefined && typeof this.props.onValueChange === "function") {
       this.props.onValueChange(Number(value));
     }
