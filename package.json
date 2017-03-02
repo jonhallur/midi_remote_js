@@ -9,7 +9,7 @@
   },
   "scripts": {
     "watch": "jumpsuit watch",
-    "build": "jumpsuit build"
+    "build": "jumpsuit build && firebase deploy"
   },
   "devDependencies": {
     "babel-core": "^6.17.0",

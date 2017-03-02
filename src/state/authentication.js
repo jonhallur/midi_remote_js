@@ -23,7 +23,8 @@ const authentication = State('authentication', {
     userEmail: '',
     showLoginModal: false,
     loginEmail: '',
-    loginPassword: ''
+    loginPassword: '',
+    showEmailLogin: false,
   },
 
   setUsingKeyValue: (state, payload) => ({
@@ -59,10 +60,7 @@ export function loginEmailUser(email, password) {
     var errorCode = error.code;
     var errorMessage = error.message;
     NotificationManager.error(errorMessage, "Login Error: " + errorCode, 5000)
-  }).then(() => {
-    console.log("Done login");
-    NotificationManager.info("Login Successful", "Authentication")
-  });
+  })
 }
 
 export function signOutUser(){
@@ -84,6 +82,30 @@ export function createEmailUser(email, password) {
       loginEmailUser(email, password)
     }, 5000);
   });
+}
+
+export function loginGoogleUser() {
+  let provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider).then(function(result) {
+    // This gives you a Google Access Token. You can use it to access the Google API.
+    var token = result.credential.accessToken;
+    // The signed-in user info.
+    var user = result.user;
+  }).catch(function(error) {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    // The email of the user's account used.
+    var email = error.email;
+    // The firebase.auth.AuthCredential type that was used.
+    var credential = error.credential;
+    NotificationManager.error(error.message, error.code);
+    // ...
+  });
+}
+
+export function createGoogleUser() {
+  firebase.auth()
 }
 
 export function initializeFirebase() {

@@ -30,3 +30,7 @@ function buildStyles () {
     })
   })
 }
+
+function copyFonts() {
+  console.log("copy")
+}

@@ -11,7 +11,6 @@ var app = Component({
   render () {
     initializeFirebase();
     startFirebaseAuthStateMonitor();
-    let showLogin = this.props.showLoginModal;
     return (
       <div className='container-fluid'>
         <div className="container-fluid">
@@ -34,7 +33,6 @@ var app = Component({
   }
 }, (state) => ({
   user: state.authentication.user,
-  showLoginModal: state.authentication.showLoginModal
 }));
 const WrappedContainer = DragDropContext(HTML5Backend)(app);
 export default WrappedContainer
