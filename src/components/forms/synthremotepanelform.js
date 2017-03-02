@@ -16,7 +16,8 @@ export default Component({
       }
       else {
         addPanel(this.props.params.remote_id, this.props.panelName);
-        synthremotes.setSynthremotePanelName('')
+        synthremotes.setSynthremotePanelName('');
+        synthpanels.setPanelName('');
       }
     },
     render() {
