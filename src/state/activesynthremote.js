@@ -241,7 +241,7 @@ export function sendCCData(parameter, value, key) {
   let {selectedOutputChannel, selectedOutput} = mididevices.getState();
   if (midiIsReady(selectedOutputChannel, selectedOutput)) {
     let output = WebMidi.getOutputById(selectedOutput);
-    output.sendControlChange(Number(parameter), value, selectedOutputChannel);
+    output.sendControlChange(Number(parameter), Number(value), selectedOutputChannel);
     if(key) {
       sendDebouncedUpdates(key, value);
     }
@@ -272,21 +272,21 @@ export function sendAllControlValues() {
   }
   activesynthremote.setControlsToSend(controls.length);
   activesynthremote.setSending();
-  sendTimeOutMIDI(controls);
+  sendTimedMidiParameters(controls);
 }
 
-function sendTimeOutMIDI(listToSend) {
+function sendTimedMidiParameters(listToSend) {
   if(listToSend.length === 0) {
     activesynthremote.setReady();
     return;
   }
   let settings = listToSend.pop();
-  if(Number(settings.type) === CONTROLTYPE.SYSEX) {
+  if (Number(settings.type) === CONTROLTYPE.SYSEX) {
     sendSysExData(settings.sysexheaderid, settings.parameter, settings.value, null);
   }
   else if (Number(settings.type) === CONTROLTYPE.CC) {
-    sendCCData(settings.parameter, settings.value, null)
+    sendCCData(settings.parameter, settings.value, null);
   }
   activesynthremote.tickControlsSent();
-  setTimeout(sendTimeOutMIDI.bind(null, listToSend), 10);
+  setTimeout(sendTimedMidiParameters.bind(null, listToSend), 10);
 }
