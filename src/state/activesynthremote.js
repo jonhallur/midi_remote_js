@@ -147,7 +147,8 @@ export function createActiveSynthRemote(synthremote) {
 }
 
 function handleControl(control) {
-  return TYPEFUNCTIONS[control.type](control);
+  console.log(control.type)
+  return TYPEFUNCTIONS[Number(control.type)](control);
 }
 
 function handleSysExControl(control) {

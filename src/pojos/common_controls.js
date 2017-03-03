@@ -12,7 +12,7 @@ export function createRangeControlData(props) {
     minimum: props.minimum,
     maximum: props.maximum,
     default: props.default,
-    type: props.default,
+    type,
     subtype: props.subtype
   };
 
