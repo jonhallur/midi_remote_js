@@ -17,10 +17,10 @@ export function createRangeControlData(props) {
   };
 
   if (type in [CONTROLTYPE.CC, CONTROLTYPE.SYSEX]) {
-    Object.assign(data, {parameter: props.parameter})
+    data = {...data, parameter: props.parameter}
   }
   if (type.toString() === CONTROLTYPE.SYSEX.toString()) {
-    Object.assign(data, {sysexheaderid: props.sysexheaderid})
+    data = {...data, sysexheaderid: props.sysexheaderid}
   }
   return data;
 }
