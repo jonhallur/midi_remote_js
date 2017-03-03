@@ -2,6 +2,7 @@
  * Created by jonh on 9.10.2016.
  */
 import {Component} from 'jumpsuit'
+import _ from 'lodash'
 
 export default Component({
   handleListChange(event) {
@@ -9,6 +10,29 @@ export default Component({
     let {value} = event.target;
     if(this.props.onValueChange !== undefined && typeof this.props.onValueChange === "function") {
       this.props.onValueChange(value);
+    }
+  },
+
+  onWheel(event) {
+    let direction = event.nativeEvent.deltaY;
+    let {control, controlValues} = this.props;
+    let length = control.options.length;
+    let currentValue = controlValues[control.key];
+    let currentIndex = _.findIndex(control.options, (o) => o.value === currentValue);
+
+    console.log(control);
+    event.preventDefault();
+    if(direction < 0) {
+      currentIndex--;
+      if(currentIndex > -1) {
+        this.props.onValueChange(control.options[currentIndex].value);
+      }
+    }
+    else if(direction > 0) {
+      currentIndex++;
+      if(currentIndex < length) {
+        this.props.onValueChange(control.options[currentIndex].value);
+      }
     }
   },
 
@@ -23,6 +47,7 @@ export default Component({
           className="drop-down-select"
           value={controlValues[control.key]}
           onChange={this.handleListChange}
+          onWheel={this.onWheel}
         >
           <option disabled value="">select</option>
           {

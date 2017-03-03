@@ -119,6 +119,7 @@ export default Component({
     this.updateCanvas();
     this.lastValue = this.position;
   },
+  
   onMouseMove(event) {
     if(this.mouseDown) {
       this.position = this.updatePosition(event);
