@@ -10,7 +10,7 @@ export default Component({
       <div>
         {
           this.props.user.providerData.map((provider, index) => (
-            <Provider key={index} provider={provider} />
+            <AuthProvider key={index} provider={provider} />
           ))
         }
 
@@ -20,7 +20,7 @@ export default Component({
   user: state.authentication.user
 }))
 
-const Provider = (props) => {
+const AuthProvider = (props) => {
   let {provider} = props;
   return (
     <div>

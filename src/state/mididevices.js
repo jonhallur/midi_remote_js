@@ -17,7 +17,14 @@ const mididevices = State('mididevices', {
     outputError: false,
     errorHandle: null,
     outputMap: [],
+    midiModalOpen: false,
   },
+  openMidiModal: (state, payload) => ({
+    midiModalOpen: true
+  }),
+  closeMidiModal: (state, payload) => ({
+    midiModalOpen: false
+  }),
   setError: (state, payload) => ({
     outputError: true
   }),

@@ -35,10 +35,11 @@ const activesynthremote = State('activesynthremote',{
     synthRemoteCreating: false,
     synthRemoteLoading: false,
     synthRemoteSending: false,
-    saveRemoteOpen: false,
     saveRemoteName: '',
     newSaveRemoteName: '',
-    saveModalOpen: true,
+    saveModalOpen: false,
+    presetChanged: false,
+    presetName: '',
     controlsToSend: 0,
     controlsSent: 0,
   },
@@ -89,6 +90,7 @@ const activesynthremote = State('activesynthremote',{
     synthRemoteCreating: false,
     synthRemoteLoading: false,
     synthRemoteSending: false,
+    presetChanged: false,
   }),
   setSending: (state, payload) => ({
     synthRemoteReady: false,
@@ -147,7 +149,6 @@ export function createActiveSynthRemote(synthremote) {
 }
 
 function handleControl(control) {
-  console.log(control.type)
   return TYPEFUNCTIONS[Number(control.type)](control);
 }
 
@@ -221,6 +222,7 @@ function midiIsReady(selectedOutputChannel, selectedOutput) {
 const sendDebouncedUpdates = _.debounce((control_key, value) => {
   let {remote_id, version} = activesynthremote.getState();
   setRemoteSettingsValue(remote_id, version, control_key, value);
+  activesynthremote.setUsingKeyValue({key: 'presetChanged', value: true})
 }, 500, {'trailing': true});
 
 export function sendSysExData(header_id, param_id, value, key) {
@@ -234,6 +236,7 @@ export function sendSysExData(header_id, param_id, value, key) {
     output.sendSysex(manufacturer_bytes, data_bytes);
     if (key) {
       sendDebouncedUpdates(key, value);
+
     }
   }
 }

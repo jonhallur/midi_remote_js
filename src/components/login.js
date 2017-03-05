@@ -54,7 +54,7 @@ export default Component({
     let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     let inputValid = this.props.loginEmail.match(emailRegex) && this.props.loginPassword;
     return (
-      <div className="navbar-right">
+      <div className="nav navbar-right">
         {this.props.user ?
           <p className="navbar-text">Logout&nbsp;
             <a

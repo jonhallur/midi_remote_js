@@ -4,6 +4,7 @@
 @import '../node_modules/rc-switch/assets/index.css';
 @import '../node_modules/rc-tree-select/assets/index.css';
 @import '../node_modules/rc-select/assets/index.css';
+@import '../node_modules/bootstrap/dist/css/bootstrap.css';
 @import '../node_modules/font-awesome/css/font-awesome.css';
 @import '../node_modules/bootstrap-social/bootstrap-social.css';
 
@@ -11,8 +12,16 @@
   float: right;
 };
 
+.panel-heading-overrides {
+  padding: 6px 15px 6px 15px;
+}
+
+.panel-body-overrides {
+  padding: 5px;
+}
+
 .midi-control-label {
-  height: 25px;
+  height: 18px;
   border-bottom: 1px solid #ddd;
   background-color: #f5f5f5;
   border-top-left-radius: 3px;
@@ -23,13 +32,13 @@
 
 .midi-control-label p {
   font-size: 11px;
-  padding-top: 5px;
+  padding-top: 2px;
 };
 
 .midi-control-box {
   float: left;
-  width: 80px;
-  height 102px;
+  width: 78px;
+  height 96px;
   border: 1px solid #ddd;
   border-radius: 5px;
   margin: 2px;
@@ -42,8 +51,8 @@
 };
 
 .drop-down-box {
-  margin-top: 25px;
-  margin-bottom: 15px;
+  margin-top: 20px;
+  margin-bottom: 20px;
   margin-left: auto;
   margin-right: auto;
   width: 60px;

@@ -3,26 +3,19 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
 import {initializeFirebase, startFirebaseAuthStateMonitor} from '../state/authentication'
 import {NotificationContainer} from 'react-notifications'
-import Login from '../components/login'
-require('react-notifications');
+import NavBar from '../components/navbar'
+import {initializeMidi} from '../state/mididevices'
 
 var app = Component({
-
+  componentWillMount() {
+    initializeMidi();
+  },
   render () {
     initializeFirebase();
     startFirebaseAuthStateMonitor();
     return (
       <div className='container-fluid'>
-        <div className="container-fluid">
-          <nav className="navbar navbar-default" role="search">
-            <div className="navbar-header">
-                <a className="navbar-brand" href="/">
-                  MIDICONTROL
-                </a>
-            </div>
-            <Login/>
-          </nav>
-        </div>
+        <NavBar />
         <NotificationContainer/>
         {this.props.user
           ? this.props.children
@@ -36,4 +29,3 @@ var app = Component({
 }));
 const WrappedContainer = DragDropContext(HTML5Backend)(app);
 export default WrappedContainer
-

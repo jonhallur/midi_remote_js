@@ -184,6 +184,7 @@ export function getLastUsedMidiDevice() {
   firebase.database().ref(path_list.join('/')).once('value', function(snapshot) {
     let data = snapshot.val();
     if(data !== null) {
+      console.log("Setting midi", data.name, data.channel);
       setMidiDeviceFromName(data.name, data.channel);
     }
   })

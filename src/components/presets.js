@@ -14,8 +14,11 @@ export default Component({
   },
   onPresetChange(key) {
     let preset = _.find(this.props.presets, function(o) { return o.key === key});
-    let setPartial=false;
+    let setPartial = false;
     setControlSettingsFromRemoteData(preset.controlValues, setPartial);
+    activesynthremote.setUsingKeyValue({key: 'presetChanged', value: false});
+    activesynthremote.setUsingKeyValue({key: 'saveModalOpen', value: false});
+    activesynthremote.setSaveRemoteName(preset.name);
   },
 
   onInputKeydown(event) {
@@ -32,58 +35,46 @@ export default Component({
   },
 
   savePresetAndClose() {
-    let {saveRemoteOpen, saveRemoteName, presets} = this.props;
-    if(!saveRemoteOpen) {
-      activesynthremote.toggleSaveRemote()
-    }
-    else {
-      let overwrite = _.find(presets, (o) => (o.name == saveRemoteName));
-      let {controlValues, remote_id, version } = activesynthremote.getState();
-      if (saveRemoteName !== '' && saveRemoteName.length > 2) {
-        activesynthremote.setSaveRemoteName('');
-        activesynthremote.toggleSaveRemote();
-        if (overwrite) {
-          saveUserRemotePreset(remote_id, version, saveRemoteName, controlValues, overwrite);
-        }
-        else {
-          saveUserRemotePreset(remote_id, version, saveRemoteName, controlValues)
-        }
+    let {saveRemoteName, presets} = this.props;
+    let overwrite = _.find(presets, (o) => (o.name == saveRemoteName));
+    let {controlValues, remote_id, version } = activesynthremote.getState();
+    if (saveRemoteName !== '' && saveRemoteName.length > 2) {
+      activesynthremote.setSaveRemoteName('');
+      activesynthremote.setUsingKeyValue({key: 'saveModalOpen', value: false});
+      activesynthremote.setUsingKeyValue({key: 'presetChanged', value: false});
+      if (overwrite) {
+        saveUserRemotePreset(remote_id, version, saveRemoteName, controlValues, overwrite);
       }
       else {
-        activesynthremote.toggleSaveRemote();
+        saveUserRemotePreset(remote_id, version, saveRemoteName, controlValues)
       }
     }
   },
-
   render () {
     //let notEmptyAndLongEnough = this.props.saveRemoteName !== '' && this.props.saveRemoteName.length > 2;
     let error = false;
     let overwrite = false;
     let errorText = '';
-    let {saveRemoteName, saveRemoteOpen} = this.props;
-    if (!saveRemoteOpen) {
-      error = false;
-      errorText = '';
-      overwrite = false;
-    }
-    else if(saveRemoteName === '' || saveRemoteName.length < 3) {
+    let {saveRemoteName} = this.props;
+    if(saveRemoteName === '' || saveRemoteName.length < 3) {
       error = true;
       errorText = "Preset name is too short"
     }
     else if (_.findIndex(this.props.presets, function(o) { return o.name === saveRemoteName}) !== -1) {
       error = true;
-      errorText = "Preset with that name already exists";
+      errorText = "Preset already exists";
       overwrite = true;
     }
-    let readyForSave = (saveRemoteOpen && !error);
-    let saveIcon = readyForSave ? 'glyphicon glyphicon-floppy-saved' : 'glyphicon glyphicon-floppy-disk';
+    let saveIcon = error ? 'glyphicon glyphicon-floppy-remove' : 'glyphicon glyphicon-floppy-disk';
     return (
-      <div>
+      <div className="form-inline">
+        <h2>Presets</h2>
         <Select
-          style={{ width: 200, float: 'left' }}
+          style={{ width: 200, float: 'left', height: 36 }}
           placeholder="Select preset"
           onChange={this.onPresetChange}
           optionLabelProp="label"
+          optionFilterProp="label"
         >
           {this.props.presets.map(
             (option) => (
@@ -102,10 +93,9 @@ export default Component({
               </Option>
             )
           )}
-
         </Select>
-        <div className="col-lg-3">
-          <div className={readyForSave ? "input-group" :"input-group has-error"}>
+        <div className="form-inline">
+          <div className={!error ? "input-group" :"input-group has-error"}>
             <span className="input-group-btn">
               <button
                 className={overwrite ? "btn btn-danger" : "btn btn-default"}
@@ -120,23 +110,23 @@ export default Component({
               type="text"
               onChange={(e) => {activesynthremote.setSaveRemoteName(e.target.value)}}
               onKeyPress={this.onInputKeydown}
-              className={this.props.saveRemoteOpen ? "form-control" : "hidden"}
+              className="form-control"
               value={this.props.saveRemoteName}
               placeholder="Preset name..."
             />
-
-          </div>
-          <div className="tooltip bottom" role="tooltip" style={error ? {opacity: 1} : {opacity: 0}}>
-            <div className="tooltip-arrow"></div>
-            <div className="tooltip-inner">
-              {errorText}
-            </div>
           </div>
         </div>
+        <div className="tooltip bottom" role="tooltip" style={error ? {opacity: 1} : {opacity: 0}}>
+          <div className="tooltip-arrow"></div>
+          <div className="tooltip-inner">
+            {errorText}
+          </div>
+        </div>
+        <p>&nbsp;</p>
       </div>
     )
 }}, (state) => ({
   presets: state.activesynthremote.presets,
-  saveRemoteOpen: state.activesynthremote.saveRemoteOpen,
+  presetName: state.activesynthremote.presetName,
   saveRemoteName: state.activesynthremote.saveRemoteName,
 }))

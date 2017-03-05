@@ -23,12 +23,6 @@ export default Component({
   render() {
     return (
       <div>
-        <div className="panel panel-default">
-          <div className="panel-body">
-            <MidiDevices/>
-            <Presets/>
-          </div>
-        </div>
         {this.props.panels.map((panel, index) => (
             <Panel key={index} id={index} panel={panel} />
         ))}
@@ -47,9 +41,9 @@ const Panel = Component({
   render() {
     let {panel, showPanel, id} = this.props;
     return (
-      <div className={showPanel[panel.key] ? "col-lg-4" : "col-lg-2"}>
+      <div className={showPanel[panel.key] ? "col-lg-4" : "col-lg-1"}>
         <div className="panel panel-default" id={panel.key}>
-          <div className="panel-heading">
+          <div className="panel-heading panel-heading-overrides">
             <h3 className="panel-title">{panel.name}
             <div className="badge float-right" onClick={e => activeSynthRemote.togglePanel(panel.key)}>
                 <span
@@ -60,7 +54,7 @@ const Panel = Component({
             </div>
             </h3>
           </div>
-          <div className={showPanel[panel.key] ? "panel-body" : "collapse"} id={'panel_' + id}>
+          <div className={showPanel[panel.key] ? "panel-body-overrides panel-body" : "collapse"} id={'panel_' + id}>
             {panel.controls.map((control) => (
               <div className="midi-control-box"  key={control.key}>
                 <div className="midi-control-label">

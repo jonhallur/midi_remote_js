@@ -9,10 +9,6 @@ import {setMidiThru} from "../state/mididevices";
 import _ from 'lodash'
 
 export default Component({
-  componentDidMount() {
-    initializeMidi();
-  },
-
   onMidiOutputSelected(value) {
     if (value === undefined) {
       return;
@@ -40,7 +36,8 @@ export default Component({
     let selectedOutDeviceChannel = selectedOutput && selectedOutputChannel ? output.name + ' - Ch: ' + (selectedOutputChannel) : '';
     let selectedInDeviceChannel = selectedInput && selectedInputChannel ? input.name + ' - Ch: ' + (selectedInputChannel) : '';
     return (
-      <div className="midi-settings-box">
+      <div>
+        <h2>Select Midi Devices</h2>
         <label>
           Output:
           <TreeSelector
