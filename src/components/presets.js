@@ -39,7 +39,6 @@ export default Component({
     let overwrite = _.find(presets, (o) => (o.name == saveRemoteName));
     let {controlValues, remote_id, version } = activesynthremote.getState();
     if (saveRemoteName !== '' && saveRemoteName.length > 2) {
-      activesynthremote.setSaveRemoteName('');
       activesynthremote.setUsingKeyValue({key: 'saveModalOpen', value: false});
       activesynthremote.setUsingKeyValue({key: 'presetChanged', value: false});
       if (overwrite) {

@@ -9,8 +9,16 @@ import Presets from './presets'
 import {customStyles} from '../pojos/constants'
 import mididevices from '../state/mididevices'
 import activesynthremote from '../state/activesynthremote'
+import _ from 'lodash'
 
 export default Component({
+  onPanelChange(change) {
+    let {panelWidth, panelWidths} = this.props;
+    let pos = _.indexOf(panelWidths, Number(panelWidth)) + change;
+    if (pos > -1 && pos < panelWidths.length) {
+      activesynthremote.setUsingKeyValue({key: 'panelWidth', value: panelWidths[pos]});
+    }
+  },
   render() {
     let midiIcon = this.props.selectedOutput ? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-alert';
     let presetIcon = this.props.presetChanged ? 'glyphicon glyphicon-alert' : 'glyphicon glyphicon-ok';
@@ -43,8 +51,38 @@ export default Component({
             </a>
             <PresetModal isOpen={this.props.saveModalOpen}/>
           </li>
+          <li>
+
+          </li>
         </ul>
+
           : null }
+        <form className="navbar-form navbar-right">
+          <div className="form-group">
+            <div className="input-group">
+              <span className="input-group-btn">
+                  <button
+                    type="button"
+                    className="btn btn-default btn-number"
+                    onClick={(event) => this.onPanelChange(-1)}
+                  >
+                    <span className="glyphicon glyphicon-minus" />
+                  </button>
+              </span>
+              <span className="input-group-btn">
+                <button
+                  type="button"
+                  className="btn btn-default btn-number"
+                  data-type="plus"
+                  data-field="quant[2]"
+                  onClick={(event) => this.onPanelChange(1)}
+                >
+                  <span className="glyphicon glyphicon-plus" />
+                </button>
+              </span>
+            </div>
+          </div>
+        </form>
         <Login/>
       </nav>
     )
@@ -55,6 +93,8 @@ export default Component({
   saveModalOpen: state.activesynthremote.saveModalOpen,
   synthRemoteReady: state.activesynthremote.synthRemoteReady,
   presetChanged: state.activesynthremote.presetChanged,
+  panelWidths: state.activesynthremote.panelWidths,
+  panelWidth: state.activesynthremote.panelWidth
 }))
 
 function onMidiModalCloseRequest(event) {

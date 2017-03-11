@@ -11,6 +11,7 @@ import RangeForm from './rangecontrolform'
 import ToggleForm from './sysextogglecontrolform'
 import ListForm from './sysexlistcontrolform'
 import BitMaskForm from './sysexbitmaskcontrolform'
+import M1000ModForm from './m1000modform'
 import {addToCollection} from "../../state/genericfirebase";
 import * as _ from "lodash";
 
@@ -54,6 +55,10 @@ function addTsvControl (lines, params) {
   else if (Number(subtype) === SUBCONTROLTYPE.BITMASK) {
     data = {...data, numbits: maximum}
   }
+  else if(Number(subtype) === SUBCONTROLTYPE.M1000MOD) {
+    data = {...data, path: parameter};
+    delete data.default;
+  }
   else {
     console.log(subtype);
     throw Error("Unknown subtype");
@@ -91,11 +96,17 @@ export default Component({
   },
 
   render() {
-    let isSysEx = this.props.selectedType === CONTROLTYPE.SYSEX.toString();
-    let isRange = this.props.selectedSubType === SUBCONTROLTYPE.RANGE.toString();
-    let isToggle = this.props.selectedSubType === SUBCONTROLTYPE.TOGGLE.toString();
-    let isList = this.props.selectedSubType === SUBCONTROLTYPE.LIST.toString();
-    let isBitMask = this.props.selectedSubType === SUBCONTROLTYPE.BITMASK.toString();
+    let {selectedType, selectedSubType} = this.props;
+    let isSysEx = selectedType === CONTROLTYPE.SYSEX.toString();
+
+    let inputsFromSubType = {
+      [SUBCONTROLTYPE.RANGE]: (<RangeForm params={this.props.params} />),
+      [SUBCONTROLTYPE.TOGGLE]: (<ToggleForm params={this.props.params} />),
+      [SUBCONTROLTYPE.LIST]: (<ListForm params={this.props.params} />),
+      [SUBCONTROLTYPE.BITMASK]: (<BitMaskForm params={this.props.params} />),
+      [SUBCONTROLTYPE.M1000MOD]: (<M1000ModForm params={this.props.params} />)
+    };
+
     return (
       <form className="form-horizontal">
         <Selector
@@ -115,10 +126,7 @@ export default Component({
           default_text="Select sub-controller type"
           eventhandler={(event) => midicontrols.setSelectedSubType(event.target.value)}
         />
-        {isRange ? <RangeForm params={this.props.params} /> : '' }
-        {isToggle ? <ToggleForm params={this.props.params} /> : '' }
-        {isList ? <ListForm params={this.props.params} /> : '' }
-        {isBitMask ? <BitMaskForm params={this.props.params} /> : '' }
+        {inputsFromSubType[selectedSubType]}
         <input type="file" name="tsv" accept="text/tsv+tsv" onChange={this.onFileInputChange} />
         <span>Select .tsv file</span>
       </form>

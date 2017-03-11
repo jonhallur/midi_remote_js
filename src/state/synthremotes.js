@@ -144,22 +144,24 @@ export function publishSynthRemote(key) {
       target.once('value', function(targetSnapshot) {
         let targetVersion = 1;
         if(targetSnapshot.exists()) {
-          console.log("Target Found");
           let targetData = targetSnapshot.val();
           targetVersion = targetData[versionKey] + 1;
           firebase.database().ref('public/oldersynthremotes/' + key).push(targetData);
           sourceData[versionKey] = targetVersion;
-          target.set(sourceData)
+          target.set(sourceData);
+          NotificationManager.info("Target found, overwritten", "PublishSynthRemote")
+
         }
         else {
           console.log("Target not found");
           sourceData[versionKey] = targetVersion;
           target.set(sourceData);
+          NotificationManager.info("Target not found, New synth", "PublishSynthRemote")
+
         }
       })
     }
     else {
-      console.log("source not found");
       NotificationManager.error("Synth source not found", "PublishSynthRemote")
     }
   })

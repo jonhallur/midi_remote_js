@@ -3,16 +3,15 @@
  */
 import {Component} from 'jumpsuit'
 import '../pojos/jquery-knob'
-import activeSynthRemote, {sendSysExData, sendCCData} from '../state/activesynthremote'
-import MidiDevices from '../components/mididevices'
+import activeSynthRemote, {sendSysExData, sendCCData, sendM1000ModData} from '../state/activesynthremote'
 import ReactKnob from '../components/midicontrols/jknob'
 import ListControl from '../components/midicontrols/dropdown'
 import Toggle from '../components/midicontrols/toggle'
 import BitMask from '../components/midicontrols/bitmask'
+import M1000Mod from '../components/midicontrols/m1000mod'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 import ActiveSynthModal from '../components/modals/activesynthremotemodal'
 import activesynthremote from '../state/activesynthremote'
-import Presets from '../components/presets'
 import {getUserSynthRemote} from "../state/synthremotes";
 
 export default Component({
@@ -39,13 +38,13 @@ export default Component({
 
 const Panel = Component({
   render() {
-    let {panel, showPanel, id} = this.props;
+    let {panel, showPanel, id, panelWidth} = this.props;
     return (
-      <div className={showPanel[panel.key] ? "col-lg-4" : "col-lg-1"}>
+      <div className={"col-lg-" +  panelWidth}>
         <div className="panel panel-default" id={panel.key}>
-          <div className="panel-heading panel-heading-overrides">
+          <div className="panel-heading panel-heading-overrides" onClick={e => activeSynthRemote.togglePanel(panel.key)}>
             <h3 className="panel-title">{panel.name}
-            <div className="badge float-right" onClick={e => activeSynthRemote.togglePanel(panel.key)}>
+            <div className="float-right">
                 <span
                   className={showPanel[panel.key] ? "glyphicon glyphicon-triangle-bottom" : "glyphicon glyphicon-triangle-left"}
                   aria-hidden="true"
@@ -56,7 +55,7 @@ const Panel = Component({
           </div>
           <div className={showPanel[panel.key] ? "panel-body-overrides panel-body" : "collapse"} id={'panel_' + id}>
             {panel.controls.map((control) => (
-              <div className="midi-control-box"  key={control.key}>
+              <div className={Number(control.subtype) === SUBCONTROLTYPE.M1000MOD ? "m1000-control-box" : "midi-control-box"}  key={control.key}>
                 <div className="midi-control-label">
                   <p>{control.short}</p>
                 </div>
@@ -69,15 +68,22 @@ const Panel = Component({
     )
   }
 }, (state) => ({
-  showPanel: state.activesynthremote.showPanel
+  showPanel: state.activesynthremote.showPanel,
+  panelWidth: state.activesynthremote.panelWidth,
 }));
 
 const ControlDelegator = Component({
   handleOnValueChange(value) {
-    let {key, sysexheaderid, parameter, type} = this.props.control;
+    let {key, sysexheaderid, parameter, type, subtype, path} = this.props.control;
     activeSynthRemote.setControlValues({uuid: key, value: value});
     if(sysexheaderid) {
-      sendSysExData(sysexheaderid, parameter, value, key);
+      if(Number(subtype) === SUBCONTROLTYPE.M1000MOD) {
+        sendM1000ModData(sysexheaderid, path, value, key);
+      }
+      else {
+        sendSysExData(sysexheaderid, parameter, value, key);
+      }
+
     }
     else if(Number(type) === CONTROLTYPE.CC) {
       sendCCData(parameter, value, key);
@@ -86,14 +92,17 @@ const ControlDelegator = Component({
   },
 
   render() {
-    let {index, control} = this.props;
+    let {index, control,controlValues} = this.props;
     let {type, subtype} = control;
     let control_map = {
-        [SUBCONTROLTYPE.RANGE]: <ReactKnob key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>,
-        [SUBCONTROLTYPE.LIST]: <ListControl key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>,
-        [SUBCONTROLTYPE.TOGGLE]: <Toggle key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>,
-        [SUBCONTROLTYPE.BITMASK]: <BitMask key={control.key} index={index} control={control} onValueChange={this.handleOnValueChange}/>
+        [SUBCONTROLTYPE.RANGE]: <ReactKnob key={control.key} control={control} value={controlValues[control.key]} onValueChange={this.handleOnValueChange}/>,
+        [SUBCONTROLTYPE.LIST]: <ListControl key={control.key} control={control} onValueChange={this.handleOnValueChange}/>,
+        [SUBCONTROLTYPE.TOGGLE]: <Toggle key={control.key} control={control} onValueChange={this.handleOnValueChange}/>,
+        [SUBCONTROLTYPE.BITMASK]: <BitMask key={control.key} control={control} onValueChange={this.handleOnValueChange}/>,
+        [SUBCONTROLTYPE.M1000MOD]: <M1000Mod key={control.key} control={control} onValueChange={this.handleOnValueChange}/>
     };
     return control_map[subtype];
   }
-});
+}, (state) => ({
+  controlValues: state.activesynthremote.controlValues
+}));

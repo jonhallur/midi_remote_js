@@ -32,7 +32,6 @@ export default Component({
 
     onPublishSynthClick(event) {
       event.preventDefault();
-      console.log("on publish");
       publishSynthRemote(this.props.params.remote_id)
 
     },

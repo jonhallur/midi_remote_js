@@ -42,6 +42,8 @@ const activesynthremote = State('activesynthremote',{
     presetName: '',
     controlsToSend: 0,
     controlsSent: 0,
+    panelWidth: 3,
+    panelWidths: [2,3,4,6,12],
   },
   setSynthRemote: (state, payload) => ({
     name: payload.name,
@@ -193,7 +195,7 @@ function createSysExHeader(header_id, param_id, value, selectedOutputChannel) {
   let sysexheader = new SysExHeaderChannel({name: data.name, fields: fields});
   let generatedHeader = sysexheader.generate_header(Number(selectedOutputChannel), []);
   generatedHeader.push(Number(param_id));
-  generatedHeader.push(value);
+  generatedHeader.push(Number(value));
   return generatedHeader;
 }
 
@@ -236,7 +238,24 @@ export function sendSysExData(header_id, param_id, value, key) {
     output.sendSysex(manufacturer_bytes, data_bytes);
     if (key) {
       sendDebouncedUpdates(key, value);
+    }
+  }
+}
 
+export function sendM1000ModData(sysexheaderid, path, value, key) {
+  let {selectedOutputChannel, selectedOutput} = mididevices.getState();
+  if (midiIsReady(selectedOutputChannel, selectedOutput)) {
+    let [source, destination, amount] = value || [0, 0, 0];
+    var sysex_payload = createSysExHeader(sysexheaderid, path, source, selectedOutputChannel);
+    sysex_payload.push(Number(amount));
+    sysex_payload.push(Number(destination));
+    let output = WebMidi.getOutputById(selectedOutput);
+    let outputBytes = PrepareOutput(sysex_payload);
+    let manufacturer_bytes = outputBytes.manufacturer_bytes;
+    let data_bytes = outputBytes.data_bytes;
+    output.sendSysex(manufacturer_bytes, data_bytes);
+    if (key) {
+      sendDebouncedUpdates(key, value);
     }
   }
 }
@@ -285,7 +304,12 @@ function sendTimedMidiParameters(listToSend) {
   }
   let settings = listToSend.pop();
   if (Number(settings.type) === CONTROLTYPE.SYSEX) {
-    sendSysExData(settings.sysexheaderid, settings.parameter, settings.value, null);
+    if(Number(settings.subtype) === SUBCONTROLTYPE.M1000MOD) {
+      sendM1000ModData(settings.sysexheaderid, settings.path, settings.value, null);
+    }
+    else {
+      sendSysExData(settings.sysexheaderid, settings.parameter, settings.value, null);
+    }
   }
   else if (Number(settings.type) === CONTROLTYPE.CC) {
     sendCCData(settings.parameter, settings.value, null);

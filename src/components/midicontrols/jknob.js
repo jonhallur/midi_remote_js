@@ -19,7 +19,7 @@ export default Component({
   },
 
   componentWillReceiveProps(nextProps) {
-    this.value = Number(nextProps.controlValues[this.props.control.key]);
+    this.value = Number(nextProps.value);
     this.position = (this.value - this.props.control.minimum) / this.range;
     this.updateCanvas();
   },
@@ -41,7 +41,7 @@ export default Component({
     let canvas = this.refs.canvas.getContext('2d');
 
     // calculate values we'll need later
-    let lineWidth = (HALF_WIDTH/2) - 1;
+    let lineWidth = (HALF_WIDTH/4) - 1;
     let centerxy = HALF_WIDTH;
 
     let margin = 5;
@@ -113,8 +113,9 @@ export default Component({
   scalePercentage(percentage) {
     return Math.round(percentage * this.range);
   },
+
   setDefaultValues () {
-    this.value = Number(this.props.control.default);
+    this.value = Number(this.props.control.default) || 0;
     this.position = (this.value - this.props.control.minimum) / this.range;
     this.updateCanvas();
     this.lastValue = this.position;
@@ -200,8 +201,5 @@ export default Component({
               </div>
             ), 100]}/>
         </div>
-
     )
-}}, (state) => ({
-  controlValues: state.activesynthremote.controlValues
-}))
+}})

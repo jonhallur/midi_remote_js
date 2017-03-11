@@ -22,6 +22,7 @@ const midicontrols = State('midicontrols', {
     nameList: '',
     valueList: '',
     numBits: '',
+    path: '',
     controls: [],
     types: [
       {value: CONTROLTYPE.SYSEX, name: 'System Exclusive'},
@@ -32,7 +33,8 @@ const midicontrols = State('midicontrols', {
       {value: SUBCONTROLTYPE.RANGE, name: 'Range'},
       {value: SUBCONTROLTYPE.TOGGLE, name: 'Toggle'},
       {value: SUBCONTROLTYPE.LIST, name: 'List'},
-      {value: SUBCONTROLTYPE.BITMASK, name: 'Bitmask'}
+      {value: SUBCONTROLTYPE.BITMASK, name: 'Bitmask'},
+      {value: SUBCONTROLTYPE.M1000MOD, name: 'M1000 Mod'}
     ]
   },
 
@@ -135,6 +137,12 @@ const midicontrols = State('midicontrols', {
     default: ''
   }),
 
+  clearM1000ModInputs: (state, payload) => ({
+    name: '',
+    short: '',
+    path: '',
+  }),
+
   toggleBasicPanel: (state, payload) => ({
     showBasicPanel: !state.showBasicPanel
   }),
@@ -145,6 +153,10 @@ const midicontrols = State('midicontrols', {
 
   toggleControlsPanel: (state, payload) => ({
     showControlsPanel: !state.showControlsPanel
+  }),
+
+  setUsingKeyValue: (state, payload) => ({
+    [payload.key]: payload.value
   })
 
 });
