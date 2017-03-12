@@ -138,7 +138,7 @@ export default Component({
             }
           </select>
         </div>
-        <div style={{backgroundColor: "#0ff", width: "77px", height: "74px", float: "left", marginLeft: "2px"}}>
+        <div style={{width: "77px", height: "74px", float: "left", marginLeft: "2px"}}>
           <Knob control={{...control, minimum: 0, maximum: 127, default: 0}} value={amount} onValueChange={this.handleKnobValueChange}/>
         </div>
       </div>
