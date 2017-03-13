@@ -14,13 +14,23 @@ function degrees(radians) {
 
 export default Component({
   componentDidMount () {
-    this.range = Number(this.props.control.maximum - this.props.control.minimum);
+    let {maximum, minimum} = this.props.control;
+    this.range = Number(maximum) + Math.abs(minimum);
+    this.signedBits = 0;
+    if(Number(minimum) < 0) {
+      if (Number(minimum) === -(1<<5)+1) {
+        this.signedBits = 6
+      }
+      else if (Number(minimum) === -(1<<6)+1) {
+        this.signedBits = 7
+      }
+    }
     this.setDefaultValues()
   },
 
   componentWillReceiveProps(nextProps) {
     this.value = Number(nextProps.value);
-    this.position = (this.value - this.props.control.minimum) / this.range;
+    this.position = this.value / this.range;
     this.updateCanvas();
   },
 
@@ -73,13 +83,26 @@ export default Component({
 
     canvas.beginPath();
     canvas.strokeStyle = '#87d068';
-    canvas.arc(centerxy, centerxy, radius, startAngle, readingAngle, false);
+    let start = startAngle;
+    let end = readingAngle;
+    let relativeValue = this.value + Number(this.props.control.minimum);
+    if(this.props.control.minimum < 0) {
+      if (relativeValue < 0) {
+        start = end;
+        end = Math.PI*(-0.5);
+      }
+      else {
+        start = Math.PI*(1.5);
+      }
+    }
+    canvas.arc(centerxy, centerxy, radius, start, end, false);
     canvas.stroke();
 
     //
-    canvas.font = "12px sans-serif";
-    let fillText = this.value.toString();
-    canvas.fillText(fillText, 36 - fillText.length*3.1, 42);
+    canvas.font = "18px sans-serif";
+
+    let fillText = relativeValue.toString();
+    canvas.fillText(fillText, 35 - fillText.length*4.5, 42);
   },
 
   updatePosition(event) {
@@ -157,7 +180,8 @@ export default Component({
   },
 
   onWheel(event) {
-    this.position -= event.nativeEvent.deltaY / 100 / (this.range);
+    let change =  event.nativeEvent.deltaY / 100 / (this.range);
+    this.position -= change;
     event.preventDefault();
     if(this.position < 0) {
       this.position = 0;
