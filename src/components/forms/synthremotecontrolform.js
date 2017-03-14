@@ -13,18 +13,19 @@ import ListForm from './sysexlistcontrolform'
 import BitMaskForm from './sysexbitmaskcontrolform'
 import M1000ModForm from './m1000modform'
 import {addToCollection} from "../../state/genericfirebase";
+import {NotificationManager} from 'react-notifications'
 import * as _ from "lodash";
 
 
 function addTsvControl (lines, params) {
   let line = lines.shift();
-  let [default_value, maximum, minimum, name, parameter, short, subtype, sysexheaderid, type] = line.split('\t');
+  let [default_value, maximum, minimum, name, parameter, short, subtype, sysexheaderid, type, signed] = line.split('\t');
   let data = {
-    name: name,
-    short: short,
-    default: default_value,
-    type: type,
-    subtype: subtype
+    name,
+    short,
+    default: Number(default_value),
+    type,
+    subtype
   };
 
   //Add type specific Data
@@ -37,7 +38,7 @@ function addTsvControl (lines, params) {
 
   //Add subtype specific Data
   if (Number(subtype) === SUBCONTROLTYPE.RANGE) {
-    data = {...data, minimum, maximum}
+    data = {...data, minimum, maximum};
   }
   else if (Number(subtype) === SUBCONTROLTYPE.TOGGLE) {
     data = {...data, onvalue: maximum, offvalue: minimum}
@@ -64,12 +65,20 @@ function addTsvControl (lines, params) {
     throw Error("Unknown subtype");
   }
 
+  //Matrix 1000 signed number format
+  if(Number(signed) > 0) {
+    data = {...data, signed}
+  }
+
   console.log("adding ", data);
   let pathList = ['admin', 'synthremotes', params.remote_id, 'panels', params.panel_id, 'controls'];
   addToCollection(pathList, data);
   setTimeout(() => {
     if(lines.length !==0) {
       addTsvControl(lines, params)
+    }
+    else {
+      NotificationManager.info("Done Importing", "TSV Importer")
     }
   }, 500);
 }

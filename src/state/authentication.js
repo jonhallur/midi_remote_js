@@ -25,6 +25,7 @@ const authentication = State('authentication', {
     loginEmail: '',
     loginPassword: '',
     showEmailLogin: false,
+    userIsAdmin: false,
   },
 
   setUsingKeyValue: (state, payload) => ({
@@ -43,6 +44,7 @@ export function startFirebaseAuthStateMonitor() {
       authentication.setUsingKeyValue({key: 'userEmail', value: user.email});
       authentication.setUsingKeyValue({key: 'loggedIn', value: true});
       authentication.setUsingKeyValue({key: 'showLoginModal', value: false});
+      console.log("user", user);
 
     } else {
       authentication.setUsingKeyValue({key: 'user', value: ''});

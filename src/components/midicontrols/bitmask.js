@@ -18,12 +18,14 @@ export default Component({
   render () {
     let {control, controlValues} = this.props;
     let bitArray = [...Array(Number(control.numbits)).keys()];
-    bitArray.reverse();
+    //bitArray.reverse(); // Need to add Reverse settings for DX synths
+    let marginTop = control.numbits > 3 ? "10px" : "25px";
     return (
       <div className="bit-mask-box">
         {
           bitArray.map(index => (
             <input
+              style={{marginTop: marginTop}}
               key={index}
               type="checkbox"
               id={index}

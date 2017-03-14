@@ -19,7 +19,7 @@ export default Component({
         <Switch
           checkedChildren={'On'}
           unCheckedChildren={'Off'}
-          checked={controlValues[control.key]}
+          checked={Boolean(Number(controlValues[control.key]))}
           onChange={this.handleToggleClick}
         />
       </div>

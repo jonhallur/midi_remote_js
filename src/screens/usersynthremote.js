@@ -74,9 +74,17 @@ const Panel = Component({
 
 const ControlDelegator = Component({
   handleOnValueChange(value) {
-    let {key, sysexheaderid, parameter, type, subtype, path} = this.props.control;
+    let {key, sysexheaderid, parameter, type, subtype, path, signed} = this.props.control;
     activeSynthRemote.setControlValues({uuid: key, value: value});
     if(sysexheaderid) {
+      if(Number(signed) > 0) {
+        let messageSize = 1 << Number(signed);
+        let halfSize = messageSize/2;
+        value = value - halfSize;
+        if(value < 0) {
+          value = value + messageSize
+        }
+      }
       if(Number(subtype) === SUBCONTROLTYPE.M1000MOD) {
         sendM1000ModData(sysexheaderid, path, value, key);
       }
