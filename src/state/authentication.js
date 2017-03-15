@@ -44,14 +44,19 @@ export function startFirebaseAuthStateMonitor() {
       authentication.setUsingKeyValue({key: 'userEmail', value: user.email});
       authentication.setUsingKeyValue({key: 'loggedIn', value: true});
       authentication.setUsingKeyValue({key: 'showLoginModal', value: false});
-      console.log("user", user);
-
+      firebase.database().ref("admin/allowed").child(user.uid).once("value", snapshot => {
+        if(snapshot.exists()) {
+          authentication.setUsingKeyValue({key: "userIsAdmin", value: true});
+        }
+      });
     } else {
       authentication.setUsingKeyValue({key: 'user', value: ''});
       authentication.setUsingKeyValue({key: 'userName', value: ''});
       authentication.setUsingKeyValue({key: 'userEmail', value: ''});
       authentication.setUsingKeyValue({key: 'loggedIn', value: false});
       authentication.setUsingKeyValue({key: 'showLoginModal', value: true});
+      authentication.setUsingKeyValue({key: "userIsAdmin", value: false});
+
     }
   });
 }

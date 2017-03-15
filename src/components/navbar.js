@@ -2,7 +2,7 @@
  * Created by jonh on 5.3.2017.
  */
 import Login from './login'
-import { Component } from 'jumpsuit'
+import { Component, Link } from 'jumpsuit'
 import Modal from 'react-modal'
 import MidiDevices from './mididevices'
 import Presets from './presets'
@@ -10,6 +10,8 @@ import {customStyles} from '../pojos/constants'
 import mididevices from '../state/mididevices'
 import activesynthremote from '../state/activesynthremote'
 import _ from 'lodash'
+
+
 
 export default Component({
   componentDidMount() {
@@ -62,7 +64,11 @@ export default Component({
           </li>
         </ul>
 
-          : null }
+          :
+          <ul className="nav navbar-nav">
+            <li>{this.props.userIsAdmin ? (<a href="/admin">ADMIN</a>) : ""}</li>
+          </ul>
+        }
         <form className="navbar-form navbar-right">
           <div className="form-group">
             <div className="input-group">
@@ -103,6 +109,7 @@ export default Component({
   panelWidth: state.activesynthremote.panelWidth,
   name: state.activesynthremote.name,
   saveRemoteName: state.activesynthremote.saveRemoteName,
+  userIsAdmin: state.authentication.userIsAdmin
 }))
 
 function onMidiModalCloseRequest(event) {
