@@ -26,7 +26,8 @@ export default Component({
     let midiIcon = this.props.selectedOutput ? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-alert';
     let presetIcon = this.props.presetChanged ? 'glyphicon glyphicon-alert' : 'glyphicon glyphicon-ok';
     let Header = this.props.name ? this.props.name : 'MIDICONTROL';
-    window.document.title = Header
+    window.document.title = Header;
+    let PresetName = this.props.saveRemoteName || "PRESETS";
     return (
       <nav className="navbar navbar-default" role="search">
         <div className="navbar-header">
@@ -52,7 +53,7 @@ export default Component({
               onClick={(e) => activesynthremote.setUsingKeyValue({key: 'saveModalOpen', value: true})}
             >
               <span aria-hidden="true" className={presetIcon} />
-              &nbsp; PRESETS
+              &nbsp; {PresetName}
             </a>
             <PresetModal isOpen={this.props.saveModalOpen}/>
           </li>
@@ -101,6 +102,7 @@ export default Component({
   panelWidths: state.activesynthremote.panelWidths,
   panelWidth: state.activesynthremote.panelWidth,
   name: state.activesynthremote.name,
+  saveRemoteName: state.activesynthremote.saveRemoteName,
 }))
 
 function onMidiModalCloseRequest(event) {
