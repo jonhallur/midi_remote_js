@@ -12,6 +12,9 @@ import activesynthremote from '../state/activesynthremote'
 import _ from 'lodash'
 
 export default Component({
+  componentDidMount() {
+
+  },
   onPanelChange(change) {
     let {panelWidth, panelWidths} = this.props;
     let pos = _.indexOf(panelWidths, Number(panelWidth)) + change;
@@ -22,11 +25,13 @@ export default Component({
   render() {
     let midiIcon = this.props.selectedOutput ? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-alert';
     let presetIcon = this.props.presetChanged ? 'glyphicon glyphicon-alert' : 'glyphicon glyphicon-ok';
+    let Header = this.props.name ? this.props.name : 'MIDICONTROL';
+    window.document.title = Header
     return (
       <nav className="navbar navbar-default" role="search">
         <div className="navbar-header">
           <a className="navbar-brand" href="/">
-            MIDICONTROL
+            {Header}
           </a>
         </div>
         {this.props.synthRemoteReady ?
@@ -94,7 +99,8 @@ export default Component({
   synthRemoteReady: state.activesynthremote.synthRemoteReady,
   presetChanged: state.activesynthremote.presetChanged,
   panelWidths: state.activesynthremote.panelWidths,
-  panelWidth: state.activesynthremote.panelWidth
+  panelWidth: state.activesynthremote.panelWidth,
+  name: state.activesynthremote.name,
 }))
 
 function onMidiModalCloseRequest(event) {

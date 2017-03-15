@@ -1,7 +1,7 @@
 {
   "rules": {
     "admin": {
-      ".read": "auth != null && data.child('allowed').child(auth.uid).exists()",
+      ".read": "auth != null",
       ".write": "auth != null && data.child('allowed').child(auth.uid).exists()"
     },
     "public": {
