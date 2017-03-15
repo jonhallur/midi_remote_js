@@ -12,6 +12,7 @@ import {getLastSavedRemoteSettings, setRemoteSettingsValue} from './synthremotes
 import _ from 'lodash'
 import WebMidi from 'webmidi'
 import {getLastUsedMidiDevice, getUserRemotePresets} from "./synthremotes";
+import {NotificationManager} from 'react-notifications'
 
 var TYPEFUNCTIONS = {
   [CONTROLTYPE.SYSEX]: handleSysExControl,
@@ -227,10 +228,14 @@ const sendDebouncedUpdates = _.debounce((control_key, value) => {
   activesynthremote.setUsingKeyValue({key: 'presetChanged', value: true})
 }, 500, {'trailing': true});
 
-export function sendSysExData(header_id, param_id, value, key) {
+export function sendSysExData(header_id, param_id, value, key, signed) {
   let {selectedOutputChannel, selectedOutput} = mididevices.getState();
+  let modified;
+  if (Number(signed) > 0) {
+    modified = createSignedValue(Number(signed), value);
+  }
   if (midiIsReady(selectedOutputChannel, selectedOutput)) {
-    var sysex_payload = createSysExHeader(header_id, param_id, value, selectedOutputChannel);
+    var sysex_payload = createSysExHeader(header_id, param_id, modified || value, selectedOutputChannel);
     let output = WebMidi.getOutputById(selectedOutput);
     let outputBytes = PrepareOutput(sysex_payload);
     let manufacturer_bytes = outputBytes.manufacturer_bytes;
@@ -242,10 +247,14 @@ export function sendSysExData(header_id, param_id, value, key) {
   }
 }
 
-export function sendM1000ModData(sysexheaderid, path, value, key) {
+export function sendM1000ModData(sysexheaderid, path, value=[0,0,63], key, signed) {
   let {selectedOutputChannel, selectedOutput} = mididevices.getState();
+  let modified;
+  if (Number(signed) > 0) {
+    modified = createSignedValue(Number(signed), value);
+  }
   if (midiIsReady(selectedOutputChannel, selectedOutput)) {
-    let [source, destination, amount] = value || [0, 0, 0];
+    let [source, destination, amount] = modified || value || [0,0,63];
     var sysex_payload = createSysExHeader(sysexheaderid, path, source, selectedOutputChannel);
     sysex_payload.push(Number(amount));
     sysex_payload.push(Number(destination));
@@ -254,6 +263,7 @@ export function sendM1000ModData(sysexheaderid, path, value, key) {
     let manufacturer_bytes = outputBytes.manufacturer_bytes;
     let data_bytes = outputBytes.data_bytes;
     output.sendSysex(manufacturer_bytes, data_bytes);
+    console.log(data_bytes);
     if (key) {
       sendDebouncedUpdates(key, value);
     }
@@ -286,6 +296,12 @@ export function setControlSettingsFromRemoteData(settings, partial=true) {
 
 export function sendAllControlValues() {
   let {controlValues, panels} = activesynthremote.getState();
+  let {selectedOutputChannel, selectedOutput} = mididevices.getState();
+  if (!midiIsReady(selectedOutputChannel, selectedOutput)) {
+    NotificationManager.warning("No MIDI selected, can't send patch", "MIDI Not Selected");
+    activesynthremote.setReady();
+    return;
+  }
   let controls = [];
   for(let panel of panels) {
     for(let control of panel.controls) {
@@ -294,6 +310,7 @@ export function sendAllControlValues() {
   }
   activesynthremote.setControlsToSend(controls.length);
   activesynthremote.setSending();
+
   sendTimedMidiParameters(controls);
 }
 
@@ -305,15 +322,39 @@ function sendTimedMidiParameters(listToSend) {
   let settings = listToSend.pop();
   if (Number(settings.type) === CONTROLTYPE.SYSEX) {
     if(Number(settings.subtype) === SUBCONTROLTYPE.M1000MOD) {
-      sendM1000ModData(settings.sysexheaderid, settings.path, settings.value, null);
+      sendM1000ModData(settings.sysexheaderid, settings.path, settings.value, null, settings.signed);
     }
     else {
-      sendSysExData(settings.sysexheaderid, settings.parameter, settings.value, null);
+      sendSysExData(settings.sysexheaderid, settings.parameter, settings.value, null, settings.signed);
     }
   }
   else if (Number(settings.type) === CONTROLTYPE.CC) {
     sendCCData(settings.parameter, settings.value, null);
   }
   activesynthremote.tickControlsSent();
-  setTimeout(sendTimedMidiParameters.bind(null, listToSend), 10);
+  setTimeout(sendTimedMidiParameters.bind(null, listToSend), 50);
+}
+
+function createSignedValue(bitSize, oldValue) {
+  let valueIsArray = oldValue.constructor === Array;
+  let messageSize = 1 << Number(bitSize);
+  let halfSize = messageSize / 2;
+  let signedValue, newValue;
+  if(valueIsArray) {
+    signedValue = oldValue[2];
+  }
+  else {
+    signedValue = oldValue;
+  }
+  signedValue = signedValue - halfSize;
+  if (signedValue < 0) {
+    signedValue = signedValue + messageSize
+  }
+  if (valueIsArray) {
+    newValue = [oldValue[0], oldValue[1], signedValue]
+  }
+  else {
+    newValue = signedValue;
+  }
+  return newValue;
 }

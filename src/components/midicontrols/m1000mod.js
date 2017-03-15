@@ -76,7 +76,8 @@ export default Component({
     event.preventDefault();
     let source = event.target.value;
     let {control, controlValues} = this.props;
-    let [,destination, value] = controlValues[control.key] || [0,0,0];
+    let [,destination, value] = controlValues[control.key] || [0,0,63];
+    console.log(source, destination, value);
     this.updateValue(source, destination, value);
   },
 
@@ -84,20 +85,20 @@ export default Component({
     event.preventDefault();
     let destination = event.target.value;
     let {control, controlValues} = this.props;
-    let [source, , value] = controlValues[control.key] || [0,0,0];
+    let [source, , value] = controlValues[control.key] || [0,0,63];
     this.updateValue(source, destination, value)
   },
 
   handleKnobValueChange(value) {
     let {control, controlValues} = this.props;
-    let [source, destination, ] = controlValues[control.key] || [0,0,0];
+    let [source, destination, ] = controlValues[control.key] || [0,0,63];
     this.updateValue(source, destination, value)
   },
 
 
   render () {
     let {control, controlValues} = this.props;
-    let [source, destination, amount] = controlValues[control.key] || [0,0,0];
+    let [source, destination, amount] = controlValues[control.key] || [0,0,63];
     return (
       <div>
         <div style={{width: "77px", height: "74px", float: "left"}}>
@@ -139,7 +140,7 @@ export default Component({
           </select>
         </div>
         <div style={{width: "77px", height: "74px", float: "left", marginLeft: "2px"}}>
-          <Knob control={{...control, minimum: 0, maximum: 127, default: 0}} value={amount} onValueChange={this.handleKnobValueChange}/>
+          <Knob control={{...control, minimum: -63, maximum: 63, default: 63}} value={amount} onValueChange={this.handleKnobValueChange}/>
         </div>
       </div>
     )
