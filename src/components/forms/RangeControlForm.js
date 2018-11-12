@@ -8,7 +8,7 @@ import midicontrols from '../../state/midicontrols'
 import {createRangeControlData} from "../../pojos/common_controls";
 import {CONTROLTYPE} from '../../pojos/constants'
 
-const CC_SYSEX_Input = (props) => (
+const COMMON_MIDI_Input = (props) => (
   <Input
     placeholder="Parameter Number"
     type="number"
@@ -52,8 +52,7 @@ export default Component({
     ];
     let {type} = this.props;
     let showCreateButton = inputList.reduce(function(a,b) {return a && b});
-    let parameterInput = type in [CONTROLTYPE.CC, CONTROLTYPE.SYSEX] ? ( <CC_SYSEX_Input props={this.props} /> ) : '';
-    let nrpnInput = Number(type) === CONTROLTYPE.NRPN ? ( <NRPN_Input props={this.props} /> ) : '';
+    let parameterInput = type in [CONTROLTYPE.CC, CONTROLTYPE.SYSEX, CONTROLTYPE.NRPN] ? ( <COMMON_MIDI_Input props={this.props} /> ) : '';
     let oscInput = Number(type) === CONTROLTYPE.OSC ? ( <OSC_Input props={this.props} /> ) : '';
 
     return (
@@ -94,7 +93,6 @@ export default Component({
           onChange={(event) => midicontrols.setDefault(event.target.value)}
         />
         { parameterInput }
-        { nrpnInput }
         { oscInput }
 
         <button className={showCreateButton ? "btn btn-default" : "hidden"} onClick={this.onAddBtnClick}>Add Range</button>

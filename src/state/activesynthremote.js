@@ -16,7 +16,8 @@ import {NotificationManager} from 'react-notifications'
 
 var TYPEFUNCTIONS = {
   [CONTROLTYPE.SYSEX]: handleSysExControl,
-  [CONTROLTYPE.CC]: handleCCControl
+  [CONTROLTYPE.CC]: handleCCControl,
+  [CONTROLTYPE.NRPN]: handleNRPNControl
 };
 
 
@@ -167,6 +168,10 @@ function handleCCControl(control) {
   return control
 }
 
+function handleNRPNControl(control) {
+  return control
+}
+
 function isHeaderInList(key) {
   let sysexheaders = activesynthremote.getState().sysexheaders;
   let index = _.findIndex(sysexheaders, ["key", key]);
@@ -274,6 +279,22 @@ export function sendCCData(parameter, value, key) {
   if (midiIsReady(selectedOutputChannel, selectedOutput)) {
     let output = WebMidi.getOutputById(selectedOutput);
     output.sendControlChange(Number(parameter), Number(value), selectedOutputChannel);
+    if(key) {
+      sendDebouncedUpdates(key, value);
+    }
+  }
+}
+
+export function sendNPRNData(parameter, value, key) {
+  let {selectedOutputChannel, selectedOutput} = mididevices.getState();
+  if (midiIsReady(selectedOutputChannel, selectedOutput)) {
+    let output = WebMidi.getOutputById(selectedOutput);
+    let param_lsb = parameter & 0x7F;
+    let param_msb = (parameter >> 7) & 0x7F;
+    let value_lsb = value  & 0x7F;
+    let value_msb = (value >> 7) & 0x7F;
+    //output.sendControlChange(Number(parameter), Number(value), selectedOutputChannel);
+    output.setNonRegisteredParameter([param_msb, param_lsb], [value_msb, value_lsb], selectedOutputChannel);
     if(key) {
       sendDebouncedUpdates(key, value);
     }

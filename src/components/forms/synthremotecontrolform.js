@@ -32,7 +32,7 @@ function addTsvControl (lines, params) {
   if(Number(type) === CONTROLTYPE.SYSEX) {
     data = {...data, sysexheaderid}
   }
-  if(type in [CONTROLTYPE.CC, CONTROLTYPE.SYSEX]) {
+  if(type in [CONTROLTYPE.CC, CONTROLTYPE.SYSEX, CONTROLTYPE.NRPN]) {
     data = {...data, parameter}
   }
 
@@ -48,7 +48,7 @@ function addTsvControl (lines, params) {
       maximum.split(','),
       minimum.split(','),
       (name, value) => (
-      {name, value}
+        {name, value}
       )
     );
     data = {...data, options: nameValueList}

@@ -14,6 +14,7 @@ export default Component({
       return;
     }
     let [device, channel] = value.split(',');
+
     mididevices.setSelectedOutput(device);
     mididevices.setSelectedOutputChannel(channel);
     saveLastUsedMidiDevice(device, channel);

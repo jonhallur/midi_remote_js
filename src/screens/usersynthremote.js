@@ -3,7 +3,7 @@
  */
 import {Component} from 'jumpsuit'
 import '../pojos/jquery-knob'
-import activeSynthRemote, {sendSysExData, sendCCData, sendM1000ModData} from '../state/activesynthremote'
+import activeSynthRemote, {sendSysExData, sendCCData, sendM1000ModData, sendNPRNData} from '../state/activesynthremote'
 import ReactKnob from '../components/midicontrols/jknob'
 import ListControl from '../components/midicontrols/dropdown'
 import Toggle from '../components/midicontrols/toggle'
@@ -39,6 +39,7 @@ export default Component({
 const Panel = Component({
   render() {
     let {panel, showPanel, id, panelWidth} = this.props;
+    console.log(panel);
     return (
       <div className={"col-lg-" +  panelWidth}>
         <div className="panel panel-default" id={panel.key}>
@@ -87,6 +88,9 @@ const ControlDelegator = Component({
     }
     else if(Number(type) === CONTROLTYPE.CC) {
       sendCCData(parameter, value, key);
+    }
+    else if(Number(type) === CONTROLTYPE.NRPN) {
+      sendNPRNData(parameter, value, key);
     }
 
   },

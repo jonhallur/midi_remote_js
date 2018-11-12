@@ -77,6 +77,8 @@ export function initializeMidi() {
     else {
       let outputs = [];
       let inputs = [];
+      console.log(WebMidi.inputs);
+      console.log(WebMidi.outputs);
       mididevices.setInputs(
         WebMidi.inputs.map(
           input => (
@@ -92,14 +94,14 @@ export function initializeMidi() {
         )
       );
       WebMidi.outputs.map(
-        (output) => {
+        (output, index) => {
           let {name, id} = output;
-          id = Number(id);
-          outputs.push({key: id+1, pId: 0, label: name});
+          outputs.push({key: index+1, pId: 0, label: name});
           outputs = outputs.concat([...Array(16)].map((v,i)=> (
           {
-            key: (id+1)*100+i,
-            pId: id+1,
+            id: id,
+            key: (index+1)*100+i,
+            pId: index+1,
             label: "Channel " + (i+1),
             value: [id, i+1].toString()
           })));
@@ -108,14 +110,14 @@ export function initializeMidi() {
       mididevices.setOutputMap(outputs);
 
       WebMidi.inputs.map(
-        (input) => {
+        (input, index) => {
           let {name, id} = input;
-          id = Number(id);
-          inputs.push({key: id+1, pId: 0, label: name});
+          inputs.push({key: index+1, pId: 0, label: name});
           inputs = inputs.concat([...Array(16)].map((v,i)=> (
           {
-            key: (id+1)*100+i,
-            pId: id+1,
+            id: id,
+            key: (index+1)*200+i,
+            pId: index+1,
             label: "Channel " + (i+1),
             value: [id, i+1].toString()
           })));

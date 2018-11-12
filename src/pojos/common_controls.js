@@ -16,7 +16,7 @@ export function createRangeControlData(props) {
     subtype: props.subtype
   };
 
-  if (type in [CONTROLTYPE.CC, CONTROLTYPE.SYSEX]) {
+  if (type in [CONTROLTYPE.CC, CONTROLTYPE.SYSEX, CONTROLTYPE.NRPN]) {
     data = {...data, parameter: props.parameter}
   }
   if (type.toString() === CONTROLTYPE.SYSEX.toString()) {
