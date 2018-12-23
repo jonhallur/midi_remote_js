@@ -14,7 +14,8 @@ function degrees(radians) {
 
 export default Component({
   componentDidMount () {
-    let {maximum, minimum} = this.props.control;
+    let {maximum, minimum, midiNoteName} = this.props.control;
+    this.useMidiNoteName = midiNoteName;
     this.range = Number(maximum) + Math.abs(minimum);
     this.signedBits = 0;
     if(Number(minimum) < 0) {
@@ -102,7 +103,7 @@ export default Component({
     canvas.font = "18px sans-serif";
 
     let fillText = relativeValue.toString();
-    if(this.props["midiNoteName"]) {
+    if(this.useMidiNoteName) {
       let octave = parseInt(this.value / 12, 10);
       let noteNumber = this.value % 12;
       fillText = NOTENAMES[noteNumber] + octave.toString()
