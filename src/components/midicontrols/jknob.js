@@ -103,7 +103,7 @@ export default Component({
 
     let fillText = relativeValue.toString();
     if(this.props["midiNoteName"]) {
-      let octave = this.value / 12;
+      let octave = parseInt(this.value / 12, 10);
       let noteNumber = this.value % 12;
       fillText = NOTENAMES[noteNumber] + octave.toString()
     }
