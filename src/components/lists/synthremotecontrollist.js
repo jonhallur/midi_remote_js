@@ -66,7 +66,7 @@ const MidiControlRow = Component({
       }
     }
     let extraInfo = '';
-    if (this.props.control.subtype === SUBCONTROLTYPE.RANGE.toString()) {
+    if (this.props.control.subtype === SUBCONTROLTYPE.RANGE.toString() || this.props.control.subtype === SUBCONTROLTYPE.NOTERANGE.toString()) {
       let stringList = [" - From:", this.props.control.minimum, "to:", this.props.control.maximum, "- Default:", this.props.control.default];
       extraInfo = stringList.join(' ');
     }

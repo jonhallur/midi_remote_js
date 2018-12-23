@@ -352,6 +352,9 @@ function sendTimedMidiParameters(listToSend) {
   else if (Number(settings.type) === CONTROLTYPE.CC) {
     sendCCData(settings.parameter, settings.value, null);
   }
+  else if (Number(settings.type) === CONTROLTYPE.NRPN) {
+    sendNPRNData(settings.parameter, settings.value, null)
+  }
   activesynthremote.tickControlsSent();
   setTimeout(sendTimedMidiParameters.bind(null, listToSend), 50);
 }

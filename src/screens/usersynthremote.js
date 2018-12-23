@@ -103,7 +103,9 @@ const ControlDelegator = Component({
         [SUBCONTROLTYPE.LIST]: <ListControl key={control.key} control={control} onValueChange={this.handleOnValueChange}/>,
         [SUBCONTROLTYPE.TOGGLE]: <Toggle key={control.key} control={control} onValueChange={this.handleOnValueChange}/>,
         [SUBCONTROLTYPE.BITMASK]: <BitMask key={control.key} control={control} onValueChange={this.handleOnValueChange}/>,
-        [SUBCONTROLTYPE.M1000MOD]: <M1000Mod key={control.key} control={control} onValueChange={this.handleOnValueChange}/>
+        [SUBCONTROLTYPE.M1000MOD]: <M1000Mod key={control.key} control={control} onValueChange={this.handleOnValueChange}/>,
+        [SUBCONTROLTYPE.NOTERANGE]: <ReactKnob key={control.key} control={control} value={controlValues[control.key]} onValueChange={this.handleOnValueChange}/>
+
     };
     return control_map[subtype];
   }

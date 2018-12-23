@@ -1,6 +1,6 @@
 import {Component} from 'jumpsuit'
 import ReactTooltip from 'react-tooltip'
-
+import {NOTENAMES} from '../../pojos/constants'
 const WIDTH = 74;
 const HALF_WIDTH = Math.round(WIDTH/2);
 
@@ -102,6 +102,11 @@ export default Component({
     canvas.font = "18px sans-serif";
 
     let fillText = relativeValue.toString();
+    if(this.props["midiNoteName"]) {
+      let octave = this.value / 12;
+      let noteNumber = this.value % 12;
+      fillText = NOTENAMES[noteNumber] + octave.toString()
+    }
     canvas.fillText(fillText, 35 - fillText.length*4.5, 42);
   },
 
