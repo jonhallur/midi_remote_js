@@ -35,7 +35,8 @@ const midicontrols = State('midicontrols', {
       {value: SUBCONTROLTYPE.LIST, name: 'List'},
       {value: SUBCONTROLTYPE.BITMASK, name: 'Bitmask'},
       {value: SUBCONTROLTYPE.M1000MOD, name: 'M1000 Mod'},
-      {value: SUBCONTROLTYPE.NOTERANGE, name: 'Note Range'}
+      {value: SUBCONTROLTYPE.NOTERANGE, name: 'Note Range'},
+      {value: SUBCONTROLTYPE.ASCII, name: 'ASCII Input'}
     ]
   },
 

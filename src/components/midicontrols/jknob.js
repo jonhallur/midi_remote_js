@@ -1,6 +1,7 @@
 import {Component} from 'jumpsuit'
 import ReactTooltip from 'react-tooltip'
 import {NOTENAMES} from '../../pojos/constants'
+
 const WIDTH = 74;
 const HALF_WIDTH = Math.round(WIDTH/2);
 
@@ -186,8 +187,7 @@ export default Component({
   },
 
   onWheel(event) {
-    let change =  event.nativeEvent.deltaY / 100 / (this.range);
-    this.position -= change;
+    this.position -= event.nativeEvent.deltaY / 100 / (this.range);
     event.preventDefault();
     if(this.position < 0) {
       this.position = 0;
@@ -227,7 +227,7 @@ export default Component({
             getContent={[() => (
               <div>
                 <span>{name} - </span>
-                <span> {this.value.toString()}</span>
+                <span> {this.value}</span>
               </div>
             ), 100]}/>
         </div>

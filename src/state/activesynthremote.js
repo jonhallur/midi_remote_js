@@ -268,7 +268,6 @@ export function sendM1000ModData(sysexheaderid, path, value=[0,0,63], key, signe
     let manufacturer_bytes = outputBytes.manufacturer_bytes;
     let data_bytes = outputBytes.data_bytes;
     output.sendSysex(manufacturer_bytes, data_bytes);
-    console.log(data_bytes);
     if (key) {
       sendDebouncedUpdates(key, value);
     }
@@ -293,11 +292,33 @@ export function sendNPRNData(parameter, value, key) {
     let param_msb = (parameter >> 7) & 0x7F;
     let value_lsb = value  & 0x7F;
     let value_msb = (value >> 7) & 0x7F;
-    //output.sendControlChange(Number(parameter), Number(value), selectedOutputChannel);
     output.setNonRegisteredParameter([param_msb, param_lsb], [value_msb, value_lsb], selectedOutputChannel);
     if(key) {
       sendDebouncedUpdates(key, value);
     }
+  }
+}
+
+function sendList(listToSend) {
+  if(listToSend.length === 0) {
+    return;
+  }
+  let [value, parameter] = listToSend.pop();
+  sendNPRNData(parameter, value);
+  if(listToSend.length > 0) {
+    setTimeout(() => {
+      sendList(listToSend)
+    }, 50);
+  }
+}
+
+export function sendNPRNAsciiData(parameter, value, first, key) {
+  let listToSend = value.map((charValue, index) => {
+    return [charValue, Number(first)+Number(index)]
+  }).reverse();
+  sendList(listToSend);
+  if(key) {
+    sendDebouncedUpdates(key, value)
   }
 }
 
@@ -332,7 +353,7 @@ export function sendAllControlValues() {
   activesynthremote.setControlsToSend(controls.length);
   activesynthremote.setSending();
 
-  sendTimedMidiParameters(controls);
+  sendTimedMidiParameters(controls.reverse());
 }
 
 function sendTimedMidiParameters(listToSend) {
@@ -353,7 +374,11 @@ function sendTimedMidiParameters(listToSend) {
     sendCCData(settings.parameter, settings.value, null);
   }
   else if (Number(settings.type) === CONTROLTYPE.NRPN) {
-    sendNPRNData(settings.parameter, settings.value, null)
+    if(Number(settings.subtype) === SUBCONTROLTYPE.ASCII) {
+      sendNPRNAsciiData(settings.parameter, settings.value, settings.first, null)
+    } else {
+      sendNPRNData(settings.parameter, settings.value, null)
+    }
   }
   activesynthremote.tickControlsSent();
   setTimeout(sendTimedMidiParameters.bind(null, listToSend), 50);

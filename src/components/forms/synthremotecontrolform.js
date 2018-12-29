@@ -23,7 +23,7 @@ function addTsvControl (lines, params) {
   let data = {
     name,
     short,
-    default: Number(default_value),
+    default: default_value,
     type,
     subtype
   };
@@ -62,6 +62,9 @@ function addTsvControl (lines, params) {
   }
   else if(Number(subtype) === SUBCONTROLTYPE.NOTERANGE) {
     data = {...data, minimum, maximum, midiNoteName:true};
+  }
+  else if(Number(subtype) === SUBCONTROLTYPE.ASCII) {
+    data = {...data, first: minimum, last: maximum}
   }
   else {
     console.log(subtype);
@@ -117,7 +120,8 @@ export default Component({
       [SUBCONTROLTYPE.LIST]: (<ListForm params={this.props.params} />),
       [SUBCONTROLTYPE.BITMASK]: (<BitMaskForm params={this.props.params} />),
       [SUBCONTROLTYPE.M1000MOD]: (<M1000ModForm params={this.props.params} />),
-      [SUBCONTROLTYPE.NOTERANGE]: (<RangeForm params={this.props.params} />)
+      [SUBCONTROLTYPE.NOTERANGE]: (<RangeForm params={this.props.params} />),
+      [SUBCONTROLTYPE.ASCII]: <RangeForm params={this.props.params}/>
     };
 
     return (

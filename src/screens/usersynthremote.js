@@ -3,15 +3,21 @@
  */
 import {Component} from 'jumpsuit'
 import '../pojos/jquery-knob'
-import activeSynthRemote, {sendSysExData, sendCCData, sendM1000ModData, sendNPRNData} from '../state/activesynthremote'
+import activesynthremote, {
+  sendCCData,
+  sendM1000ModData,
+  sendNPRNAsciiData,
+  sendNPRNData,
+  sendSysExData
+} from '../state/activesynthremote'
 import ReactKnob from '../components/midicontrols/jknob'
 import ListControl from '../components/midicontrols/dropdown'
 import Toggle from '../components/midicontrols/toggle'
 import BitMask from '../components/midicontrols/bitmask'
 import M1000Mod from '../components/midicontrols/m1000mod'
+import Ascii from '../components/midicontrols/Ascii'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 import ActiveSynthModal from '../components/modals/activesynthremotemodal'
-import activesynthremote from '../state/activesynthremote'
 import {getUserSynthRemote} from "../state/synthremotes";
 
 export default Component({
@@ -39,7 +45,7 @@ export default Component({
 const Panel = Component({
   render() {
     let {panel, showPanel, id, panelWidth} = this.props;
-    console.log(panel);
+    //console.log(panel);
     return (
       <div className={"col-lg-" +  panelWidth}>
         <div className="panel panel-default" id={panel.key}>
@@ -56,7 +62,7 @@ const Panel = Component({
           </div>
           <div className={showPanel[panel.key] ? "panel-body-overrides panel-body" : "collapse"} id={'panel_' + id}>
             {panel.controls.map((control) => (
-              <div className={Number(control.subtype) === SUBCONTROLTYPE.M1000MOD ? "m1000-control-box" : "midi-control-box"}  key={control.key}>
+              <div className={Number(control.subtype) === SUBCONTROLTYPE.M1000MOD || Number(control.subtype) === SUBCONTROLTYPE.ASCII ? "m1000-control-box" : "midi-control-box"} key={control.key}>
                 <div className="midi-control-label">
                   <p>{control.short}</p>
                 </div>
@@ -74,9 +80,10 @@ const Panel = Component({
 }));
 
 const ControlDelegator = Component({
-  handleOnValueChange(value) {
-    let {key, sysexheaderid, parameter, type, subtype, path, signed} = this.props.control;
-    activeSynthRemote.setControlValues({uuid: key, value: value});
+  handleOnValueChange(value, targetParameter) {
+    let parameter = targetParameter || this.props.control.parameter;
+    let {key, sysexheaderid, type, subtype, path, signed, first, last} = this.props.control;
+    activesynthremote.setControlValues({uuid: key, value: value});
     if(sysexheaderid) {
       if(Number(subtype) === SUBCONTROLTYPE.M1000MOD) {
         sendM1000ModData(sysexheaderid, path, value, key, signed);
@@ -84,15 +91,17 @@ const ControlDelegator = Component({
       else {
         sendSysExData(sysexheaderid, parameter, value, key, signed);
       }
-
     }
     else if(Number(type) === CONTROLTYPE.CC) {
       sendCCData(parameter, value, key);
     }
     else if(Number(type) === CONTROLTYPE.NRPN) {
-      sendNPRNData(parameter, value, key);
+      if(Number(subtype) === SUBCONTROLTYPE.ASCII) {
+        sendNPRNAsciiData(parameter, value, first, key);
+      } else {
+        sendNPRNData(parameter, value, key);
+      }
     }
-
   },
 
   render() {
@@ -104,8 +113,8 @@ const ControlDelegator = Component({
         [SUBCONTROLTYPE.TOGGLE]: <Toggle key={control.key} control={control} onValueChange={this.handleOnValueChange}/>,
         [SUBCONTROLTYPE.BITMASK]: <BitMask key={control.key} control={control} onValueChange={this.handleOnValueChange}/>,
         [SUBCONTROLTYPE.M1000MOD]: <M1000Mod key={control.key} control={control} onValueChange={this.handleOnValueChange}/>,
-        [SUBCONTROLTYPE.NOTERANGE]: <ReactKnob key={control.key} control={control} value={controlValues[control.key]} onValueChange={this.handleOnValueChange}/>
-
+        [SUBCONTROLTYPE.NOTERANGE]: <ReactKnob key={control.key} control={control} value={controlValues[control.key]} onValueChange={this.handleOnValueChange}/>,
+        [SUBCONTROLTYPE.ASCII]: <Ascii key={control.key} control={control} value={controlValues[control.key]} onValueChange={this.handleOnValueChange}/>
     };
     return control_map[subtype];
   }

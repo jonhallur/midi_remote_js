@@ -77,7 +77,6 @@ export default Component({
     let source = event.target.value;
     let {control, controlValues} = this.props;
     let [,destination, value] = controlValues[control.key] || [0,0,63];
-    console.log(source, destination, value);
     this.updateValue(source, destination, value);
   },
 
