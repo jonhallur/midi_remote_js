@@ -27,7 +27,7 @@ export default Component({
   },
   render() {
     return (
-      <div>
+      <div className="panel-group">
         {this.props.panels.map((panel, index) => (
             <Panel key={index} id={index} panel={panel} />
         ))}
@@ -45,11 +45,10 @@ export default Component({
 const Panel = Component({
   render() {
     let {panel, showPanel, id, panelWidth} = this.props;
-    //console.log(panel);
     return (
       <div className={"col-lg-" +  panelWidth}>
         <div className="panel panel-default" id={panel.key}>
-          <div className="panel-heading panel-heading-overrides" onClick={e => activeSynthRemote.togglePanel(panel.key)}>
+          <div className="panel-heading panel-heading-overrides" onClick={e => activesynthremote.togglePanel(panel.key)}>
             <h3 className="panel-title">{panel.name}
             <div className="float-right">
                 <span

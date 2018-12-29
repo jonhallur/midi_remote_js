@@ -64,7 +64,7 @@ function addTsvControl (lines, params) {
     data = {...data, minimum, maximum, midiNoteName:true};
   }
   else if(Number(subtype) === SUBCONTROLTYPE.ASCII) {
-    data = {...data, first: minimum, last: maximum}
+    data = {...data, default: default_value.split(','), first: minimum, last: maximum}
   }
   else {
     console.log(subtype);

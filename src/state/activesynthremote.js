@@ -381,7 +381,7 @@ function sendTimedMidiParameters(listToSend) {
     }
   }
   activesynthremote.tickControlsSent();
-  setTimeout(sendTimedMidiParameters.bind(null, listToSend), 50);
+  setTimeout(sendTimedMidiParameters.bind(null, listToSend), 10);
 }
 
 function createSignedValue(bitSize, oldValue) {
