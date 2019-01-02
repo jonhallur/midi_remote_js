@@ -15,7 +15,7 @@ const M1000MOD = Symbol('m1000mod');
 
 export const EOX = 0xF7;
 export const CONTROLTYPE = {SYSEX: 0, CC: 1, NRPN: 2, OSC: 3};
-export const SUBCONTROLTYPE = {RANGE: 0, TOGGLE: 1, LIST: 2, BITMASK: 3, M1000MOD: 4, NOTERANGE: 5, ASCII: 6};
+export const SUBCONTROLTYPE = {RANGE: 0, TOGGLE: 1, LIST: 2, BITMASK: 3, M1000MOD: 4, NOTERANGE: 5, ASCII: 6, SHRUTHIMOD: 7};
 
 export const ITEMTYPE = {
   LISTROW: 'listrow'

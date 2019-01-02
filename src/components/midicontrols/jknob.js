@@ -16,22 +16,17 @@ function degrees(radians) {
 export default Component({
   componentDidMount () {
     let {maximum, minimum, midiNoteName} = this.props.control;
+    this.minimum = Number(minimum);
     this.useMidiNoteName = midiNoteName;
-    this.range = Number(maximum) + Math.abs(minimum);
-    this.signedBits = 0;
+    this.range = Number(maximum) - Number(minimum);
     if(Number(minimum) < 0) {
-      if (Number(minimum) === -(1<<5)+1) {
-        this.signedBits = 6
-      }
-      else if (Number(minimum) === -(1<<6)+1) {
-        this.signedBits = 7
-      }
+      this.range = Number(maximum) + Math.abs(minimum);
     }
     this.setDefaultValues()
   },
 
   componentWillReceiveProps(nextProps) {
-    this.value = Number(nextProps.value);
+    this.value = Number(nextProps.value) - this.minimum;
     this.position = this.value / this.range;
     this.updateCanvas();
   },
@@ -39,8 +34,9 @@ export default Component({
   updateMidi() {
     if(this.value !== this.lastMidiValueSent) {
       if((this.props.onValueChange !== undefined) && (typeof this.props.onValueChange === "function")) {
-        this.props.onValueChange(this.value);
+        let absValue = this.value + this.minimum;
         this.lastMidiValueSent = this.value;
+        this.props.onValueChange(absValue);
       }
     }
   },

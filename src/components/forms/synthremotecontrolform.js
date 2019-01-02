@@ -56,9 +56,8 @@ function addTsvControl (lines, params) {
   else if (Number(subtype) === SUBCONTROLTYPE.BITMASK) {
     data = {...data, numbits: maximum}
   }
-  else if(Number(subtype) === SUBCONTROLTYPE.M1000MOD) {
-    data = {...data, path: parameter};
-    delete data.default;
+  else if(Number(subtype) === SUBCONTROLTYPE.M1000MOD || Number(subtype) === SUBCONTROLTYPE.SHRUTHIMOD) {
+    data = {...data, path: parameter, minimum, maximum, default: default_value.split(',')};
   }
   else if(Number(subtype) === SUBCONTROLTYPE.NOTERANGE) {
     data = {...data, minimum, maximum, midiNoteName:true};
@@ -121,7 +120,8 @@ export default Component({
       [SUBCONTROLTYPE.BITMASK]: (<BitMaskForm params={this.props.params} />),
       [SUBCONTROLTYPE.M1000MOD]: (<M1000ModForm params={this.props.params} />),
       [SUBCONTROLTYPE.NOTERANGE]: (<RangeForm params={this.props.params} />),
-      [SUBCONTROLTYPE.ASCII]: <RangeForm params={this.props.params}/>
+      [SUBCONTROLTYPE.ASCII]: <RangeForm params={this.props.params}/>,
+      [SUBCONTROLTYPE.SHRUTHIMOD]: (<M1000ModForm params={this.props.params} />),
     };
 
     return (

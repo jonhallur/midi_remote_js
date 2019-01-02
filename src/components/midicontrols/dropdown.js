@@ -19,6 +19,7 @@ export default Component({
     let length = control.options.length;
     let currentValue = controlValues[control.key];
     let currentIndex = _.findIndex(control.options, {value: currentValue});
+    console.log(currentValue, currentIndex)
     event.preventDefault();
     if(direction < 0) {
       currentIndex--;

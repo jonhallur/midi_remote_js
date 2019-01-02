@@ -2,17 +2,21 @@
  * Created by jonh on 9.10.2016.
  */
 import {State} from 'jumpsuit'
-import mididevices from './mididevices'
+import mididevices, {toggleTimedErrorFeedback} from './mididevices'
 import {CONTROLTYPE, SUBCONTROLTYPE} from '../pojos/constants'
 import {getSingleSysexheader} from './sysexheaders'
 import {SysExHeaderChannel} from '../pojos/SysExHeader'
-import {SysExHeaderField, SysExHeaderChannelModifiedField} from "../pojos/SysExHeaderField";
-import {toggleTimedErrorFeedback} from "./mididevices"
-import {getLastSavedRemoteSettings, setRemoteSettingsValue} from './synthremotes'
+import {SysExHeaderChannelModifiedField, SysExHeaderField} from "../pojos/SysExHeaderField";
+import {
+  getLastSavedRemoteSettings,
+  getLastUsedMidiDevice,
+  getUserRemotePresets,
+  setRemoteSettingsValue
+} from './synthremotes'
 import _ from 'lodash'
 import WebMidi from 'webmidi'
-import {getLastUsedMidiDevice, getUserRemotePresets} from "./synthremotes";
 import {NotificationManager} from 'react-notifications'
+import {createNRPNPairFromNumber, createSignedValue} from "../pojos/bitutils";
 
 var TYPEFUNCTIONS = {
   [CONTROLTYPE.SYSEX]: handleSysExControl,
@@ -273,6 +277,23 @@ export function sendM1000ModData(sysexheaderid, path, value=[0,0,63], key, signe
     }
   }
 }
+
+export function sendShruthiModData(path, value=[0,0,0], key) {
+  let {selectedOutputChannel, selectedOutput} = mididevices.getState();
+  if(midiIsReady(selectedOutputChannel, selectedOutput)) {
+    let [source, destination, amount] = value;
+    let sourceParam = 32 + (3 * Number(path));
+    let destinationParam = 33 + (3 * Number(path));
+    let amountParam = 34 + (3 * Number(path));
+    setTimeout(() => {sendNPRNData(sourceParam, source, null)}, 100);
+    setTimeout(() => {sendNPRNData(destinationParam, destination, null)}, 200);
+    setTimeout(() => {sendNPRNData(amountParam, amount, null)}, 300);
+    if(key) {
+      sendDebouncedUpdates(key, value)
+    }
+  }
+}
+
 export function sendCCData(parameter, value, key) {
   let {selectedOutputChannel, selectedOutput} = mididevices.getState();
   if (midiIsReady(selectedOutputChannel, selectedOutput)) {
@@ -284,14 +305,17 @@ export function sendCCData(parameter, value, key) {
   }
 }
 
-export function sendNPRNData(parameter, value, key) {
+export function sendNPRNData(parameter, value, key, signed, minimum) {
   let {selectedOutputChannel, selectedOutput} = mididevices.getState();
   if (midiIsReady(selectedOutputChannel, selectedOutput)) {
+    let modified = value;
+    if(!isNaN(signed)) {
+      modified = value - minimum;
+    }
     let output = WebMidi.getOutputById(selectedOutput);
-    let param_lsb = parameter & 0x7F;
-    let param_msb = (parameter >> 7) & 0x7F;
-    let value_lsb = value  & 0x7F;
-    let value_msb = (value >> 7) & 0x7F;
+    let [param_msb, param_lsb] = createNRPNPairFromNumber(parameter);
+    let [value_msb, value_lsb] = createNRPNPairFromNumber(modified);
+    console.log("param", param_msb, param_lsb, "value", value_msb, value_lsb);
     output.setNonRegisteredParameter([param_msb, param_lsb], [value_msb, value_lsb], selectedOutputChannel);
     if(key) {
       sendDebouncedUpdates(key, value);
@@ -384,26 +408,3 @@ function sendTimedMidiParameters(listToSend) {
   setTimeout(sendTimedMidiParameters.bind(null, listToSend), 10);
 }
 
-function createSignedValue(bitSize, oldValue) {
-  let valueIsArray = oldValue.constructor === Array;
-  let messageSize = 1 << Number(bitSize);
-  let halfSize = messageSize / 2;
-  let signedValue, newValue;
-  if(valueIsArray) {
-    signedValue = oldValue[2];
-  }
-  else {
-    signedValue = oldValue;
-  }
-  signedValue = signedValue - halfSize;
-  if (signedValue < 0) {
-    signedValue = signedValue + messageSize
-  }
-  if (valueIsArray) {
-    newValue = [oldValue[0], oldValue[1], signedValue]
-  }
-  else {
-    newValue = signedValue;
-  }
-  return newValue;
-}
