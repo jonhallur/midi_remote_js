@@ -1,46 +1,30 @@
 {
-  "name": "midiRemote",
-  "version": "1.0.0",
-  "description": "Jumpsuit getting started example",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jumpsuit/jumpsuit.git"
+  "name": "remote-midi-js",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^3.8.1",
+    "@material-ui/icons": "^3.0.1",
+    "firebase": "^5.7.2",
+    "ramda": "^0.26.1",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "^2.1.3"
   },
   "scripts": {
-    "watch": "jumpsuit watch",
-    "build": "jumpsuit build && firebase deploy"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "devDependencies": {
-    "babel-core": "^6.17.0",
-    "babel-polyfill": "^6.16.0",
-    "babel-preset-es2015": "^6.16.0",
-    "mocha": "^5.2.0",
-    "nib": "^1.1.0",
-    "stylus": "^0.54.5"
+  "eslintConfig": {
+    "extends": "react-app"
   },
-  "dependencies": {
-    "bootstrap": "^3.3.7",
-    "bootstrap-social": "^5.1.1",
-    "chai": "^4.2.0",
-    "firebase": "^3.5.2",
-    "font-awesome": "^4.7.0",
-    "jquery": "^3.1.1",
-    "jquery-knob": "^1.2.11",
-    "jumpsuit": "^0.7.0",
-    "lodash": "^4.16.4",
-    "ramda": "^0.26.1",
-    "rc-select": "^6.6.11",
-    "rc-switch": "^1.4.2",
-    "rc-tree-select": "^1.8.6",
-    "react-addons-css-transition-group": "^15.4.1",
-    "react-dnd": "^2.1.4",
-    "react-dnd-html5-backend": "^2.1.2",
-    "react-modal": "^1.6.4",
-    "react-notifications": "^1.3.0",
-    "react-tooltip": "^3.2.2",
-    "stylus-font": "^0.2.0",
-    "uuid": "^2.0.3",
-    "webmidi": "^2.0.0-beta.1"
-  }
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

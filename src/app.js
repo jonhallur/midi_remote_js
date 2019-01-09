@@ -1,36 +1,96 @@
-import { Render, Router, Route, IndexRoute } from 'jumpsuit'
-/* state */
-import datasource from 'state/index'
-/* screens */
-import CLApp from 'screens/index'
-import Main from 'screens/main'
-import Admin from 'screens/admin'
-import Manufacturers from 'screens/manufacturers'
-import Manufacturer from 'screens/manufacturer'
-import SysExHeaders from 'screens/sysexheaders'
-import SysExHeader from 'screens/sysexheader'
-import SynthRemotes from 'screens/synthremotes'
-import SynthRemote from 'screens/synthremote'
-import SynthPanel from 'screens/synthpanel'
-import UserSynthRemote from 'screens/usersynthremote'
-import User from 'screens/user'
+import React, {Component} from 'react';
+import './App.css';
+import * as firebase from "firebase/app";
+import "firebase/database";
+import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
+import {Header} from "./Header";
+import {Route} from 'react-router-dom';
+import {UserView} from "./UserView";
+import {AdminView} from "./AdminView";
+import {GenericCollectionList} from "./admin/GenericCollectionList";
+import {FORM_TYPE} from './pojos/const'
+
+const userTheme = createMuiTheme({
+  typography: {
+    useNextVariants: true,
+  },
+  palette: {
+    primary: {
+      main: "#8ea981"
+    },
+    secondary: {
+      main: "#96b6b7"
+    }
+  }
+});
+
+const adminTheme = createMuiTheme({
+  typography: {
+    useNextVariants: true,
+  },
+  palette: {
+    primary: {
+      main: "#967228"
+    },
+    secondary: {
+      main: "#d4cdee"
+    }
+  }
+});
+
+var config = {
+  apiKey: "AIzaSyCb0Xe0-wxCskS2fVwfNEe_b1NdfbYff90",
+  authDomain: "midi-remote-23d30.firebaseapp.com",
+  databaseURL: "https://midi-remote-23d30.firebaseio.com",
+  storageBucket: "midi-remote-23d30.appspot.com",
+};
+
+let firebase_initialized = false;
+
+export function initializeFirebase() {
+  if (firebase_initialized) {
+    return;
+  }
+  firebase.initializeApp(config);
+  firebase_initialized = true;
+}
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: undefined,
+      isAdmin: false
+    }
+  }
+
+  setUser(user, isAdmin) {
+    this.setState({
+      user: user,
+      isAdmin: isAdmin
+    })
+  }
+
+  render() {
+    return (
+      <MuiThemeProvider theme={this.state.isAdmin ? adminTheme : userTheme}>
+        <Header changeUser={this.setUser.bind(this)}/>
+          <Route exact path="/" render={(props) => <UserView {...props} {...this.state} />} />
+          <Route exact path="/admin" render={(props) => <AdminView {...props} {...this.state}/>} />
+          <Route exact
+                 path="/admin/manufacturers"
+                 render={(props) => <GenericCollectionList
+                                        path="v2/private/manufacturers"
+                                        title="Manufacturers List"
+                                        model={
+                                          {
+                                            name: {type: FORM_TYPE.string, help: "Type manufacturer name here"},
+                                            sys_ex_id: {type: FORM_TYPE.number_list, help: "Comma separated list, extended starts with 0"}}}
+                                        {...props} {...this.state}/>} />
+      </MuiThemeProvider>
+    );
+  }
+}
 
 
-Render(datasource, (
-    <Router>
-        <Route path="/" component={CLApp}>
-            <IndexRoute component={Main} />
-            <Route path="admin" component={Admin}>
-                <Route path="manufacturers" component={Manufacturers} />
-                <Route path="manufacturer/edit/:key" component={Manufacturer} />
-                <Route path="sysexheaders" component={SysExHeaders} />
-                <Route path="sysexheader/edit/:key" component={SysExHeader} />
-                <Route path="synthremotes" component={SynthRemotes} />
-                <Route path="synthremote/edit/:remote_id" component={SynthRemote} />
-                <Route path="synthremote/:remote_id/panel/edit/:panel_id" component={SynthPanel} />
-            </Route>
-            <Route path="synthremote/:remote_id" component={UserSynthRemote} />
-            <Route path="user" component={User} />
-        </Route>
-    </Router>
-));
+export default App;
