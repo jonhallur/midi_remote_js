@@ -7,6 +7,7 @@ import IconButton from "@material-ui/core/IconButton/IconButton";
 import MenuIcon from "@material-ui/icons/Menu"
 import HomeIcon from "@material-ui/icons/Home"
 import AdminIcon from "@material-ui/icons/Settings"
+import LinkIcon from "@material-ui/icons/Link"
 import Typography from "@material-ui/core/Typography/Typography";
 import Button from "@material-ui/core/Button/Button";
 import {initializeFirebase} from "./App";
@@ -15,6 +16,55 @@ import Menu from "@material-ui/core/Menu/Menu";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText/ListItemText";
+import * as R from 'ramda'
+
+const LinkToHome = () => (
+  <NavLink to="/">
+    <MenuItem>
+      <ListItemIcon>
+        <HomeIcon/>
+      </ListItemIcon>
+      <ListItemText>Home</ListItemText>
+    </MenuItem>
+  </NavLink>
+);
+
+const LinkToAdmin = (props) => {
+  if(props.isAdmin === true) {
+    return (
+      <NavLink to="/admin">
+        <MenuItem>
+          <ListItemIcon>
+            <AdminIcon/>
+          </ListItemIcon>
+          <ListItemText>Admin</ListItemText>
+        </MenuItem>
+      </NavLink>
+    )
+  } else {
+    return "";
+  }
+};
+
+const BreadCrumbs = () => {
+  let fullPathList = window.location.pathname.split("/");
+  let filteredPathList = R.filter(n => n !== "" && n !== "admin",R.dropLast(1,fullPathList));
+  return filteredPathList.map((name, index) => {
+    let indexOf = R.indexOf(name, fullPathList);
+    let link = R.join("", R.take(indexOf+1, R.map(path => R.concat(path, "/"), fullPathList)));
+    return (
+      <NavLink key={index} to={link}>
+        <MenuItem>
+          <ListItemIcon>
+            <LinkIcon/>
+          </ListItemIcon>
+          <ListItemText>{name}</ListItemText>
+        </MenuItem>
+      </NavLink>
+      )
+    }
+  );
+};
 
 export class Header extends Component {
   constructor(props) {
@@ -72,6 +122,18 @@ export class Header extends Component {
 
   render() {
     let {user, anchorEl} = this.state;
+    let dropDownMenu = (
+      <Menu
+        id="nav-menu"
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClick={this.onMenuClose.bind(this)}
+      >
+        <LinkToHome />
+        <LinkToAdmin {...this.state} />
+        <BreadCrumbs/>
+      </Menu>
+    );
     return (
       <div style={{flexGrow: 1}}>
         <AppBar position="static">
@@ -83,34 +145,7 @@ export class Header extends Component {
                 onClick={this.onMenuClick.bind(this)}
               />
             </IconButton>
-            <Menu
-              id="nav-menu"
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClick={this.onMenuClose.bind(this)}
-            >
-              <NavLink to="/">
-                <MenuItem>
-                  <ListItemIcon>
-                    <HomeIcon />
-                  </ListItemIcon>
-                  <ListItemText>Home</ListItemText>
-                </MenuItem>
-              </NavLink>
-              {
-                this.state.isAdmin
-                ? <NavLink to="/admin">
-                    <MenuItem>
-                      <ListItemIcon>
-                        <AdminIcon />
-                      </ListItemIcon>
-                      <ListItemText>Admin</ListItemText>
-                    </MenuItem>
-                  </NavLink>
-
-                  : ''
-              }
-            </Menu>
+            {dropDownMenu}
             <Typography variant="h6" color="inherit" style={{flexGrow: 1}}>
               MIDI Remotes
             </Typography>

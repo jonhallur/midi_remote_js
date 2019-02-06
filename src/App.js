@@ -6,9 +6,7 @@ import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
 import {Header} from "./Header";
 import {Route} from 'react-router-dom';
 import {UserView} from "./UserView";
-import {AdminView} from "./AdminView";
-import {GenericCollectionList} from "./admin/GenericCollectionList";
-import {FORM_TYPE} from './pojos/const'
+import {AdminRoutes} from "./admin/AdminRoutes";
 
 const userTheme = createMuiTheme({
   typography: {
@@ -16,10 +14,14 @@ const userTheme = createMuiTheme({
   },
   palette: {
     primary: {
-      main: "#8ea981"
+      light: "#f8ffd7",
+      main: "#c5e1a5",
+      dark: "#94af76",
     },
     secondary: {
-      main: "#96b6b7"
+      light: "#e4e65e",
+      main: "#afb42b",
+      dark: "#7c8500",
     }
   }
 });
@@ -30,10 +32,14 @@ const adminTheme = createMuiTheme({
   },
   palette: {
     primary: {
-      main: "#967228"
+      light: "#efdcd5",
+      main: "#bcaaa4",
+      dark: "#8c7b75",
     },
     secondary: {
-      main: "#d4cdee"
+      light: "#8e8e8e",
+      main: "#616161",
+      dark: "#373737",
     }
   }
 });
@@ -76,17 +82,7 @@ class App extends Component {
       <MuiThemeProvider theme={this.state.isAdmin ? adminTheme : userTheme}>
         <Header changeUser={this.setUser.bind(this)}/>
           <Route exact path="/" render={(props) => <UserView {...props} {...this.state} />} />
-          <Route exact path="/admin" render={(props) => <AdminView {...props} {...this.state}/>} />
-          <Route exact
-                 path="/admin/manufacturers"
-                 render={(props) => <GenericCollectionList
-                                        path="v2/private/manufacturers"
-                                        title="Manufacturers List"
-                                        model={
-                                          {
-                                            name: {type: FORM_TYPE.string, help: "Type manufacturer name here"},
-                                            sys_ex_id: {type: FORM_TYPE.number_list, help: "Comma separated list, extended starts with 0"}}}
-                                        {...props} {...this.state}/>} />
+          <AdminRoutes {...this.state} />
       </MuiThemeProvider>
     );
   }

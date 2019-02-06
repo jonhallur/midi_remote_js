@@ -22,6 +22,11 @@ export class ListOfRemotes extends Component {
     this.getSynthRemotes();
   }
 
+  componentWillUnmount() {
+    initializeFirebase();
+    firebase.database().ref("v2/public/remotes").off();
+  }
+
   getSynthRemotes() {
     firebase.database().ref("v2/public/remotes").on("value", (snapshot) => {
       let data = snapshot.val();

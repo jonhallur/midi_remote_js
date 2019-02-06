@@ -2,17 +2,11 @@ import React, {Component} from "react";
 import {initializeFirebase} from "../App";
 import * as firebase from "firebase/app";
 import "firebase/database";
-import ListItem from "@material-ui/core/ListItem/ListItem";
-import ListItemText from "@material-ui/core/ListItemText/ListItemText";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction/ListItemSecondaryAction";
-import IconButton from "@material-ui/core/IconButton/IconButton";
+import {ListItem, ListItemText, ListItemSecondaryAction, IconButton, List} from '@material-ui/core'
 import DeleteIcon from "@material-ui/icons/Delete";
 import {GenericModelForm} from "./GenericModelForm";
-import Typography from "@material-ui/core/Typography/Typography";
-import Paper from "@material-ui/core/Paper/Paper";
 import {NavLink} from "react-router-dom";
-import List from "@material-ui/core/List/List";
-import {manufacturers} from '../pojos/predefined'
+//import {manufacturers} from '../pojos/predefined'
 
 export class GenericCollectionList extends Component {
   constructor(props) {
@@ -24,8 +18,21 @@ export class GenericCollectionList extends Component {
 
   componentDidMount() {
     initializeFirebase();
-    let path = this.props.path;
-    this.getList(path);
+    let modelPath = this.props.modelPath;
+    this.getList(modelPath);
+  }
+
+  componentWillUnmount() {
+    initializeFirebase();
+    let modelPath = this.props.modelPath;
+    firebase.database().ref(modelPath).off();
+  }
+
+  shouldComponentUpdate(nextProps, nextState, nextContext) {
+    if(this.props.setStateFromChild !== undefined) {
+      this.props.setStateFromChild(nextState);
+    }
+    return true;
   }
 
   getList(path) {
@@ -37,10 +44,10 @@ export class GenericCollectionList extends Component {
           list.push({...remote.val(), key: remote.key})
         })
       } else {
-        var ref = firebase.database().ref(this.props.path);
-        manufacturers.forEach((item) => {
-          ref.push(item);
-        })
+      //   var ref = firebase.database().ref(this.props.modelPath);
+      //   manufacturers.forEach((item) => {
+      //     ref.push(item);
+      //   })
       }
       this.setState({
         list: list
@@ -49,24 +56,26 @@ export class GenericCollectionList extends Component {
   }
 
   deleteListItem(key) {
-    let ref = firebase.database().ref(this.props.path);
+    let ref = firebase.database().ref(this.props.modelPath);
     ref.child(key).remove(function(error) {
       if(!error) {
         console.log("Remote", key, "removed")
       }
       else {
-        console.log("Remote removal error")
+        console.error("Remote removal error")
       }
     })
   }
 
   render() {
+    console.log(this.props.model)
+    console.log(this.state)
     const genericList = this.state.list.map((item) =>
       <ListItem key={item.key}>
-        <NavLink to={this.props.path + '/' + item.key}>
+        <NavLink to={this.props.modelPath.replace("v2/private/", "/admin/") + '/' + item.key}>
           <ListItemText
             primary={item.name}
-            secondary={`Created at ${new Date(item.timestamp).toLocaleTimeString()} on ${new Date(item.timestamp).toLocaleDateString()} by ${item.userEmail}`}/>
+            secondary={`Created at ${new Date(item.created).toLocaleTimeString()} on ${new Date(item.created).toLocaleDateString()} by ${item.userEmail}`}/>
         </NavLink>
         {
           this.props.isAdmin ?
@@ -75,18 +84,20 @@ export class GenericCollectionList extends Component {
                 <DeleteIcon/>
               </IconButton>
             </ListItemSecondaryAction> : undefined
-
         }
       </ListItem>
     );
     return (
-      <Paper elevation={5}>
-        <Typography variant={"h3"}>{this.props.title}</Typography>
-       <GenericModelForm {...this.props} />
-        <List>
+      <>
+        {
+          this.props.model
+            ? <GenericModelForm {...this.props} />
+            : ""
+        }
+        <List dense={true} >
           {genericList}
         </List>
-      </Paper>
+      </>
     )
   }
 }

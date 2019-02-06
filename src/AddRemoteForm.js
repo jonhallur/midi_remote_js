@@ -22,7 +22,7 @@ export class AddRemoteInput extends Component {
     let newRemote = firebase.database().ref("v2/public/remotes").push();
     newRemote.set({
       name: this.state.remoteName,
-      timestamp: new Date().toISOString(),
+      created: new Date().toISOString(),
       userId: this.props.user.uid,
       userEmail: this.props.user.email
     });
